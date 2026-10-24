@@ -608,3 +608,323 @@ The PO rules on §9's items as the Fact-Checker advises. The human was away, and
 - **PO-7. Media's Caspian coast:** confirmed. Media reaches the Caspian, and its north and north-east are a coast. The coast's east end is disputed (the Tapyri, Strabo 11.9.1).
 - **PO-8. Mesopotamia's south:** Strabo's close from Babylon to Seleucia. The note names Pliny's broader Mesopotamia and the record's narrower one (Arrian).
 - **PO-9.** Noted. M5-19's conclusion stands on Strabo 11.13.1 and ISBE, so nothing shipped changes.
+
+## Re-check (2026-10-24)
+- **Checked:** the Research Lead's correction round, `c9dc5db` (diff `9e5846a..c9dc5db`; only `docs/research/M5-20-region-anchors.md` changed). I checked it against R1–R49 above and the PO's rulings PO-1 to PO-9. This is a focused check: only what changed, plus whether the six outlines have anchors on both sides of every edge. The rest of this report stands.
+- **Verifier:** fact-checker · **Date:** 2026-10-24 (UTC) · No data file changes, so no record's `status` changes.
+
+**Result: not yet signed off for the geometry phase. Ten blocking fixes remain (R50–R59), each with exact text below.**
+- R1–R49 and PO-1 to PO-9 are applied. A few slips remain: two places cite PO-2 for Iconium, and one restores the "short-lived" gloss that R36 removed.
+- All the IDs I re-checked are right, including Babylon's corrected `893951`. Bactra stands.
+- **(a) Arsamosata passes, and it is better sourced than the note says:** Pliny 6.10 names it among the towns of Greater Armenia. The build should use its representative point, and the north edge's confidence is low. The note must also say where the north line meets the Euphrates: about 140 km above the Zeugma, so the Zeugma is no longer the corner.
+- **(b) Matiane fails as an anchor.** Its point is the centre of a 1° grid cell, 63 km from Gazaca. Used as a seed, it would cut Media's own Zagros interior out of Media.
+- **Building the corrected anchors exposes three more gaps:**
+  - Media's north-west doesn't close. My R31 was wrong to make Artaxata only a check point.
+  - Lycaonia reaches the Cilician coast.
+  - Mysia crosses into Thrace and takes in Lesbos.
+- **Two area ranges would fail a correct build:** Pisidia's ceiling and Mesopotamia's.
+- **Licensing passes.**
+
+| Region | Verdict | Blocking |
+|---|---|---|
+| Pisidia | Needs change (area range only) | R59 |
+| Lycaonia | Needs change | R52 |
+| Mysia | Needs change | R53 |
+| Phrygia | Pass (R60 recommended) | — |
+| Media | Needs change | R50, R51 |
+| Mesopotamia | Needs change | R54–R58 |
+| Parthian Empire | Pass: not outlined (PO-1) | — |
+| Licensing | Pass | — |
+
+**Sources opened, 2026-10-23 to 2026-10-24 (UTC):**
+- **Pleiades** JSON and KML (the KML gives the representative point), at `https://pleiades.stoa.org/places/<id>/json` and `/kml`. IDs: 884148, 638748, 638804, 942276, 942333, 511194, 550506, 550706, 550833, 894084, 893951, 884179, 874354, 874361, 658636, 884109, 609367, 648651 and 638996.
+- **Pliny**, Perseus (tr. Bostock and Riley), 6.9 and 6.10: `https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.02.0137:book=6:chapter=10` (and `chapter=9`).
+- **Strabo**, LacusCurtius (tr. Jones), 11.14 (`https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Strabo/11N*.html`) and 16.1.21–23 (`…/16A*.html`).
+- **Wikidata Query Service** (P1584), for Carcathiocerta and Tigranocerta.
+- **Geometry inputs**, as in Method 3 above: the pinned Natural Earth rivers, `data/geo/ancient-areas.geojson` and `data/locations/`. The scratch scripts in `/tmp/m520` aren't committed.
+
+### RC1. Corrections R1–R49 and rulings PO-1 to PO-9
+| Item | Verdict | Finding |
+|---|---|---|
+| R1–R30, R32–R34, R36–R44, R46, R48, R49 | Pass | Applied as written. The RL added some text around them, and that text has slips in six places (R64–R69). |
+| R31 | Applied as written, but my correction was wrong | It made Artaxata only a check point. Without Artaxata as an outside anchor, Media's north-west doesn't close (RC4). Fixed by R50. |
+| R35 | Needs change | The RL supplied Matiane, but it fails as an anchor (RC3b). Fixed by R51. |
+| R39 | Pass, with fixes | Arsamosata (RC3a). Fixed by R54–R57. |
+| R45 | Pass | §11's Parthian row gives the decided state, "**Not outlined, per PO-1**", instead of my "the PO decides". That is correct now that PO-1 has been ruled. |
+| R47 | Needs change | Parts 3 and 4 are applied. Part 2 leaves the Pisidia and Lycaonia ceilings "pending that grid estimate". Part 1's text, pasted verbatim, no longer fits the new Arsamosata north line. Fixed by R58 and R59. |
+| PO-1 to PO-9 | Pass | Each ruling is reflected. Two passages about Iconium cite PO-2 (which is about Rhagae) where M5-19's P5 is meant (R64, R65). |
+| Gordion | Pass | It is no longer one of the East row's outside anchors. Pessinus, 50 km away, still keeps it outside, and the paragraph R21 asked for is there. |
+
+### RC2. The IDs
+All of these are confirmed in Pleiades. Each "Representative point" is the KML's "Calculated Representative Point (Centroid)", given as lon, lat.
+
+| Place | ID | Pleiades title | Representative point | Verdict |
+|---|---|---|---|---|
+| Gazaca | 884148 | "Ganzak?/Gazaca?/Gazae?" | 46.202, 37.012 | Pass. The "?" marks an uncertain identification, which the note doesn't mention (R50, R61). |
+| Antioch on the Maeander | 638748 | "Antiochia ad Maeandrum" | 28.548, 37.873 | Pass |
+| Kibyra | 638804 | "Cibyra" | 29.492, 37.159 | Pass |
+| Hecatompylos | 942276 | "Hecatompylos?/Komish/[(Shahr-i) Qumis]" | 54.038, 35.961 | Pass. The identification is uncertain (R62). |
+| Hyrcania | 942333 | "Varkana/Hyrcania/Gurgan" | 56.3, 37.1 | Pass. The centroid includes a 1° Barrington cell, so the point is rough. It does no harm: its cell never borders Rhagae's (0 grid points), and Hecatompylos governs the east edge and the coast's east end, at about 52.5°E. |
+| Apamea Myrlea | 511194 | "Brylleion/Myrleia/Apamea/Col. Iulia Concordia" | 28.883, 40.376 | Pass |
+| Cyme | 550506 | "Cyme" | 26.938, 38.760 | Pass |
+| Magnesia ad Sipylum | 550706 | "Magnesia ad Sipylum" | 27.433, 38.613 | Pass |
+| Pitane | 550833 | "Pitane" | 26.938, 38.928 | Pass |
+| Seleucia on the Tigris | 894084 | "Seleucia/Sliq Kharawta" | 44.524, 33.098 | Pass |
+| Babylon | 893951 | "Babylon" | 44.425, 32.537 | Pass. §8 calls 896947 "the record's own id", but no record uses it (R67). |
+| Bactra | 961886 | as in §2 | — | Pass (phase 2). Research only, per PO-1. |
+| Matiane | 884179 | "Matiane" | 46.5, 36.5 | Right record, but its only location is the grid cell "BAtlas 90 B4", so the point is the cell's centre. Fails as an anchor (RC3b). |
+| Arsamosata | 874354 | "Arsamosata" | 39.511, 38.661 | Pass. Its two DARMC locations (39.754, 38.618 and 39.268, 38.704) are 43.3 km apart, so the build should use the representative point (R54). |
+| Artaxata | 874361 | "Artaxata" | 44.575, 39.882 | Pass. Reopened for R50. The point lies about 1 km from Natural Earth's Aras, on its north side. |
+| Zeugma | 658636 | "Zeugma" | 37.870, 37.058 | Pass. Reopened for R55. |
+| Adur Gushnasp/[Shiz] | 884109 | "Adur Gushnasp/[Shiz]" | 47.235, 36.604 | A test point only (RC3b). |
+| Dorylaeum | 609367 | — | 30.517, 39.775 | Pass: the point is at Eskişehir. This closes a phase-2 "not verified" item. |
+| Isaura Nova | 648651 | "Isaura (Nova)/Leontopolis" | 32.354, 37.190 | Pass. This closes a phase-2 "not verified" item. |
+| Milyas | 638996 | — | 29.988, 36.765 | Pass (reprPoint) |
+
+### RC3. The two gaps the Research Lead closed
+**(a) Arsamosata, Mesopotamia's north outside anchor: pass, with fixes (R54–R57).**
+- **The right place and ID.** `pleiades:874354` is "Arsamosata", with its representative point at 39.511°E 38.661°N. It has two DARMC locations, 43.3 km apart. The note's distances, 184 km to Edessa and 215 km to Nisibis, come from the first of them. From the representative point they are 178.6 km and 231.6 km.
+- **Better sourced than the note says.** The note says "No passage read in this research names Arsamosata itself as Armenian". Pliny does: "The more famous towns in Lesser Armenia are Cæsarea, Aza, and Nicopolis; in the Greater Arsamosata, which lies near the Euphrates, Carcathiocerta upon the Tigris, Tigranocerta which stands on an elevated site, and, on a plain adjoining the river Araxes, Artaxata" (6.10). Pleiades' "part of Armenia Maior" connection (30 BC – AD 300) cites this same passage, as NH 6.26 in Mayhoff's numbering. Its "part of Sophene" connection is dated 330–30 BC.
+- **Strabo's side holds.** In 11.14.2, Masius "lies above the Mygdonians of Mesopotamia on the south, in whose country is Nisibis, whereas Sophenê is situated in the northern parts, between Masius and Antitaurus". In 16.1.23, Nisibis "lies at the foot of Mt. Masius".
+- **Acceptable under the card and M5-19's rules.** Arsamosata is a named place with an ID and a passage, on the stated side. It is not "a weaker kind of evidence" (§13). The line itself, though, is an equidistant construction that no author states, so the north edge's confidence is low, like the Asia Minor lines.
+- **Where the line falls.** It meets the Euphrates at about 39.04°E 37.93°N. That is 141 km in a straight line from the Zeugma (`pleiades:658636`, 37.870°E 37.058°N). It meets the Tigris (Natural Earth's "Dicle") at about 40.34°E 37.83°N, and between the two rivers it runs at about 37.8°N.
+- **The note disagrees with that line.** Its West row runs the Euphrates edge "from the Zeugma", and its confidence paragraph says "the Zeugma anchors the south-western corner precisely". The Zeugma is at the north-west, and with this line it isn't a corner at all. Strabo measures the river from "the Zeugma at Commagenê, where Mesopotamia begins" (16.1.22). The build needs one rule:
+  - R55–R57 let the line govern, and the outline's note gives Strabo's phrase as the other reading.
+  - The alternative, a sourced outside anchor on the east bank above the Zeugma, needs new research. It isn't required.
+- **Not recommended as anchors:**
+  - Tigranocerta: Strabo 16.1.23 puts it "at the foot of Mt. Masius" with Nisibis, while Pliny 6.10 lists it in Greater Armenia.
+  - Carcathiocerta: it has no Pleiades ID in Wikidata.
+
+**(b) Matiane, Media's west outside anchor: fails as an anchor (R51).**
+- **The right record, but the wrong kind of point.** `pleiades:884179` has one location, the Barrington grid cell "BAtlas 90 B4". Its point (46.5°E 36.5°N) is the centre of that 1° cell, so it is known only to within about ±50 km. It lies 62.8 km from Gazaca, and south-east of Lake Urmia, not west of it as R35 asked.
+- **As a seed, it decides Media's shape.** Its cell covers about 58,500 km² of the box 44–49°E, 34–39°N. It takes Adur Gushnasp/[Shiz] (`pleiades:884109`, 47.235°E 36.604°N) and the Sanandaj plateau (47.0°E 35.31°N) out of Media. That contradicts two sources:
+  - ISBE: Media "extended thence to the Zagrus Mountains on the West".
+  - Strabo 11.13.6: Greater Media is bounded "on the west by the Atropatii and certain of the Armenians", not by Matiane.
+- **The rule I apply.** A rough point can be a seed only when its uncertainty is small against its distance to the nearest anchor on the other side.
+  - Matiane: about ±50 km against 63 km. It fails, and its result contradicts the sources.
+  - Hyrcania: 467 km from Rhagae. It passes, and it never borders Rhagae's cell.
+  - The Milyas, which R7 kept: a Barrington label arc, so its point is a digitized position, and its cell puts no anchor on the wrong side.
+- **Keep Matiane named, unlocated.** Strabo 11.13.2 ("lies east of Armenia and Matianê") stays as the source for Atropatene's western neighbours. Arbela closes the west edge, and Artaxata the north-west (R50).
+
+### RC4. Anchors on both sides of every edge (item 5)
+| Region | Finding | Verdict |
+|---|---|---|
+| Pisidia | Sourced anchors on both sides of every edge. The cell doesn't touch the sea. | Pass |
+| Lycaonia | Every anchor-pair edge has both sides. But the south edge doesn't close: past Laranda, the cell reaches the Cilician coast (G-b). | Needs change (R52) |
+| Mysia | Both sides on the east, south-east and south. The coast row gives no clip, so the cell crosses into Europe and takes in Lesbos (G-c). | Needs change (R53) |
+| Phrygia | Sourced anchors on both sides of every edge. The cell doesn't touch the sea. | Pass |
+| Media | The east, south-east, south and coast edges close. The north-west has no outside seed, and Matiane, as a seed, cuts Media's interior (G-a, RC3b). | Needs change (R50, R51) |
+| Mesopotamia | Both sides on the north (Arsamosata) and the south (PO-8), and the two rivers. The north line's corner on the Euphrates isn't stated (RC3a). | Needs change (R54–R57) |
+
+**G-a. Media's north-west doesn't close (B, R50).** My R31 made Artaxata only a check point. That was wrong:
+- **With the note's seeds** (Matiane in, Artaxata only a check point), no outside anchor bounds Media between the upper Araxes and Arbela. Its cell runs west to the land east of Lake Van and to the Maku and Khoy plains, although Strabo puts Armenia and Matianê west of Atropatene (11.13.2).
+- **With Artaxata as a seed and nothing else,** the equidistant line runs south of the Araxes all the way to the lower Kura. At 46°E it is at 38.66°N, against the river's 38.90°N; at 48°E, 39.32°N against 39.80°N. The line meets Natural Earth's river only on the Kura, at about 49.0°E 39.6°N. So Media would never reach the Araxes, against Strabo 11.13.3 ("the Araxes, which forms the boundary between Armenia and Atropatenê") and ISBE.
+- **R50's rule** stays within M5-19's G0. It uses only the river, a straight segment between two anchors (Artaxata and Gazaca) and an equidistant line:
+  1. The river, from the sea upstream to where it first meets the straight segment from Artaxata to Gazaca (44.60°E 39.83°N, 5.9 km from Artaxata).
+  2. That segment, to the line equidistant from Artaxata and Gazaca (45.39°E 38.45°N; Artaxata–Gazaca is 349 km).
+  3. That line, to the line with Arbela (about 44.25°E 38.04°N).
+
+  East of the segment, Media reaches the river.
+
+| Test point (lon, lat) | The note as written | Artaxata a seed, equidistant only | R50 |
+|---|---|---|---|
+| East of Lake Van (44.30, 38.60) | in | out | out |
+| Khoy plain (44.97, 38.55) | in | out | out |
+| Maku (44.51, 39.29) | in | out | out |
+| South bank at Poldasht (45.07, 39.35) | in | out | in |
+| South bank at Julfa (45.60, 38.93) | in | out | in |
+| Mughan plain (47.90, 39.40) | in | out | in |
+| Urmia, Tabriz, Ardabil | in | in | in |
+| Adur Gushnasp/[Shiz] (47.235, 36.604) | out | in | in |
+| Sanandaj plateau (47.00, 35.31) | out | in | in |
+| Hakkari (43.74, 37.57); Nakhchivan, north bank (45.41, 39.21) | out | out | out |
+
+No source I read places the Khoy plain on either side. Under R50 it falls on Armenia's side, west of the segment.
+
+**G-b. Lycaonia reaches the sea (B, R52).** Check (e) says no outline touches the sea unless the research lists a coast, and §11 lists none for Lycaonia.
+- **The leak.** From the corrected anchors, Lycaonia's equidistant cell reaches the Cilician coast between about 32.45°E and 34.69°E (141 sea cells at 0.02°).
+- **An extra anchor isn't enough.** With an outside anchor at Coracesium alone (Strabo 14.4.2, "the beginning of Cilicia Tracheia"; I used a test point only), 86 sea cells would remain.
+- **The fix.** Excluding the drawn `cilicia-tracheia` and `cilicia` areas leaves no coastal cell, and Lycaonia stays one piece, of about 17,200 km² (down from 26,400).
+- **Why this fix fits the rules.**
+  - It is sourced: ISBE Lycaonia ("on the South by Cilicia Tracheia") and Strabo 12.6.1.
+  - It is G0-compliant, since it uses an existing area's edge.
+  - No inside anchor lies in drawn Cilicia: Lystra, Derbe and Isaura Nova are in `galatia`, Isaura Vetus in `pamphylia` and Coropassus in `cappadocia`. Laranda, an outside anchor, is in `cilicia-tracheia`.
+
+**G-c. Mysia crosses into Europe and takes in Lesbos (B, R53).**
+- **The leak.** Mysia's cell takes about 12,900 km² of the drawn `thrace`, across the Hellespont and the Propontis. It also takes about 1,600 km² of `asia`'s islands, Lesbos among them: `mitylene.json`'s point (26.547°E 39.110°N) is nearest to Teuthrania (44.6 km).
+- **The source.** ISBE bounds Mysia by "the Sea of Marmora" on the north and the "Hellespont" on the west, so the outline stops at the Asian shore. On the mainland it covers about 29,500 km².
+- **Cyzicus.** Its point lies 0.09 km off the drawn coast, within the 1 km that M5-19's check (c) allows.
+
+### RC5. The area ranges (item 4)
+| Region | Grid estimate (0.02°, corrected anchors, land) | The note's range | Verdict |
+|---|---:|---|---|
+| Pisidia | 21,574 km² | 2,200–21,000 km² | **Fail:** a correct build would exceed the ceiling. Use 2,200–32,000 km², 1.5 times the estimate, the method of R47 part 2 (R59). |
+| Lycaonia | 17,218 km² with R52 (26,447 km² without) | 7,400–43,000 km² | Pass |
+| Mysia | 29,481 km² (mainland, R53) | 16,000–57,000 km² | Pass |
+| Phrygia | 78,235 km² | 40,000–90,000 km² | Pass, with a 15% margin. But the ceiling is a hull, and §10 itself says a hull is no ceiling ("A hull widened to the outside anchors isn't one either"). R60 (40,000–117,000 km²) is recommended. |
+| Media | about 369,000 km² (0.05°, with R50; a rough, hand-placed Caspian shore used only for this check) | 41,600–575,000 km² | Pass |
+| Mesopotamia | 149,329 km² (the Arsamosata line, closed Babylon–Seleucia; 148,914 km² from the first DARMC location) | 100,000–150,000 km² | **Fail:** within 0.5% of the ceiling, and the paragraph still describes the Nisibis–Edessa close (about 123,000 km²). Use 100,000–180,000 km² (R58). Both long edges are pinned rivers and the south close is fixed, so 1.2 times the estimate is enough. |
+
+The note's own figures, checked:
+- Media's triangle: 41,476 km² (the note says about 41,600).
+- Mysia's hulls: 16,102 and 58,766 km² (the note says about 16,000 and 56,700).
+- Phrygia's hulls: 39,963 and 92,962 km² (the note says about 40,000 and 89,600).
+
+The differences don't matter once R59 and R60 put the ceilings on the grid estimates.
+
+**Kept out of shipped notes: pass.** "km²" appears only in §10, and §10 says the figures "must stay out of every shipped outline's own note". R53 adds no figure to any row.
+
+### RC6. Corrections for the Research Lead (R50–R70)
+(B) marks a fix that blocks the geometry phase. The section numbers are the note's.
+
+**§7 Media**
+- **R50 (B).** Replace the whole line that begins "| North-west (the Araxes, with Armenia) |" with:
+  > \| North-west (the Araxes, with Armenia) \| Gazaca (`pleiades:884148`, confirmed this round, 46.202°E 37.012°N; Pleiades titles it "Ganzak?/Gazaca?/Gazae?", so its site is uncertain), Ecbatana (`pleiades:903021`, spot-checked directly — Pleiades' own alternate location, "CIGS location of Hamadān," confirms it) \| Artaxata (`pleiades:874361`, in Armenia; representative point 44.575°E 39.882°N, just north of Natural Earth's Aras), an outside anchor. The edge is the Araxes (Natural Earth's Aras, then the lower Kura to the sea; `pleiades:884118` names the river and isn't a point anchor), from the sea upstream to where it first meets the straight segment from Artaxata to Gazaca (about 44.60°E 39.83°N); then that segment, to the line equidistant from Artaxata and Gazaca (about 45.39°E 38.45°N); then that line, to where it meets the west edge's line with Arbela (about 44.25°E 38.04°N). East of the segment, the land between the equidistant line and the river is Media's, because the river is the boundary there \| Strabo 11.13.3 ("Their royal summer palace is situated in a plain at Gazaca"; "the Araxes, which forms the boundary between Armenia and Atropatenê"); ISBE Media ("bounded by the rivers Araxes and Cyrus, which separated it from Armenia"; "The chief cities of ancient Media were Ecbatana, Gazaea, and Ragae"); Pliny 6.10 (among the towns of Greater Armenia, "on a plain adjoining the river Araxes, Artaxata") \|
+- **R51 (B).** In the West row, find:
+  > Arbela (`pleiades:874341`, spot-checked directly, 44.011°E 36.190°N); Matiane (`pleiades:884179`, confirmed this round, Barrington Atlas grid cell "BAtlas 90 B4 Matiane", reprPoint about 46.5°E 36.5°N — a rough anchor, flagged as such)
+
+  Replace with:
+  > Arbela (`pleiades:874341`, spot-checked directly, 44.011°E 36.190°N); Artaxata (north-west row) closes the edge's north end. Matiane is named but not used as an anchor: Pleiades' only record under that name (`pleiades:884179`) is a 1°×1° Barrington grid cell, "BAtlas 90 B4 Matiane", whose centre (46.5°E 36.5°N) lies south-east of Lake Urmia, 63 km from Gazaca
+- **R61.** Find "**Confidence:** medium, with the east edge low because of Rhagae." Replace with:
+  > **Confidence:** medium, with the east and west edges low: the east because of Rhagae, the west because Gazaca's site is uncertain (Pleiades titles it "Ganzak?/Gazaca?/Gazae?") and Matiane is unlocated.
+
+  In the same paragraph, find "`bib:pliny-natural-history` (6.29), `bib:isbe-media`". Replace with "`bib:pliny-natural-history` (6.10, 6.29), `bib:isbe-media`".
+- **R62.** In the East row, make two changes:
+  - Find "Hecatompylos (`pleiades:942276`, confirmed this round, 54.04°E 35.96°N)". Replace with:
+    > Hecatompylos (`pleiades:942276`, confirmed this round, 54.04°E 35.96°N; Pleiades titles it "Hecatompylos?/Komish/[(Shahr-i) Qumis]", so the identification is uncertain)
+  - Find "Hyrcania (`pleiades:942333`, confirmed this round)". Replace with:
+    > Hyrcania (`pleiades:942333`, confirmed this round; a rough point, since its centroid includes a 1° Barrington cell, but its cell never borders Rhagae's, so Hecatompylos governs this edge)
+
+**§4 Lycaonia**
+- **R52 (B).** In the South row, find "| Laranda (`pleiades:648693`) |". Replace with:
+  > \| Laranda (`pleiades:648693`); and the drawn `cilicia-tracheia` and `cilicia` areas (`data/geo/ancient-areas.geojson`), which the outline excludes. Without them, the equidistant build reaches the sea between about 32.4°E and 34.7°E \|
+- **R64.** Find:
+  > **Per PO-2 (which extends the M5-19 ruling P5 to this card), Iconium stays outside Lycaonia, on Phrygia's side**
+
+  Replace with:
+  > **Per the M5-19 ruling P5, Iconium stays outside Lycaonia, on Phrygia's side**
+
+  PO-2 is about Rhagae.
+
+**§5 Mysia**
+- **R53 (B).** In the North-and-west row, find "| — (coast) | — | ISBE Mysia". Replace with:
+  > \| — (coast) \| — (the outline is clipped to the Asian mainland: no island and no land in Europe. Without the clip, the equidistant build crosses the Hellespont and the Propontis into the drawn `thrace`, and takes in `asia`'s islands, Lesbos and `mitylene.json`'s point among them. Cyzicus's point lies 0.09 km off the drawn coast, within the 1 km that M5-19's check (c) allows) \| ISBE Mysia
+- **R69.** Find "The coastal edge is the one natural feature among the seven regions' edges,". Replace with "The coastal edge is Mysia's one natural feature,". The old wording is wrong: Media's coast and the Euphrates, Tigris and Araxes are natural features too.
+
+**§6 Phrygia**
+- **R65.** In the South-east row, find "M5-19 ruling P5, extended by PO-2." Replace with "M5-19 ruling P5." This is R22 as written.
+- **R68.** In the Extent paragraph, find "gives four neighbours:". Replace with "gives five neighbours:". The quotation names Galatia, Lycaonia, Pisidia, Mygdonia and Cappadocia.
+
+**§8 Mesopotamia**
+- **R54 (B).** Replace the whole line that begins "| North (the Taurus, with Armenia) |" with:
+  > \| North (the Taurus, with Armenia) \| Nisibis (`pleiades:874623`, spot-checked directly, 41.215°E 37.067°N), Edessa, Carrhae \| Arsamosata (`pleiades:874354`, confirmed this round; its representative point, 39.511°E 38.661°N, since its two DARMC locations lie 43 km apart; 179 km from Edessa, 232 km from Nisibis). The line equidistant from the inside anchors and Arsamosata meets the Euphrates at about 39.0°E 37.9°N and the Tigris (Natural Earth's "Dicle") at about 40.3°E 37.8°N; beyond those points the rivers are the edge \| Strabo 16.1.21 ("on the north is the Taurus, which separates Armenia from Mesopotamia"); 16.1.23 (Nisibis "lies at the foot of Mt. Masius, and so do ... the regions of Carrhae and Nicephorium"); 11.14.2 ("Sophenê is situated in the northern parts, between Masius and Antitaurus," with "the royal city of Sophenê," Carcathiocerta, which this research could not find in Pleiades); Pliny 6.10 ("The more famous towns in Lesser Armenia are Cæsarea, Aza, and Nicopolis; in the Greater Arsamosata, which lies near the Euphrates"); Pleiades places Arsamosata in Armenia Maior (30 BC – AD 300) and, earlier, in Sophene (330–30 BC) \|
+- **R55 (B).** Find "| West, south-west (the Euphrates, from the Zeugma) |". Replace with:
+  > \| West, south-west (the Euphrates, from where the north edge's line meets it, at about 39.0°E 37.9°N, down past the Zeugma) \|
+- **R56 (B).** Replace the paragraph that begins "**The north edge's outside anchor.**" with:
+  > **The north edge's outside anchor.** Strabo's own Armenia chapter (11.14.2) places Sophenê, an Armenian district, "in the northern parts, between Masius and Antitaurus" — directly north of the Mesopotamian towns at the foot of Mt. Masius (16.1.23). Its own "royal city," Carcathiocerta, has no Pleiades record this research could find. Arsamosata (`pleiades:874354`) has one, and Pliny names it among the towns of Greater Armenia: "The more famous towns in Lesser Armenia are Cæsarea, Aza, and Nicopolis; in the Greater Arsamosata, which lies near the Euphrates" (6.10). Pleiades places it in Armenia Maior (30 BC – AD 300, citing Pliny) and, earlier, in Sophene (330–30 BC). Its two DARMC locations lie 43 km apart, so the build uses its representative point (39.511°E 38.661°N), 179 km from Edessa and 232 km from Nisibis. The line equidistant from Edessa, Carrhae and Nisibis inside and Arsamosata outside meets the Euphrates at about 39.0°E 37.9°N, some 140 km in a straight line above the Zeugma (`pleiades:658636`, 37.870°E 37.058°N), and the Tigris (Natural Earth's "Dicle") at about 40.3°E 37.8°N; beyond those points the rivers are the edge. Strabo measures Mesopotamia along the river from "the Zeugma at Commagenê, where Mesopotamia begins" (16.1.22); the outline's note gives that as the other reading of the north-west corner.
+- **R57 (B).** Replace the paragraph that begins "**Confidence:** medium; the south edge is low." with:
+  > **Confidence:** medium; the north and south edges are low. Both rivers are real, drawable features, and the Zeugma, where Strabo says Mesopotamia "begins" (16.1.22), lies on the west edge. The north edge has a sourced anchor on each side, Arsamosata outside (Pliny 6.10), but no source states the line, which is an equidistant construction; and the south edge is a straight close at Strabo's own narrows, not a named line. **Sources:** `bib:strabo-geography` (11.14.2, 16.1.3, 16, 21–23, 28), `bib:pliny-natural-history` (6.10, 6.30), `bib:livius-mesopotamia` (cite-only, already ruled; quote nothing from it), plus the Pleiades IDs above.
+- **R66.** In the Extent paragraph, find:
+  > — describing a short-lived high-water mark east of the river, while Strabo gives the boundary of his own day plainly elsewhere:
+
+  Replace with "; Strabo gives the boundary of his own day plainly elsewhere:". The gloss is unsourced; R36 removed it once.
+- **R67.** In the South row, find:
+  > confirmed this round — the record's own id, "Untitled... around Babylon," `pleiades:896947`, is a wrong, 1°-grid-cell connection; Babylon itself is 893951, 44.424°E 32.540°N)
+
+  Replace with:
+  > confirmed this round, 44.425°E 32.537°N; `pleiades:896947`, cited in this note's first draft, is an untitled wall "around Babylon" in a 1° grid cell, not Babylon)
+
+  No record in `data/` uses either ID.
+
+**§10 Rough areas**
+- **R58 (B).** Find:
+  > Measured instead between the pinned Natural Earth rivers, the land is about 122,000–124,000 km². That runs from the Zeugma on the Euphrates and from 42.377°E 37.063°N on the Tigris, closed in the north through Nisibis and Edessa and in the south from Babylon to Seleucia. **Range for the check: 100,000–150,000 km².**
+
+  Replace with:
+  > Measured instead between the pinned Natural Earth rivers, closed in the south from Babylon to Seleucia (PO-8) and in the north by the line equidistant from Edessa, Carrhae and Nisibis inside and Arsamosata outside (§8), the land is about 149,000 km² (the Fact-Checker's 0.02° grid). Closed in the north through Nisibis and Edessa instead, it is about 122,000–124,000 km². **Range for the check: 100,000–180,000 km²**; the ceiling is about 1.2 times the estimate, because both long edges are pinned rivers and the south close is fixed.
+- **R59 (B).** Find:
+  > Before the GIS phase, give each a ceiling with its basis: for example, a grid estimate of the equidistant build from the corrected anchors, times 1.5. (From this note's uncorrected anchors, Pisidia comes to about 20,800 km², and Lycaonia to at least 42,500 km², or about 30,200 km² without Lake Tatta.) **Range for the check, pending that grid estimate: Pisidia about 2,200–21,000 km²; Lycaonia about 7,400–43,000 km².**
+
+  Replace with:
+  > Each ceiling therefore comes from the Fact-Checker's grid estimate (0.02°) of the equidistant build from the corrected anchors: Pisidia about 21,600 km²; Lycaonia about 17,200 km² with the drawn Cilicia areas excluded (§4), or 26,400 km² without them. **Range for the check: Pisidia about 2,200–32,000 km²** (1.5 times the estimate); **Lycaonia about 7,400–43,000 km²** (kept; about 1.6 times the unclipped estimate).
+- **R60.** Find:
+  > the combined inside-and-outside hull is about 89,600 km², a rough ceiling. **Range for the check: about 40,000–90,000 km².**
+
+  Replace with:
+  > the combined inside-and-outside hull is about 89,600 km², but that is not a true ceiling, since an equidistant cell reaches beyond its anchors. The Fact-Checker's grid estimate (0.02°) of the equidistant build is about 78,200 km². **Range for the check: about 40,000–117,000 km²** (1.5 times the estimate).
+
+  After "**Range for the check: about 16,000–57,000 km².**", add " The Fact-Checker's grid estimate, on the Asian mainland, is about 29,500 km²."
+
+**§11 Ready, partial, or not possible**
+- **R63.** Make five replacements:
+  - Find "| The Taurus (range, south), drawn by anchor pairs |". Replace with "| The Taurus (range, south), drawn by anchor pairs and the drawn Cilicia areas' edge (§4) |".
+  - Find "| Yes: the Propontis, the Hellespont and the Aegean to the Caicus outlets |". Replace with "| Yes: the Propontis, the Hellespont and the Aegean to the Caicus outlets (the Asian mainland only) |".
+  - Find "| medium (the east edge low) |". Replace with "| medium (the east and west edges low) |".
+  - Find "The Araxes (river, north-west)". Replace with "The Araxes (river, north-west, from Artaxata down)".
+  - Find "| medium (the south edge low) |". Replace with "| medium (the north and south edges low) |".
+
+**§12–§14**
+- **R70.** Make five changes:
+  1. In §12, find "; [6.29, the Parthian Empire and Media](". Replace with:
+     > ; [6.10, Armenia](https://www.perseus.tufts.edu/hopper/text?doc=Perseus%3Atext%3A1999.02.0137%3Abook%3D6%3Achapter%3D10); [6.29, the Parthian Empire and Media](
+  2. In §13, replace the item that begins "- **Mesopotamia's north outside anchor** (§8, correction R39):" with:
+     > - **Mesopotamia's north outside anchor** (§8, correction R39): Arsamosata (`pleiades:874354`). Pliny names it among the towns of Greater Armenia (6.10), and Pleiades places it in Armenia Maior (30 BC – AD 300) and, earlier, in Sophene, which Strabo puts "between Masius and Antitaurus" (11.14.2). The anchor meets the card's rule; the line itself is an equidistant construction no source states, so the north edge is low. Strabo's "royal city" of Sophene, Carcathiocerta, has no Pleiades record this research could find.
+  3. In §13, replace the item that begins "- **Media's west edge's "Matiane" anchor** (§7, correction R35):" with:
+     > - **Media's west: Matiane is named, not used as an anchor** (§7, correction R35). Pleiades' only record under that name (`884179`) is a 1°×1° Barrington grid cell whose centre lies south-east of Lake Urmia, 63 km from Gazaca; as an anchor it would cut Media's own Zagros interior out of the outline. Arbela closes Media's west, and Artaxata its north-west (§7).
+  4. In §13, replace the item that begins "- **Mysia's and Phrygia's area ceilings** (§10):" with:
+     > - **Mysia's and Phrygia's area ceilings** (§10): replaced by the Fact-Checker's grid estimates of the equidistant build.
+  5. In §14, replace items 2, 3 and 4 with:
+     > 2. **Mesopotamia's north edge, Arsamosata** (§8): answered by the Fact-Checker's re-check. Pliny 6.10 names it as Armenian, so the anchor stands; the north edge is low.
+     > 3. **Media's "Matiane" anchor** (§7, §13): answered by the Fact-Checker's re-check. The grid cell isn't used as an anchor; Artaxata closes the north-west.
+     > 4. **Mysia's and Phrygia's area ceilings** (§10, §13): answered by the Fact-Checker's re-check, with grid estimates (§10).
+
+### RC7. Advice on the note's §14 open questions
+1. **Pisidia and Lycaonia crossing provinces.** Agreed: settled by M5-19.
+2. **Arsamosata.** Acceptable, and better than the note says: Pliny 6.10 names it among the towns of Greater Armenia, so it meets the card's anchor rule outright. Use its representative point, mark the north edge low, and state where the line meets the rivers (R54–R57). Don't leave the edge as the unanchored Taurus.
+3. **Matiane.** Not acceptable as a seed (RC3b). Name it as an unlocated neighbour; Artaxata closes the north-west instead (R50, R51).
+4. **Mysia's and Phrygia's ceilings.** Re-checked with grid estimates. Mysia's range stands. Phrygia's ceiling should be 117,000 km² (R60).
+5. **Cadi.** Agreed (PO-5). The GIS check should accept Cadi on the line only if the build makes it a vertex; otherwise Cadi goes on Phrygia's side.
+6. **The Parthian Empire.** Agreed: settled by PO-1.
+
+### Checks run (re-check)
+- **Grid estimates (0.02°, corrected anchors, land mask from the drawn mainland areas):**
+  - Pisidia 21,574 km².
+  - Lycaonia 26,447 km²; 17,218 km² with drawn Cilicia excluded, in one piece, with 0 coastal cells (26 before).
+  - Mysia 29,481 km² on land; 61,955 km² including the sea, `asia`'s islands (1,556 km²) and `thrace` (12,883 km²).
+  - Phrygia 78,235 km².
+- **Lycaonia's leak:** 141 sea cells, between 32.45°E and 34.69°E; 86 with a Coracesium test point (31.99°E 36.54°N).
+- **Mesopotamia:**
+  - Between the Natural Earth rivers, with the Arsamosata line and the Babylon–Seleucia close: 149,329 km² (148,914 km² from the first DARMC location).
+  - The line crosses the Euphrates ("Firat") at 39.04°E 37.93°N, 141 km from the Zeugma, and the Tigris ("Dicle") at 40.34°E 37.83°N.
+  - It runs at 37.99°N at 38.9°E, 37.81°N at 39.5°E and 37.76°N at 40.2°E.
+  - Arsamosata's representative point is 178.6 km from Edessa and 231.6 km from Nisibis. From its first location: 182.9 and 214.6 km. Its two locations are 43.3 km apart.
+- **Media:**
+  - Nearest-anchor tests for the three variants in RC4, using Natural Earth's Aras and Kura.
+  - Matiane's cell: 58,481 km² in 44–49°E, 34–39°N. Gazaca–Matiane: 62.8 km. Rhagae–Hyrcania: 467 km. Hyrcania is never the neighbour of Rhagae's cell.
+  - Area under R50: about 369,000 km², on a 0.05° grid, with the Caspian shore placed roughly by hand for this check only.
+  - The Artaxata–Gazaca segment meets the Aras three times within 6 km of Artaxata. The first crossing upstream from the Kura is the one at 5.9 km.
+- **Point in polygon:** Lystra, Derbe and Isaura Nova in `galatia`; Isaura Vetus in `pamphylia`; Coropassus in `cappadocia`; Laranda in `cilicia-tracheia`; `mitylene.json` on an `asia` island; Cyzicus 0.09 km outside `asia`'s coast.
+- **Text checks:**
+  - Grepped for each R1–R49 replacement and each PO ruling.
+  - Grepped `data/` for 896947 and 893951 (no hits).
+  - "km²" appears only in §10.
+  - Each find string in R50–R70 occurs exactly once in `c9dc5db`.
+
+### Licensing (re-check)
+**Pass.** The new citations come from sources already ruled on:
+- Pliny 6.10 is the public-domain Bostock and Riley translation (L2).
+- Strabo is LacusCurtius, public domain (L1).
+- Pleiades is CC BY 3.0 (L4).
+- R52 uses the project's own drawn areas.
+
+Several locations are OpenStreetMap-derived and so ODbL: Artaxata's ("OSM Location: Khor Virap"), Babylon's (an OSM location), and the points of Kibyra ("osm-location-of-kibyra") and Cyme ("osm-location-of-cyme"). As with L5, they are fine in `data/geo/` and must never be copied into the CC BY-SA records. `docs/LICENSES.md` and `ATTRIBUTION.md` need no change.
+
+### Sign-off (re-check)
+**Not signed off for the geometry phase yet. The blockers are R50–R59:**
+- Media's north-west and west (R50, R51).
+- Lycaonia's Cilicia exclusion (R52).
+- Mysia's mainland clip (R53).
+- Mesopotamia's north edge and corner (R54–R57).
+- The Mesopotamia and Pisidia ranges (R58, R59).
+
+Each is exact text. If the Research Lead applies R50–R59 verbatim, the geometry phase is signed off without another fact-check round. The GIS check (e) and the area ranges then test the build. R60–R70 should go in the same pass, but they don't block the build. Licensing is signed off.
