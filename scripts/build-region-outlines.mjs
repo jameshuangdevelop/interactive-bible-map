@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import mapshaper from "mapshaper";
 import booleanValid from "@turf/boolean-valid";
-import { pointInGeometry } from "./lib/ancient-area-checks.mjs";
+import { distancePointToSegmentKm, pointInGeometry } from "./lib/ancient-area-checks.mjs";
 import { ancientGeoCache, fetchPinnedInputs, readJsonFile } from "./lib/ancient-geo-inputs.mjs";
 import { geometryAreaKm2, polygonsOf } from "./lib/geometry-cleanup.mjs";
 import { buildGroupVoronoi } from "./lib/local-equirect-voronoi.mjs";
@@ -22,9 +22,10 @@ const OUTPUT_PRECISION = 0.00001;
 const MIN_NON_ISLAND_PART_KM2 = 1;
 const ISLAND_REGION_IDS = new Set(["crete", "chios", "cos", "malta", "rhodes", "samos"]);
 const ALLOWED_DROPPED_ISLAND_PARTS = Object.freeze({
-  pontus: [{ name: "pontus-lower-halys-coastal-islet", maxAreaKm2: 10 }],
-  lycaonia: [{ name: "lycaonia-detached-voronoi-fragments", maxAreaKm2: 50 }]
+  pontus: [{ name: "pontus-lower-halys-coastal-islet", maxAreaKm2: 10 }]
 });
+const LYCAONIA_DROPPED_PARTS_MAX_TOTAL_KM2 = 40;
+const LYCAONIA_DROPPED_PART_MAX_DRAWN_OVERLAP_KM2 = 0.5;
 const VORONOI_EPSILON = 1e-9;
 
 function featureCollection(features) {
@@ -819,7 +820,115 @@ function partCount(geometry) {
   return 0;
 }
 
-function pruneSmallParts(feature) {
+function coastlineLinesFromLandFeatures(landFeatures) {
+  const lines = [];
+  for (const feature of landFeatures ?? []) {
+    for (const polygon of polygonsOf(feature.geometry)) {
+      const outer = polygon?.[0];
+      if (Array.isArray(outer) && outer.length >= 2) lines.push(outer);
+    }
+  }
+  return lines;
+}
+
+function polygonCentroidApprox(polygon) {
+  const ring = polygon?.[0] ?? [];
+  if (!Array.isArray(ring) || ring.length === 0) return null;
+  let sumLon = 0;
+  let sumLat = 0;
+  let count = 0;
+  for (const point of ring) {
+    sumLon += point[0];
+    sumLat += point[1];
+    count += 1;
+  }
+  return count > 0 ? [sumLon / count, sumLat / count] : null;
+}
+
+function minimumDistanceToLinesKm(point, lines) {
+  let minimum = Infinity;
+  for (const line of lines) {
+    for (let index = 1; index < line.length; index += 1) {
+      minimum = Math.min(minimum, distancePointToSegmentKm(point, line[index - 1], line[index]));
+    }
+  }
+  return minimum;
+}
+
+function polygonTouchesCoastlineWithinKm(polygon, coastlineLines, limitKm) {
+  const ring = polygon?.[0] ?? [];
+  if (!Array.isArray(ring) || ring.length < 2) return false;
+  for (let index = 1; index < ring.length; index += 1) {
+    const start = ring[index - 1];
+    const end = ring[index];
+    const midpoint = [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
+    if (minimumDistanceToLinesKm(start, coastlineLines) <= limitKm) return true;
+    if (minimumDistanceToLinesKm(midpoint, coastlineLines) <= limitKm) return true;
+  }
+  return false;
+}
+
+function translatePolygon(polygon, deltaLon, deltaLat) {
+  return (polygon ?? []).map((ring) => (ring ?? []).map(([lon, lat]) => [lon + deltaLon, lat + deltaLat]));
+}
+
+function seededInlandDropEntry(referenceEntry) {
+  return {
+    ...referenceEntry,
+    polygon: translatePolygon(referenceEntry.polygon, 2, 0),
+    areaKm2: referenceEntry.areaKm2
+  };
+}
+
+async function overlapAreaKm2ForPolygon({ polygon, drawnAreaFeatures, workDirectory, tag }) {
+  const overlaps = await booleanOp({
+    workDirectory,
+    tag,
+    operation: "clip",
+    subjectFeatures: [geometryFeature({ type: "Polygon", coordinates: polygon })],
+    maskFeatures: drawnAreaFeatures
+  });
+  return totalAreaKm2(overlaps);
+}
+
+async function validateLycaoniaDroppedParts({ featureId, dropped, coastlineLines, drawnAreaFeatures, seededError = null, workDirectory }) {
+  if (featureId !== "lycaonia" || dropped.length === 0) return;
+  const candidates = seededError === "lycaonia-drop-inland"
+    ? dropped.map((entry, index) => (index === 0 ? seededInlandDropEntry(entry) : entry))
+    : dropped;
+  const totalAreaKm2 = candidates.reduce((sum, entry) => sum + entry.areaKm2, 0);
+  if (totalAreaKm2 > LYCAONIA_DROPPED_PARTS_MAX_TOTAL_KM2) {
+    throw new Error(
+      `lycaonia: dropped detached parts total ${totalAreaKm2.toFixed(3)} km² (> ${LYCAONIA_DROPPED_PARTS_MAX_TOTAL_KM2.toFixed(3)} km² ceiling).`
+    );
+  }
+  for (let index = 0; index < candidates.length; index += 1) {
+    const entry = candidates[index];
+    const centroid = polygonCentroidApprox(entry.polygon);
+    const coastTouch = polygonTouchesCoastlineWithinKm(entry.polygon, coastlineLines, 0.3);
+    const overlapKm2 = await overlapAreaKm2ForPolygon({
+      polygon: entry.polygon,
+      drawnAreaFeatures,
+      workDirectory,
+      tag: `lycaonia-dropped-overlap-${index}`
+    });
+    const outsideDrawnAreas = overlapKm2 <= LYCAONIA_DROPPED_PART_MAX_DRAWN_OVERLAP_KM2;
+    const centroidText = centroid ? `${centroid[0].toFixed(5)}, ${centroid[1].toFixed(5)}` : "unknown";
+    console.warn(
+      `lycaonia: dropped part ${entry.areaKm2.toFixed(3)} km² at centroid (${centroidText}); coastal-touch=${coastTouch}; overlap-with-drawn-areas=${overlapKm2.toFixed(3)} km².`
+    );
+    if (!coastTouch) {
+      throw new Error(`lycaonia: dropped detached part ${entry.areaKm2.toFixed(3)} km² does not touch Natural Earth coastline within 0.3 km.`);
+    }
+    if (!outsideDrawnAreas) {
+      throw new Error(
+        `lycaonia: dropped detached part ${entry.areaKm2.toFixed(3)} km² overlaps drawn areas by ${overlapKm2.toFixed(3)} km² (> ${LYCAONIA_DROPPED_PART_MAX_DRAWN_OVERLAP_KM2.toFixed(3)} km²).`
+      );
+    }
+  }
+}
+
+async function pruneSmallParts(feature, { coastlineLines, drawnAreaFeatures, seededError = null, workDirectory } = {}) {
   if (ISLAND_REGION_IDS.has(feature.id)) return feature;
   const polygons = polygonsOf(feature.geometry);
   if (polygons.length <= 1) return feature;
@@ -840,6 +949,16 @@ function pruneSmallParts(feature) {
   if (dropped.length > 0) {
     const droppedSummary = dropped.map((entry) => entry.areaKm2.toFixed(3)).join(", ");
     console.warn(`${feature.id}: dropping ${dropped.length} detached part(s) after simplification (${droppedSummary} km²).`);
+    if (feature.id === "lycaonia") {
+      await validateLycaoniaDroppedParts({
+        featureId: feature.id,
+        dropped,
+        coastlineLines: coastlineLines ?? [],
+        drawnAreaFeatures: drawnAreaFeatures ?? [],
+        seededError,
+        workDirectory
+      });
+    }
     const allowed = ALLOWED_DROPPED_ISLAND_PARTS[feature.id] ?? [];
     if (allowed.length > 0) {
       console.warn(
@@ -848,10 +967,12 @@ function pruneSmallParts(feature) {
           .join("; ")}.`
       );
     }
-    const largeDrop = dropped.find((entry) => {
-      if (entry.areaKm2 < MIN_NON_ISLAND_PART_KM2) return false;
-      return !allowed.some((island) => entry.areaKm2 <= island.maxAreaKm2);
-    });
+    const largeDrop = feature.id === "lycaonia"
+      ? null
+      : dropped.find((entry) => {
+        if (entry.areaKm2 < MIN_NON_ISLAND_PART_KM2) return false;
+        return !allowed.some((island) => entry.areaKm2 <= island.maxAreaKm2);
+      });
     if (largeDrop) {
       throw new Error(`${feature.id}: dropped detached part ${largeDrop.areaKm2.toFixed(3)} km² (>= ${MIN_NON_ISLAND_PART_KM2} km²); refusing silent geometry loss.`);
     }
@@ -913,7 +1034,7 @@ async function simplifyCollection({ workDirectory, collection }) {
   return simplified;
 }
 
-export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
+export async function buildRegionOutlinesData({ writeOutput = false, seededError = null } = {}) {
   const workDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "ibm-region-outlines-"));
   try {
     const areas = JSON.parse(await fs.readFile(areasPath, "utf8"));
@@ -929,6 +1050,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const empireEdge = await readJsonFile(empireEdgePath);
     const gazaFaceSource = await readJsonFile(gazaFacePath);
     const landMask = (naturalEarthLand.features ?? []).filter((feature) => feature.geometry);
+    const coastlineLines = coastlineLinesFromLandFeatures(landMask);
 
     const features = [];
     const m520Diagnostics = {};
@@ -1425,24 +1547,37 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const euphratesNearBabylon = nearestPointOnLine(euphrates, babylonAnchor).point;
     const tigrisNearSeleucia = nearestPointOnLine(tigris, seleuciaAnchor).point;
     const empireFromNorthToSouth = sliceLineBetweenPoints(empireEdgeChain, northWestPoint, babylonAnchor);
-    let empireSouthJoin = null;
-    for (const candidate of empireFromNorthToSouth) {
-      const nearestOnEuphrates = nearestPointOnLine(euphrates, candidate).point;
-      const distanceKm = pointDistanceKm(candidate, nearestOnEuphrates);
-      if (distanceKm <= 0.2) {
-        empireSouthJoin = candidate;
-        continue;
-      }
-      if (empireSouthJoin) break;
-    }
-    if (!empireSouthJoin) {
+    const empireNearRiverThresholdKm = 5;
+    const empireSouthCandidates = empireFromNorthToSouth.map((vertex) => {
+      const nearest = nearestPointOnLine(euphrates, vertex);
+      const distanceKm = pointDistanceKm(vertex, nearest.point);
+      return { vertex, nearest, distanceKm };
+    });
+    const nearIndices = empireSouthCandidates
+      .map((candidate, index) => ({ candidate, index }))
+      .filter(({ candidate }) => candidate.distanceKm <= empireNearRiverThresholdKm)
+      .map(({ index }) => index);
+    if (nearIndices.length === 0) {
       throw new Error("Could not derive Mesopotamia empire-edge handoff from the Euphrates.");
     }
+    let southJoinIndex = nearIndices.at(-1);
+    for (let index = 1; index < empireSouthCandidates.length; index += 1) {
+      if (
+        empireSouthCandidates[index - 1].distanceKm <= empireNearRiverThresholdKm &&
+        empireSouthCandidates[index].distanceKm > empireNearRiverThresholdKm
+      ) {
+        southJoinIndex = index - 1;
+      }
+    }
+    const empireSouthJoin = empireSouthCandidates[southJoinIndex].vertex;
+    const empireSouthJoinOnEuphrates = empireSouthCandidates[southJoinIndex].nearest.point;
     const empireWestEdge = sliceLineBetweenPoints(empireEdgeChain, northWestPoint, empireSouthJoin);
-    let lowerEuphratesEdge = sliceLineBetweenPoints(euphrates, empireSouthJoin, euphratesNearBabylon);
+    let lowerEuphratesEdge = sliceLineBetweenPoints(euphrates, empireSouthJoinOnEuphrates, euphratesNearBabylon);
     let tigrisEdge = sliceLineBetweenPoints(tigris, tigrisCrossing, tigrisNearSeleucia);
+    const empireSouthJoinOnLowerEuphrates = nearestPointOnLine(lowerEuphratesEdge, empireSouthJoin).point;
     const babylonOnEuphrates = nearestPointOnLine(lowerEuphratesEdge, babylonAnchor);
     const seleuciaOnTigris = nearestPointOnLine(tigrisEdge, seleuciaAnchor);
+    lowerEuphratesEdge = insertPointOnLine(lowerEuphratesEdge, nearestPointOnLine(lowerEuphratesEdge, empireSouthJoinOnLowerEuphrates));
     lowerEuphratesEdge = insertPointOnLine(lowerEuphratesEdge, babylonOnEuphrates);
     tigrisEdge = insertPointOnLine(tigrisEdge, seleuciaOnTigris);
     const babylonRiverPoint = babylonOnEuphrates.point;
@@ -1450,14 +1585,17 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const southBridge = [babylonAnchor, seleuciaAnchor];
     const babylonConnector = [babylonAnchor, babylonRiverPoint];
     const seleuciaConnector = [seleuciaAnchor, seleuciaRiverPoint];
+    const empireRiverConnector = [empireSouthJoinOnLowerEuphrates, empireSouthJoin];
     allowInput("ne-river-slice", featureFromLine(lowerEuphratesEdge).geometry, { source: "euphrates" });
     allowInput("ne-river-slice", featureFromLine(tigrisEdge).geometry, { source: "tigris" });
     allowInput("empire-edge-slice", featureFromLine(empireWestEdge).geometry, { source: "ancient-empire-edge" });
+    allowInput("edge-river-connector", featureFromLine(empireRiverConnector).geometry, { source: "mesopotamia-west-edge-handoff" });
     allowInput("anchor-segment", featureFromLine(southBridge).geometry, { anchors: ["babylon", "seleucia-tigris"] });
     allowInput("anchor-river-connector", featureFromLine(babylonConnector).geometry, { anchor: "babylon" });
     allowInput("anchor-river-connector", featureFromLine(seleuciaConnector).geometry, { anchor: "seleucia-tigris" });
     const westEdgeFromBabylonToNorth = [
       ...lowerEuphratesEdge.slice().reverse(),
+      ...empireRiverConnector.slice(1),
       ...empireWestEdge.slice().reverse().slice(1)
     ];
     const mesopotamiaRing = normalizeRing([
@@ -1482,7 +1620,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     addFeature(features, {
       id: "mesopotamia",
       geometry: mesopotamia.geometry,
-      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:livius-mesopotamia", "naturalearth:ne-10m-rivers-lake-centerlines", "pleiades:658636", "pleiades:874354", "pleiades:893951", "pleiades:894084"],
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:livius-mesopotamia", "awmc:roman-empire-ad-69-extent", "naturalearth:ne-10m-rivers-lake-centerlines", "pleiades:658636", "pleiades:874354", "pleiades:893951", "pleiades:894084"],
       confidence: "medium",
       note: "Mesopotamia, which Strabo says 'lies between the Euphrates and the Tigris', with 'the Taurus, which separates Armenia from Mesopotamia' to the north (Geography 16.1.21). Its east edge is the Tigris. Its west edge is the Euphrates, the frontier with Rome: 'The Euphrates and the land beyond it constitute the boundary of the Parthian empire' (16.1.28). In the south it closes between Babylon and Seleucia, where Strabo puts 'the shortest distance between the two rivers' (16.1.21), with short straight links from each city to its river. The north edge is approximate. It is drawn halfway between Edessa, Carrhae and Nisibis and Arsamosata, which Pliny lists among the towns of Greater Armenia (Natural History 6.10). It meets the Euphrates about 140 km above the Zeugma, while Strabo measures Mesopotamia from 'the Zeugma at Commagenê, where Mesopotamia begins' (16.1.22). The name's reach varied: the historian Arrian used it only for the northern part, today's Jezira, while Pliny's Mesopotamia also takes in Babylonia, with 'Seleucia, Laodicea, Artemita' (6.30)."
     });
@@ -1508,7 +1646,12 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     });
     const cleanedFeatures = [];
     for (const feature of simplified.features ?? []) {
-      const cleaned = pruneSmallParts(feature);
+      const cleaned = await pruneSmallParts(feature, {
+        coastlineLines,
+        drawnAreaFeatures: areas.features ?? [],
+        seededError,
+        workDirectory
+      });
       if (!booleanValid(cleaned)) throw new Error(`${cleaned.id} is invalid after simplification.`);
       cleanedFeatures.push(cleaned);
     }

@@ -182,6 +182,7 @@ function parseArguments(argv) {
   let proofM520On8a8f467 = false;
   let proofInjectedRiverSlice = false;
   let proofP4OnCb75908 = false;
+  let proofLycaoniaDropInland = false;
   for (const argument of argv) {
     if (argument.startsWith("--seed-error=")) {
       seededError = argument.slice("--seed-error=".length).trim();
@@ -207,12 +208,16 @@ function parseArguments(argv) {
       proofP4OnCb75908 = true;
       continue;
     }
+    if (argument === "--proof-lycaonia-drop-inland") {
+      proofLycaoniaDropInland = true;
+      continue;
+    }
     throw new Error(`Unknown argument '${argument}'.`);
   }
   if (seededError && !["b", "d", "e", "coast"].includes(seededError)) {
     throw new Error("--seed-error supports only b, d, e or coast.");
   }
-  return { seededError, proofFOnFe27276, proofEgOn20320e9, proofM520On8a8f467, proofInjectedRiverSlice, proofP4OnCb75908 };
+  return { seededError, proofFOnFe27276, proofEgOn20320e9, proofM520On8a8f467, proofInjectedRiverSlice, proofP4OnCb75908, proofLycaoniaDropInland };
 }
 
 function ringsOf(geometry) {
@@ -308,6 +313,9 @@ function geometryFeature(geometry, properties = {}) {
 function geometriesAsFeatures(document) {
   if (!document) return [];
   if (document.type === "FeatureCollection") return (document.features ?? []).filter((feature) => feature.geometry);
+  if (document.type === "GeometryCollection") {
+    return (document.geometries ?? []).filter(Boolean).map((geometry) => geometryFeature(geometry));
+  }
   if (document.type === "Feature") return document.geometry ? [document] : [];
   if (document.type && document.coordinates) return [geometryFeature(document)];
   return [];
@@ -644,6 +652,7 @@ function validateAllowedInputKinds({
     "ne-river-slice",
     "ne-lake-slice",
     "empire-edge-slice",
+    "edge-river-connector",
     "anchor-segment",
     "anchor-river-connector",
     "m5-19-g11-line",
@@ -726,26 +735,59 @@ function validateAllowedInputKinds({
       riverSliceGeometries.push(entry.geometry);
       continue;
     }
+    if (entry.kind === "empire-edge-slice") {
+      const coordinates = entry.geometry?.coordinates;
+      if (!Array.isArray(coordinates) || coordinates.length < 2) {
+        failures.push("(f) empire-edge-slice must be a LineString with at least 2 coordinates.");
+        continue;
+      }
+      const samples = densifiedLineSamples(coordinates, 0.1);
+      for (const sample of samples) {
+        const nearestKm = nearestDistanceFromSegmentIndexKm(sample, empireEdgeIndex);
+        if (nearestKm > 0.001) {
+          failures.push(`(f) empire-edge-slice sample ${JSON.stringify(sample)} is ${nearestKm.toFixed(4)} km from ancient-empire-edge.`);
+          break;
+        }
+      }
+      continue;
+    }
+    if (entry.kind === "edge-river-connector") {
+      const coordinates = entry.geometry?.coordinates;
+      if (!Array.isArray(coordinates) || coordinates.length !== 2) {
+        failures.push("(f) edge-river-connector must contain exactly 2 coordinates.");
+        continue;
+      }
+      const [start, end] = coordinates;
+      const startToEmpireKm = nearestDistanceFromSegmentIndexKm(start, empireEdgeIndex);
+      const endToEmpireKm = nearestDistanceFromSegmentIndexKm(end, empireEdgeIndex);
+      const empireEnd = startToEmpireKm <= endToEmpireKm ? start : end;
+      const riverEnd = empireEnd === start ? end : start;
+      const empireDistanceKm = Math.min(startToEmpireKm, endToEmpireKm);
+      if (empireDistanceKm > 0.001) {
+        failures.push("(f) edge-river-connector has no endpoint within 1 m of an empire-edge slice.");
+        continue;
+      }
+      const touchingRiver = riverSliceGeometries
+        .map((geometry) => ({ geometry, distanceKm: nearestGeometryDistanceKm(riverEnd, [geometry]) }))
+        .sort((left, right) => left.distanceKm - right.distanceKm)[0];
+      if (!touchingRiver || touchingRiver.distanceKm > 0.001) {
+        failures.push("(f) edge-river-connector river endpoint is not within 1 m of a validated river slice.");
+        continue;
+      }
+      const connectorLengthKm = distanceBetweenPointsKm(empireEnd, riverEnd);
+      const nearestOnRiver = nearestPointOnGeometryForPoint(empireEnd, touchingRiver.geometry);
+      const trueDistanceKm = nearestOnRiver?.distanceKm ?? Number.POSITIVE_INFINITY;
+      if (Math.abs(connectorLengthKm - trueDistanceKm) > 0.02) {
+        failures.push(
+          `(f) edge-river-connector length ${connectorLengthKm.toFixed(4)} km differs from true empire-edge→river distance ${trueDistanceKm.toFixed(4)} km by over 20 m.`
+        );
+      }
+      continue;
+    }
     if (entry.kind === "anchor-segment") {
       const coordinates = entry.geometry?.coordinates;
       if (!Array.isArray(coordinates) || coordinates.length !== 2) {
         failures.push("(f) anchor-segment must contain exactly 2 coordinates.");
-        continue;
-      }
-      if (entry.kind === "empire-edge-slice") {
-        const coordinates = entry.geometry?.coordinates;
-        if (!Array.isArray(coordinates) || coordinates.length < 2) {
-          failures.push("(f) empire-edge-slice must be a LineString with at least 2 coordinates.");
-          continue;
-        }
-        const samples = densifiedLineSamples(coordinates, 0.1);
-        for (const sample of samples) {
-          const nearestKm = nearestDistanceFromSegmentIndexKm(sample, empireEdgeIndex);
-          if (nearestKm > 0.001) {
-            failures.push(`(f) empire-edge-slice sample ${JSON.stringify(sample)} is ${nearestKm.toFixed(4)} km from ancient-empire-edge.`);
-            break;
-          }
-        }
         continue;
       }
       const [start, end] = coordinates;
@@ -1035,24 +1077,28 @@ function evaluateM520CoastalTouch({ featureById, naturalEarthLandGeometries }) {
   return { failures, figures };
 }
 
-async function evaluateMesopotamiaDrawnAreaAdjacency({ featureById, areaById, allowedTagged }) {
+async function evaluateMesopotamiaDrawnAreaAdjacency({ featureById, areaFeatures, allowedTagged }) {
   const failures = [];
   const mesopotamia = featureById.get("mesopotamia");
-  const syria = areaById.get("syria");
-  const commagene = areaById.get("commagene");
-  if (!mesopotamia || !syria || !commagene) {
+  const drawnAreas = (areaFeatures ?? []).filter((feature) => feature?.geometry && feature?.properties?.areaId !== "mesopotamia");
+  if (!mesopotamia || drawnAreas.length === 0) {
     return {
-      failures: ["(g) missing mesopotamia/syria/commagene feature for adjacency checks."],
+      failures: ["(g) missing mesopotamia or drawn area features for adjacency checks."],
       overlapKm2: null,
       maxGapKm: null
     };
   }
 
-  const overlapSyria = await clippedAreaKm2(mesopotamia, syria, "mesopotamia-overlap-syria");
-  const overlapCommagene = await clippedAreaKm2(mesopotamia, commagene, "mesopotamia-overlap-commagene");
-  const overlapKm2 = overlapSyria + overlapCommagene;
+  let overlapKm2 = 0;
+  for (const area of drawnAreas) {
+    overlapKm2 += await clippedAreaKm2(
+      mesopotamia,
+      area,
+      `mesopotamia-overlap-${String(area.properties?.areaId ?? "area").replace(/[^a-z0-9-]+/gi, "-")}`
+    );
+  }
   if (overlapKm2 >= 1) {
-    failures.push(`(g) mesopotamia overlaps drawn syria/commagene areas by ${overlapKm2.toFixed(3)} km² (must be < 1 km²).`);
+    failures.push(`(g) mesopotamia overlaps drawn areas by ${overlapKm2.toFixed(3)} km² (must be < 1 km²).`);
   }
 
   const empireSlices = (allowedTagged ?? [])
@@ -1062,16 +1108,65 @@ async function evaluateMesopotamiaDrawnAreaAdjacency({ featureById, areaById, al
   if (empireSlices.length === 0) {
     failures.push("(g) mesopotamia has no tagged empire-edge-slice input for west-edge validation.");
   }
-  let maxGapKm = 0;
-  for (const line of empireSlices) {
-    for (const sample of densifiedLineSamples(line.coordinates ?? [], 0.2)) {
-      maxGapKm = Math.max(maxGapKm, distanceToGeometryKm(sample, mesopotamia.geometry));
-    }
+  const empireSliceCoords = empireSlices.flatMap((geometry) => geometry.coordinates ?? []);
+  if (empireSliceCoords.length === 0) {
+    failures.push("(g) mesopotamia empire-edge-slice has no coordinates for gap validation.");
   }
+  const latitudes = empireSliceCoords.map((point) => point[1]);
+  const longitudes = empireSliceCoords.map((point) => point[0]);
+  const latBandMin = Math.min(...latitudes) - 0.05;
+  const latBandMax = Math.max(...latitudes) + 0.3;
+  const lonBandMax = Math.max(...longitudes) + 1.5;
+  const westEdgeReferenceGeometries = empireSlices;
+  const westBandBox = [
+    Math.min(...longitudes) - 1,
+    latBandMin - 0.1,
+    lonBandMax + 0.1,
+    latBandMax + 0.1
+  ];
+  const adjacentDrawnAreas = drawnAreas.filter((feature) => {
+    const box = geometryBbox(feature.geometry);
+    if (!box) return false;
+    return !(box[2] < westBandBox[0] || box[0] > westBandBox[2] || box[3] < westBandBox[1] || box[1] > westBandBox[3]);
+  });
+  const drawnAreaGeometries = adjacentDrawnAreas.map((feature) => feature.geometry);
   const mesopotamiaToleranceKm = regionToleranceKm("mesopotamia");
-  if (maxGapKm > mesopotamiaToleranceKm) {
+  let bestCoincidentRun = [];
+  for (const line of empireSlices) {
+    const samples = densifiedLineSamples(line.coordinates ?? [], 0.2);
+    let current = [];
+    for (const sample of samples) {
+      if (nearestGeometryDistanceKm(sample, drawnAreaGeometries) <= mesopotamiaToleranceKm) {
+        current.push(sample);
+      } else if (current.length > 0) {
+        if (current.length > bestCoincidentRun.length) bestCoincidentRun = current;
+        current = [];
+      }
+    }
+    if (current.length > bestCoincidentRun.length) bestCoincidentRun = current;
+  }
+  if (bestCoincidentRun.length === 0) {
+    failures.push("(g) mesopotamia found no empire-edge samples close to adjacent drawn areas.");
+  }
+  const sharedLatMin = bestCoincidentRun.length > 0 ? Math.min(...bestCoincidentRun.map((point) => point[1])) - 0.01 : latBandMin;
+  const sharedLatMax = bestCoincidentRun.length > 0 ? Math.max(...bestCoincidentRun.map((point) => point[1])) + 0.01 : latBandMax;
+  const sampleStepKm = 0.2;
+  const westBoundarySamples = densifiedEdgeSamples(mesopotamia.geometry, sampleStepKm).filter((sample) => {
+    if (!(sample[1] >= sharedLatMin && sample[1] <= sharedLatMax && sample[0] <= lonBandMax)) return false;
+    if (westEdgeReferenceGeometries.length === 0) return true;
+    return nearestGeometryDistanceKm(sample, westEdgeReferenceGeometries) <= mesopotamiaToleranceKm + 0.05;
+  });
+  if (westBoundarySamples.length === 0) {
+    failures.push("(g) mesopotamia west-edge band produced no boundary samples for gap validation.");
+  }
+  let maxGapKm = 0;
+  for (const sample of westBoundarySamples) {
+    maxGapKm = Math.max(maxGapKm, nearestGeometryDistanceKm(sample, drawnAreaGeometries));
+  }
+  const gapToleranceKm = mesopotamiaToleranceKm + 0.02; // allow up to 20 m for densification/sampling aliasing.
+  if (maxGapKm > gapToleranceKm) {
     failures.push(
-      `(g) mesopotamia gap to syria/commagene is ${maxGapKm.toFixed(3)} km (must be <= ${mesopotamiaToleranceKm.toFixed(3)} km).`
+      `(g) mesopotamia max gap to drawn areas is ${maxGapKm.toFixed(3)} km (must be <= ${gapToleranceKm.toFixed(3)} km).`
     );
   }
   return { failures, overlapKm2, maxGapKm };
@@ -1099,7 +1194,8 @@ async function runRegionOutlineChecks({ seededError, cacheRoot }) {
   const locationById = new Map(locations.map((location) => [location.id, location]));
   const features = outlines.features ?? [];
   const featureById = new Map(features.map((feature) => [feature.id, feature]));
-  const areaById = new Map((ancientAreas.features ?? []).map((feature) => [feature?.properties?.areaId, feature]).filter(([id]) => typeof id === "string"));
+  const areaFeatures = ancientAreas.features ?? [];
+  const areaById = new Map(areaFeatures.map((feature) => [feature?.properties?.areaId, feature]).filter(([id]) => typeof id === "string"));
   const anchorCoordinatesById = new Map(
     (anchors.anchors ?? [])
       .filter((anchor) => typeof anchor?.id === "string" && Array.isArray(anchor?.coordinates))
@@ -1223,12 +1319,12 @@ async function runRegionOutlineChecks({ seededError, cacheRoot }) {
 
   const mesopotamiaAdjacency = await evaluateMesopotamiaDrawnAreaAdjacency({
     featureById,
-    areaById,
+    areaFeatures,
     allowedTagged: rebuilt.allowedInputGeometriesTagged
   });
   if (mesopotamiaAdjacency.overlapKm2 != null && mesopotamiaAdjacency.maxGapKm != null) {
     console.log(
-      `(g) mesopotamia drawn-area overlap ${mesopotamiaAdjacency.overlapKm2.toFixed(3)} km²; max gap to syria/commagene ${mesopotamiaAdjacency.maxGapKm.toFixed(3)} km`
+      `(g) mesopotamia drawn-area overlap ${mesopotamiaAdjacency.overlapKm2.toFixed(3)} km²; max gap to drawn areas ${mesopotamiaAdjacency.maxGapKm.toFixed(3)} km`
     );
   }
   failures.push(...mesopotamiaAdjacency.failures);
@@ -1402,41 +1498,71 @@ async function proofInjectedRiverSlice({ context }) {
 }
 
 async function proofP4OnCb75908({ context }) {
-  const previous = spawnSync("git", ["show", "cb75908:data/geo/region-outlines.geojson"], {
-    cwd: repositoryRoot,
-    encoding: "utf8"
-  });
-  if (previous.status !== 0) throw new Error(`git show failed: ${previous.stderr}`);
-  const oldCollection = JSON.parse(previous.stdout);
-  const oldById = new Map((oldCollection.features ?? []).map((feature) => [feature.id, feature]));
-  const failures = [];
+  const evaluateRevision = async (revision) => {
+    const previous = spawnSync("git", ["show", `${revision}:data/geo/region-outlines.geojson`], {
+      cwd: repositoryRoot,
+      encoding: "utf8"
+    });
+    if (previous.status !== 0) throw new Error(`git show failed: ${previous.stderr}`);
+    const oldCollection = JSON.parse(previous.stdout);
+    const oldById = new Map((oldCollection.features ?? []).map((feature) => [feature.id, feature]));
+    const failures = [];
 
-  const lycaoniaLocation = JSON.parse(await fs.readFile(path.join(locationsDirectory, "lycaonia.json"), "utf8"));
-  const lycaoniaPoint = lycaoniaLocation?.candidates?.[0]?.coordinates;
-  const lycaoniaFeature = oldById.get("lycaonia");
-  if (Array.isArray(lycaoniaPoint) && lycaoniaFeature && !pointInGeometry(lycaoniaPoint, lycaoniaFeature.geometry)) {
-    failures.push("(b) lycaonia: region point is outside its outline.");
-  }
+    const lycaoniaLocation = JSON.parse(await fs.readFile(path.join(locationsDirectory, "lycaonia.json"), "utf8"));
+    const lycaoniaPoint = lycaoniaLocation?.candidates?.[0]?.coordinates;
+    const lycaoniaFeature = oldById.get("lycaonia");
+    if (Array.isArray(lycaoniaPoint) && lycaoniaFeature && !pointInGeometry(lycaoniaPoint, lycaoniaFeature.geometry)) {
+      failures.push("(b) lycaonia: region point is outside its outline.");
+    }
 
-  failures.push(
-    ...evaluateCheckE({
+    failures.push(
+      ...evaluateCheckE({
+        featureById: oldById,
+        anchorCoordinatesById: context.anchorCoordinatesById
+      })
+    );
+    const mesopotamiaAdjacency = await evaluateMesopotamiaDrawnAreaAdjacency({
       featureById: oldById,
-      anchorCoordinatesById: context.anchorCoordinatesById
-    })
-  );
-  const mesopotamiaAdjacency = await evaluateMesopotamiaDrawnAreaAdjacency({
-    featureById: oldById,
-    areaById: new Map(
-      (context.areaFeatures ?? []).map((feature) => [feature?.properties?.areaId, feature]).filter(([id]) => typeof id === "string")
-    ),
-    allowedTagged: context.rebuilt.allowedInputGeometriesTagged
-  });
-  failures.push(...mesopotamiaAdjacency.failures);
-  if (failures.length === 0) {
+      areaFeatures: context.areaFeatures,
+      allowedTagged: context.rebuilt.allowedInputGeometriesTagged
+    });
+    failures.push(...mesopotamiaAdjacency.failures);
+    return failures;
+  };
+
+  const cbFailures = await evaluateRevision("cb75908");
+  if (cbFailures.length === 0) {
     throw new Error("Expected cb75908 to fail P4 checks, but it passed.");
   }
   console.log("Proof for P4 checks on cb75908:");
-  for (const failure of failures) console.log(`- ${failure}`);
+  for (const failure of cbFailures) console.log(`- ${failure}`);
+
+  const e2350efFailures = await evaluateRevision("e2350ef");
+  if (!e2350efFailures.some((line) => line.includes("overlaps drawn areas"))) {
+    throw new Error("Expected e2350ef to fail P4 overlap check, but it did not.");
+  }
+  console.log("Proof for P4 overlap check on e2350ef:");
+  for (const failure of e2350efFailures.filter((line) => line.includes("overlaps drawn areas") || line.includes("max gap to drawn areas"))) {
+    console.log(`- ${failure}`);
+  }
+}
+
+async function proofLycaoniaDropInland() {
+  try {
+    await buildRegionOutlinesData({ writeOutput: false, seededError: "lycaonia-drop-inland" });
+  } catch (error) {
+    const message = String(error?.message ?? "");
+    if (
+      message.includes("lycaonia: dropped detached part") &&
+      (message.includes("does not touch Natural Earth coastline within 0.3 km") || message.includes("overlaps or lies inside a drawn area"))
+    ) {
+      console.log("Proof for Lycaonia dropped-part rule:");
+      console.log(`- ${message}`);
+      return;
+    }
+    throw error;
+  }
+  throw new Error("Expected seeded Lycaonia inland dropped-part fault to throw, but it passed.");
 }
 
 async function verifyGazaFaceReproducibility(cacheRoot) {
@@ -1458,7 +1584,8 @@ async function main() {
     proofEgOn20320e9: runProofEg,
     proofM520On8a8f467: runProofM520,
     proofInjectedRiverSlice: runProofInjectedRiverSlice,
-    proofP4OnCb75908: runProofP4OnCb75908
+    proofP4OnCb75908: runProofP4OnCb75908,
+    proofLycaoniaDropInland: runProofLycaoniaDropInland
   } = parseArguments(process.argv.slice(2));
   const before = changedGeoFiles();
   if (before.length > 0) throw new Error(`data/geo/ has uncommitted changes, so the rebuild can't be compared with it:\n${before.join("\n")}`);
@@ -1489,6 +1616,9 @@ async function main() {
     }
     if (runProofP4OnCb75908) {
       await proofP4OnCb75908({ context });
+    }
+    if (runProofLycaoniaDropInland) {
+      await proofLycaoniaDropInland();
     }
     console.log(`Reproduced data/geo/ byte for byte from an empty cache in ${Math.round((Date.now() - started) / 1000)} s.`);
   } finally {
