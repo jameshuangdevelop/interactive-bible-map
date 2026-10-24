@@ -1510,6 +1510,9 @@ export async function buildRegionOutlinesData({ writeOutput = false, seededError
     );
     const insideAnchors = ["edessa", "carrhae", "nisibis"].map((anchorId) => anchorPoint(anchorsById, anchorId));
     const outsideAnchor = anchorPoint(anchorsById, "arsamosata");
+    const insideLatitudes = insideAnchors.map((point) => point[1]);
+    const equidistantMinLat = Math.min(...insideLatitudes, outsideAnchor[1]) - 0.5;
+    const equidistantMaxLat = Math.max(...insideLatitudes, outsideAnchor[1]) + 0.5;
     const groupBLatitudes = [...GROUP_B_LABELS.keys()].map((anchorId) => anchorPoint(anchorsById, anchorId)[1]);
     const cosPhi = Math.cos((groupBLatitudes.reduce((sum, latitude) => sum + latitude, 0) / groupBLatitudes.length) * Math.PI / 180);
     const equidistantOptions = { insideAnchors, outsideAnchor, cosPhi };
@@ -1524,7 +1527,11 @@ export async function buildRegionOutlinesData({ writeOutput = false, seededError
     const lonEnd = Math.max(euphratesCrossing[0], tigrisCrossing[0]);
     const northEdge = [];
     for (let lon = lonStart; lon <= lonEnd + 1e-9; lon += 0.01) {
-      const solvedLat = solveEquidistantLatitudeAtLongitude(lon, { ...equidistantOptions, minLat: 37.2, maxLat: 38.9 });
+      const solvedLat = solveEquidistantLatitudeAtLongitude(lon, {
+        ...equidistantOptions,
+        minLat: equidistantMinLat,
+        maxLat: equidistantMaxLat
+      });
       if (!Number.isFinite(solvedLat)) continue;
       northEdge.push([lon, solvedLat]);
     }

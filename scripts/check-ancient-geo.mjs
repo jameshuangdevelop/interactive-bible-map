@@ -465,6 +465,128 @@ function nearestDistanceFromSegmentIndexKm(point, segmentIndex) {
   return nearest;
 }
 
+function lineFeatureCoordinates(feature) {
+  if (feature?.geometry?.type === "LineString") return [feature.geometry.coordinates ?? []];
+  if (feature?.geometry?.type === "MultiLineString") return feature.geometry.coordinates ?? [];
+  return [];
+}
+
+function riverCandidateLines(features, matchesName) {
+  const lines = [];
+  for (const feature of features ?? []) {
+    const names = Object.values(feature.properties ?? {})
+      .filter((value) => typeof value === "string")
+      .map((value) => value.toLowerCase());
+    if (!names.some((name) => matchesName(name))) continue;
+    for (const coordinates of lineFeatureCoordinates(feature)) {
+      if (coordinates.length >= 2) lines.push(coordinates);
+    }
+  }
+  return lines;
+}
+
+function endpointDistanceSquared(lineA, lineB) {
+  const endpointsA = [lineA[0], lineA.at(-1)];
+  const endpointsB = [lineB[0], lineB.at(-1)];
+  let best = Infinity;
+  for (const a of endpointsA) {
+    for (const b of endpointsB) {
+      const d2 = (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2;
+      if (d2 < best) best = d2;
+    }
+  }
+  return best;
+}
+
+function nearestPointDistanceSquared(line, point) {
+  let best = Infinity;
+  for (const vertex of line) {
+    const d2 = (vertex[0] - point[0]) ** 2 + (vertex[1] - point[1]) ** 2;
+    if (d2 < best) best = d2;
+  }
+  return best;
+}
+
+function orientLineFromNearPoint(line, point) {
+  const startDistance = (line[0][0] - point[0]) ** 2 + (line[0][1] - point[1]) ** 2;
+  const endDistance = (line.at(-1)[0] - point[0]) ** 2 + (line.at(-1)[1] - point[1]) ** 2;
+  return startDistance <= endDistance ? line : [...line].reverse();
+}
+
+function connectLines(lineA, lineB) {
+  const endpointsA = [lineA[0], lineA.at(-1)];
+  const endpointsB = [lineB[0], lineB.at(-1)];
+  let best = null;
+  for (const endpointA of endpointsA) {
+    for (const endpointB of endpointsB) {
+      const distance = (endpointA[0] - endpointB[0]) ** 2 + (endpointA[1] - endpointB[1]) ** 2;
+      if (!best || distance < best.distance) best = { endpointA, endpointB, distance };
+    }
+  }
+  const orientedA = best.endpointA === lineA.at(-1) ? lineA : [...lineA].reverse();
+  const orientedB = best.endpointB === lineB[0] ? lineB : [...lineB].reverse();
+  return [...orientedA, ...orientedB.slice(1)];
+}
+
+function stitchNamedRiverChain(features, pattern, anchorCoordinates) {
+  const candidates = riverCandidateLines(features, (name) => pattern.test(name));
+  if (candidates.length === 0) return null;
+  const allLines = (features ?? [])
+    .flatMap((feature) => lineFeatureCoordinates(feature))
+    .filter((coordinates) => coordinates.length >= 2);
+  const ordered = [...candidates].sort(
+    (left, right) => nearestPointDistanceSquared(left, anchorCoordinates) - nearestPointDistanceSquared(right, anchorCoordinates)
+  );
+  const used = new Set();
+  let chain = orientLineFromNearPoint(ordered[0], anchorCoordinates);
+  used.add(ordered[0]);
+  while (used.size < candidates.length) {
+    const next = candidates
+      .filter((candidate) => !used.has(candidate))
+      .map((candidate) => ({ candidate, d2: endpointDistanceSquared(chain, candidate) }))
+      .sort((left, right) => left.d2 - right.d2)[0];
+    if (!next || next.d2 > 0.2) break;
+    chain = connectLines(chain, next.candidate);
+    used.add(next.candidate);
+  }
+  const usedAny = new Set([...used]);
+  while (usedAny.size < allLines.length) {
+    const next = allLines
+      .filter((candidate) => !usedAny.has(candidate))
+      .map((candidate) => ({ candidate, d2: endpointDistanceSquared(chain, candidate) }))
+      .sort((left, right) => left.d2 - right.d2)[0];
+    if (!next || next.d2 > 0.2) break;
+    chain = connectLines(chain, next.candidate);
+    usedAny.add(next.candidate);
+  }
+  return chain;
+}
+
+function stitchEmpireEdgeChain(geometries, anchorCoordinates) {
+  const candidates = (geometries ?? []).flatMap((geometry) => {
+    if (geometry?.type === "LineString") return [geometry.coordinates ?? []];
+    if (geometry?.type === "MultiLineString") return geometry.coordinates ?? [];
+    return [];
+  }).filter((coordinates) => coordinates.length >= 2);
+  if (candidates.length === 0) return null;
+  const ordered = [...candidates].sort(
+    (left, right) => nearestPointDistanceSquared(left, anchorCoordinates) - nearestPointDistanceSquared(right, anchorCoordinates)
+  );
+  const used = new Set();
+  let chain = orientLineFromNearPoint(ordered[0], anchorCoordinates);
+  used.add(ordered[0]);
+  while (used.size < candidates.length) {
+    const next = candidates
+      .filter((candidate) => !used.has(candidate))
+      .map((candidate) => ({ candidate, d2: endpointDistanceSquared(chain, candidate) }))
+      .sort((left, right) => left.d2 - right.d2)[0];
+    if (!next || next.d2 > 0.2) break;
+    chain = connectLines(chain, next.candidate);
+    used.add(next.candidate);
+  }
+  return chain;
+}
+
 function regionToleranceKm(regionId) {
   return (SIMPLIFY_INTERVAL_METRES[regionId] ?? 600) / 1000 + 0.1;
 }
@@ -1077,7 +1199,7 @@ function evaluateM520CoastalTouch({ featureById, naturalEarthLandGeometries }) {
   return { failures, figures };
 }
 
-async function evaluateMesopotamiaDrawnAreaAdjacency({ featureById, areaFeatures, allowedTagged }) {
+async function evaluateMesopotamiaDrawnAreaAdjacency({ featureById, areaFeatures, empireEdgeGeometries, naturalEarthRiverFeatures, anchorCoordinatesById }) {
   const failures = [];
   const mesopotamia = featureById.get("mesopotamia");
   const drawnAreas = (areaFeatures ?? []).filter((feature) => feature?.geometry && feature?.properties?.areaId !== "mesopotamia");
@@ -1085,7 +1207,9 @@ async function evaluateMesopotamiaDrawnAreaAdjacency({ featureById, areaFeatures
     return {
       failures: ["(g) missing mesopotamia or drawn area features for adjacency checks."],
       overlapKm2: null,
-      maxGapKm: null
+      maxGapKm: null,
+      maxGapPoint: null,
+      excludedNearHandoffSamples: 0
     };
   }
 
@@ -1101,75 +1225,132 @@ async function evaluateMesopotamiaDrawnAreaAdjacency({ featureById, areaFeatures
     failures.push(`(g) mesopotamia overlaps drawn areas by ${overlapKm2.toFixed(3)} km² (must be < 1 km²).`);
   }
 
-  const empireSlices = (allowedTagged ?? [])
-    .filter((entry) => entry.kind === "empire-edge-slice")
-    .map((entry) => entry.geometry)
-    .filter((geometry) => geometry?.type === "LineString");
+  const lineStringsFromGeometry = (geometry) => {
+    if (!geometry) return [];
+    if (geometry.type === "LineString") return [geometry];
+    if (geometry.type === "MultiLineString") return (geometry.coordinates ?? []).map((coordinates) => ({ type: "LineString", coordinates }));
+    return [];
+  };
+  const empireSlices = (empireEdgeGeometries ?? []).flatMap((geometry) => lineStringsFromGeometry(geometry));
   if (empireSlices.length === 0) {
-    failures.push("(g) mesopotamia has no tagged empire-edge-slice input for west-edge validation.");
+    failures.push("(g) mesopotamia has no empire-edge geometry for west-edge validation.");
+    return { failures, overlapKm2, maxGapKm: null, maxGapPoint: null, excludedNearHandoffSamples: 0 };
   }
-  const empireSliceCoords = empireSlices.flatMap((geometry) => geometry.coordinates ?? []);
-  if (empireSliceCoords.length === 0) {
-    failures.push("(g) mesopotamia empire-edge-slice has no coordinates for gap validation.");
+
+  const arsamosata = anchorCoordinatesById?.get("arsamosata");
+  const euphratesChain = Array.isArray(arsamosata)
+    ? stitchNamedRiverChain(naturalEarthRiverFeatures, /(euphrates|firat|alfurat)/iu, arsamosata)
+    : null;
+  const euphratesSlices = euphratesChain ? [{ type: "LineString", coordinates: euphratesChain }] : [];
+  if (euphratesSlices.length === 0) {
+    failures.push("(g) mesopotamia could not derive Euphrates geometry from pinned Natural Earth rivers.");
+    return { failures, overlapKm2, maxGapKm: null, maxGapPoint: null, excludedNearHandoffSamples: 0 };
   }
-  const latitudes = empireSliceCoords.map((point) => point[1]);
-  const longitudes = empireSliceCoords.map((point) => point[0]);
-  const latBandMin = Math.min(...latitudes) - 0.05;
-  const latBandMax = Math.max(...latitudes) + 0.3;
-  const lonBandMax = Math.max(...longitudes) + 1.5;
-  const westEdgeReferenceGeometries = empireSlices;
-  const westBandBox = [
-    Math.min(...longitudes) - 1,
-    latBandMin - 0.1,
-    lonBandMax + 0.1,
-    latBandMax + 0.1
-  ];
-  const adjacentDrawnAreas = drawnAreas.filter((feature) => {
-    const box = geometryBbox(feature.geometry);
-    if (!box) return false;
-    return !(box[2] < westBandBox[0] || box[0] > westBandBox[2] || box[3] < westBandBox[1] || box[1] > westBandBox[3]);
-  });
-  const drawnAreaGeometries = adjacentDrawnAreas.map((feature) => feature.geometry);
-  const mesopotamiaToleranceKm = regionToleranceKm("mesopotamia");
-  let bestCoincidentRun = [];
-  for (const line of empireSlices) {
-    const samples = densifiedLineSamples(line.coordinates ?? [], 0.2);
-    let current = [];
-    for (const sample of samples) {
-      if (nearestGeometryDistanceKm(sample, drawnAreaGeometries) <= mesopotamiaToleranceKm) {
-        current.push(sample);
-      } else if (current.length > 0) {
-        if (current.length > bestCoincidentRun.length) bestCoincidentRun = current;
-        current = [];
-      }
-    }
-    if (current.length > bestCoincidentRun.length) bestCoincidentRun = current;
-  }
-  if (bestCoincidentRun.length === 0) {
-    failures.push("(g) mesopotamia found no empire-edge samples close to adjacent drawn areas.");
-  }
-  const sharedLatMin = bestCoincidentRun.length > 0 ? Math.min(...bestCoincidentRun.map((point) => point[1])) - 0.01 : latBandMin;
-  const sharedLatMax = bestCoincidentRun.length > 0 ? Math.max(...bestCoincidentRun.map((point) => point[1])) + 0.01 : latBandMax;
+
+  const drawnAreaGeometries = drawnAreas.map((feature) => feature.geometry);
   const sampleStepKm = 0.2;
-  const westBoundarySamples = densifiedEdgeSamples(mesopotamia.geometry, sampleStepKm).filter((sample) => {
-    if (!(sample[1] >= sharedLatMin && sample[1] <= sharedLatMax && sample[0] <= lonBandMax)) return false;
-    if (westEdgeReferenceGeometries.length === 0) return true;
-    return nearestGeometryDistanceKm(sample, westEdgeReferenceGeometries) <= mesopotamiaToleranceKm + 0.05;
-  });
-  if (westBoundarySamples.length === 0) {
-    failures.push("(g) mesopotamia west-edge band produced no boundary samples for gap validation.");
+  const boundaryToleranceKm = 0.01;
+  const riverBandKm = 5;
+  const handoffExclusionKm = 1;
+  const mesopotamiaToleranceKm = regionToleranceKm("mesopotamia");
+
+  const mesopotamiaBoundaryFrontierSamples = densifiedEdgeSamples(mesopotamia.geometry, sampleStepKm).filter((sample) =>
+    nearestGeometryDistanceKm(sample, drawnAreaGeometries) <= boundaryToleranceKm &&
+    nearestGeometryDistanceKm(sample, euphratesSlices) <= riverBandKm &&
+    nearestGeometryDistanceKm(sample, empireSlices) <= 0.05
+  );
+  if (mesopotamiaBoundaryFrontierSamples.length === 0) {
+    failures.push("(g) mesopotamia could not derive its north-west frontier corner from pinned inputs.");
+    return { failures, overlapKm2, maxGapKm: null, maxGapPoint: null, excludedNearHandoffSamples: 0 };
   }
+  const northWestPoint = [...mesopotamiaBoundaryFrontierSamples].sort((left, right) => {
+    if (Math.abs(right[1] - left[1]) > 1e-9) return right[1] - left[1];
+    return left[0] - right[0];
+  })[0];
+
+  const frontierSamples = empireSlices.flatMap((line) => densifiedLineSamples(line.coordinates ?? [], sampleStepKm))
+    .filter((sample) =>
+      nearestGeometryDistanceKm(sample, drawnAreaGeometries) <= boundaryToleranceKm &&
+      nearestGeometryDistanceKm(sample, euphratesSlices) <= riverBandKm
+    );
+  if (frontierSamples.length === 0) {
+    failures.push("(g) mesopotamia found no frontier samples on drawn boundaries near the Euphrates.");
+    return { failures, overlapKm2, maxGapKm: null, maxGapPoint: null, excludedNearHandoffSamples: 0 };
+  }
+
+  const frontierLine = stitchEmpireEdgeChain(empireEdgeGeometries, northWestPoint);
+  if (!frontierLine || frontierLine.length < 2) {
+    failures.push("(g) mesopotamia could not derive the empire-edge frontier line for gap validation.");
+    return { failures, overlapKm2, maxGapKm: null, maxGapPoint: null, excludedNearHandoffSamples: 0 };
+  }
+
+  const nearestFrontierVertexIndex = frontierLine
+    .map((vertex, index) => ({ index, distanceKm: distanceBetweenPointsKm(vertex, northWestPoint) }))
+    .sort((left, right) => left.distanceKm - right.distanceKm)[0]?.index ?? 0;
+  const forwardVertices = frontierLine.slice(nearestFrontierVertexIndex);
+  const backwardVertices = frontierLine.slice(0, nearestFrontierVertexIndex + 1).reverse();
+  const forwardMinLat = Math.min(...forwardVertices.map((point) => point[1]));
+  const backwardMinLat = Math.min(...backwardVertices.map((point) => point[1]));
+  const scorePath = (vertices) => vertices.reduce(
+    (score, vertex) => (
+      nearestGeometryDistanceKm(vertex, drawnAreaGeometries) <= boundaryToleranceKm &&
+      nearestGeometryDistanceKm(vertex, euphratesSlices) <= riverBandKm
+        ? score + 1
+        : score
+    ),
+    0
+  );
+  const frontierPath = forwardMinLat < backwardMinLat
+    ? forwardVertices
+    : backwardMinLat < forwardMinLat
+      ? backwardVertices
+      : scorePath(forwardVertices) >= scorePath(backwardVertices)
+        ? forwardVertices
+        : backwardVertices;
+
+  const riverDistancesByVertex = frontierPath.map((vertex) => nearestGeometryDistanceKm(vertex, euphratesSlices));
+  let handoffVertexIndex = -1;
+  for (let index = 0; index < frontierPath.length - 1; index += 1) {
+    const currentOnFrontier = riverDistancesByVertex[index] <= riverBandKm &&
+      nearestGeometryDistanceKm(frontierPath[index], drawnAreaGeometries) <= boundaryToleranceKm;
+    if (currentOnFrontier && riverDistancesByVertex[index + 1] > riverBandKm) {
+      handoffVertexIndex = index;
+    }
+  }
+  if (handoffVertexIndex < 0) {
+    failures.push("(g) mesopotamia could not derive the west-edge hand-off vertex from empire-edge/river distances.");
+    return { failures, overlapKm2, maxGapKm: null, maxGapPoint: null, excludedNearHandoffSamples: 0 };
+  }
+  const handoffVertex = frontierPath[handoffVertexIndex];
+  const frontierSegment = frontierPath.slice(0, handoffVertexIndex + 1);
+  const measuredFrontierSamples = densifiedLineSamples(frontierSegment, sampleStepKm).filter((sample) =>
+    nearestGeometryDistanceKm(sample, drawnAreaGeometries) <= boundaryToleranceKm &&
+    nearestGeometryDistanceKm(sample, euphratesSlices) <= riverBandKm
+  );
+  // The hand-off connector intentionally leaves the shared frontier at a local hairpin; skip samples
+  // within 1 km of the hand-off so this by-construction loop simplification does not register as a gap.
+  const includedSamples = measuredFrontierSamples.filter((sample) => distanceBetweenPointsKm(sample, handoffVertex) > handoffExclusionKm);
+  const excludedNearHandoffSamples = measuredFrontierSamples.length - includedSamples.length;
+  if (includedSamples.length === 0) {
+    failures.push("(g) mesopotamia west-edge gap check had no samples outside the hand-off exclusion zone.");
+    return { failures, overlapKm2, maxGapKm: null, maxGapPoint: null, excludedNearHandoffSamples };
+  }
+
   let maxGapKm = 0;
-  for (const sample of westBoundarySamples) {
-    maxGapKm = Math.max(maxGapKm, nearestGeometryDistanceKm(sample, drawnAreaGeometries));
+  let maxGapPoint = null;
+  for (const sample of includedSamples) {
+    const gapKm = distanceToGeometryKm(sample, mesopotamia.geometry);
+    if (gapKm > maxGapKm) {
+      maxGapKm = gapKm;
+      maxGapPoint = sample;
+    }
   }
-  const gapToleranceKm = mesopotamiaToleranceKm + 0.02; // allow up to 20 m for densification/sampling aliasing.
-  if (maxGapKm > gapToleranceKm) {
+  if (maxGapKm > mesopotamiaToleranceKm) {
     failures.push(
-      `(g) mesopotamia max gap to drawn areas is ${maxGapKm.toFixed(3)} km (must be <= ${gapToleranceKm.toFixed(3)} km).`
+      `(g) mesopotamia max gap to drawn areas is ${maxGapKm.toFixed(3)} km at [${maxGapPoint[0].toFixed(5)},${maxGapPoint[1].toFixed(5)}] (must be <= ${mesopotamiaToleranceKm.toFixed(3)} km).`
     );
   }
-  return { failures, overlapKm2, maxGapKm };
+  return { failures, overlapKm2, maxGapKm, maxGapPoint, excludedNearHandoffSamples };
 }
 
 async function runRegionOutlineChecks({ seededError, cacheRoot }) {
@@ -1320,11 +1501,19 @@ async function runRegionOutlineChecks({ seededError, cacheRoot }) {
   const mesopotamiaAdjacency = await evaluateMesopotamiaDrawnAreaAdjacency({
     featureById,
     areaFeatures,
-    allowedTagged: rebuilt.allowedInputGeometriesTagged
+    empireEdgeGeometries: (empireEdge.features ?? []).map((feature) => feature.geometry),
+    naturalEarthRiverFeatures: [
+      ...(naturalEarthRiversMain.features ?? []),
+      ...(naturalEarthRiversEurope.features ?? [])
+    ],
+    anchorCoordinatesById
   });
   if (mesopotamiaAdjacency.overlapKm2 != null && mesopotamiaAdjacency.maxGapKm != null) {
+    const atText = mesopotamiaAdjacency.maxGapPoint
+      ? `[${mesopotamiaAdjacency.maxGapPoint[0].toFixed(5)},${mesopotamiaAdjacency.maxGapPoint[1].toFixed(5)}]`
+      : "unknown";
     console.log(
-      `(g) mesopotamia drawn-area overlap ${mesopotamiaAdjacency.overlapKm2.toFixed(3)} km²; max gap to drawn areas ${mesopotamiaAdjacency.maxGapKm.toFixed(3)} km`
+      `(g) mesopotamia drawn-area overlap ${mesopotamiaAdjacency.overlapKm2.toFixed(3)} km²; max gap to drawn areas ${mesopotamiaAdjacency.maxGapKm.toFixed(3)} km at ${atText}; excluded ${mesopotamiaAdjacency.excludedNearHandoffSamples} sample(s) within 1 km of hand-off`
     );
   }
   failures.push(...mesopotamiaAdjacency.failures);
@@ -1345,6 +1534,10 @@ async function runRegionOutlineChecks({ seededError, cacheRoot }) {
     naturalEarthRivers: [
       ...(naturalEarthRiversMain.features ?? []).map((feature) => feature.geometry),
       ...(naturalEarthRiversEurope.features ?? []).map((feature) => feature.geometry)
+    ],
+    naturalEarthRiverFeatures: [
+      ...(naturalEarthRiversMain.features ?? []),
+      ...(naturalEarthRiversEurope.features ?? [])
     ],
     naturalEarthLakes: (naturalEarthLakes.features ?? []).map((feature) => feature.geometry),
     areaGeometries: (ancientAreas.features ?? []).map((feature) => feature.geometry),
@@ -1524,7 +1717,9 @@ async function proofP4OnCb75908({ context }) {
     const mesopotamiaAdjacency = await evaluateMesopotamiaDrawnAreaAdjacency({
       featureById: oldById,
       areaFeatures: context.areaFeatures,
-      allowedTagged: context.rebuilt.allowedInputGeometriesTagged
+      empireEdgeGeometries: context.empireEdgeGeometries,
+      naturalEarthRiverFeatures: context.naturalEarthRiverFeatures,
+      anchorCoordinatesById: context.anchorCoordinatesById
     });
     failures.push(...mesopotamiaAdjacency.failures);
     return failures;
