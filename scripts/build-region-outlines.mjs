@@ -460,13 +460,20 @@ function stitchNamedRiverChain(riversMain, pattern, anchorCoordinates) {
 }
 
 function nearestPointOnSegment(point, start, end) {
-  const vx = end[0] - start[0];
-  const vy = end[1] - start[1];
-  const wx = point[0] - start[0];
-  const wy = point[1] - start[1];
+  const cosPhi = Math.cos((point[1] * Math.PI) / 180);
+  const sx = start[0] * cosPhi;
+  const sy = start[1];
+  const ex = end[0] * cosPhi;
+  const ey = end[1];
+  const px = point[0] * cosPhi;
+  const py = point[1];
+  const vx = ex - sx;
+  const vy = ey - sy;
+  const wx = px - sx;
+  const wy = py - sy;
   const denominator = vx * vx + vy * vy;
   const t = denominator < VORONOI_EPSILON ? 0 : Math.max(0, Math.min(1, (wx * vx + wy * vy) / denominator));
-  return [start[0] + t * vx, start[1] + t * vy, t];
+  return [start[0] + t * (end[0] - start[0]), start[1] + t * (end[1] - start[1]), t];
 }
 
 function nearestPointOnLine(line, point) {
@@ -628,23 +635,129 @@ function ringPathsBetweenPoints(ring, start, end) {
   const withStart = insertPointOnLine(ring, startNearest);
   const endNearest = nearestPointOnLine(withStart, end);
   const withBoth = insertPointOnLine(withStart, endNearest);
-  const startIndex = withBoth.findIndex(
+  const openRing = withBoth.length > 1
+    && Math.abs(withBoth[0][0] - withBoth.at(-1)[0]) < VORONOI_EPSILON
+    && Math.abs(withBoth[0][1] - withBoth.at(-1)[1]) < VORONOI_EPSILON
+    ? withBoth.slice(0, -1)
+    : withBoth;
+  const startIndex = openRing.findIndex(
     (point) => Math.abs(point[0] - startNearest.point[0]) < VORONOI_EPSILON && Math.abs(point[1] - startNearest.point[1]) < VORONOI_EPSILON
   );
-  const endIndex = withBoth.findIndex(
+  const endIndex = openRing.findIndex(
     (point) => Math.abs(point[0] - endNearest.point[0]) < VORONOI_EPSILON && Math.abs(point[1] - endNearest.point[1]) < VORONOI_EPSILON
   );
-  const forward = startIndex <= endIndex
-    ? withBoth.slice(startIndex, endIndex + 1)
-    : [...withBoth.slice(startIndex), ...withBoth.slice(0, endIndex + 1)];
-  const reverse = endIndex <= startIndex
-    ? withBoth.slice(endIndex, startIndex + 1).reverse()
-    : [...withBoth.slice(endIndex), ...withBoth.slice(0, startIndex + 1)].reverse();
+  const n = openRing.length;
+  const nextIndex = (index) => (index + 1) % n;
+  const prevIndex = (index) => (index - 1 + n) % n;
+  const walk = (stepper) => {
+    const out = [openRing[startIndex]];
+    let cursor = startIndex;
+    let safety = 0;
+    while (cursor !== endIndex && safety <= n + 2) {
+      cursor = stepper(cursor);
+      out.push(openRing[cursor]);
+      safety += 1;
+    }
+    return out;
+  };
+  const forward = walk(nextIndex);
+  const reverse = walk(prevIndex);
   return { forward, reverse };
 }
 
 function meanLatitudeOfLine(line) {
   return line.reduce((sum, point) => sum + point[1], 0) / Math.max(line.length, 1);
+}
+
+function maxLatitudeOfLine(line) {
+  return line.reduce((max, point) => Math.max(max, point[1]), -Infinity);
+}
+
+function squaredProjectedDistance(point, anchor, cosPhi) {
+  const dx = (point[0] - anchor[0]) * cosPhi;
+  const dy = point[1] - anchor[1];
+  return dx * dx + dy * dy;
+}
+
+function equidistantDifference(point, { insideAnchors, outsideAnchor, cosPhi }) {
+  const outside = squaredProjectedDistance(point, outsideAnchor, cosPhi);
+  const inside = Math.min(...insideAnchors.map((anchor) => squaredProjectedDistance(point, anchor, cosPhi)));
+  return outside - inside;
+}
+
+function solveEquidistantLatitudeAtLongitude(lon, options) {
+  const { minLat = 36, maxLat = 40.5 } = options;
+  let lower = minLat;
+  let upper = maxLat;
+  let fLower = equidistantDifference([lon, lower], options);
+  let fUpper = equidistantDifference([lon, upper], options);
+  if (fLower * fUpper > 0) {
+    let found = false;
+    const step = 0.05;
+    for (let start = minLat; start < maxLat; start += step) {
+      const end = Math.min(maxLat, start + step);
+      const fStart = equidistantDifference([lon, start], options);
+      const fEnd = equidistantDifference([lon, end], options);
+      if (fStart === 0) return start;
+      if (fStart * fEnd <= 0) {
+        lower = start;
+        upper = end;
+        fLower = fStart;
+        fUpper = fEnd;
+        found = true;
+        break;
+      }
+    }
+    if (!found) return null;
+  }
+  for (let iteration = 0; iteration < 32; iteration += 1) {
+    const mid = (lower + upper) / 2;
+    const fMid = equidistantDifference([lon, mid], options);
+    if (Math.abs(fMid) < 1e-12) return mid;
+    if (fLower * fMid <= 0) {
+      upper = mid;
+      fUpper = fMid;
+    } else {
+      lower = mid;
+      fLower = fMid;
+    }
+  }
+  return (lower + upper) / 2;
+}
+
+function riverEquidistantCrossings(line, options) {
+  const hits = [];
+  for (let index = 1; index < line.length; index += 1) {
+    const start = line[index - 1];
+    const end = line[index];
+    let fStart = equidistantDifference(start, options);
+    let fEnd = equidistantDifference(end, options);
+    if (fStart === 0) hits.push({ point: start, segmentIndex: index - 1, t: 0 });
+    if (fStart * fEnd > 0) continue;
+    let low = 0;
+    let high = 1;
+    for (let iteration = 0; iteration < 32; iteration += 1) {
+      const mid = (low + high) / 2;
+      const point = [start[0] + (end[0] - start[0]) * mid, start[1] + (end[1] - start[1]) * mid];
+      const fMid = equidistantDifference(point, options);
+      if (Math.abs(fMid) < 1e-12) {
+        low = mid;
+        high = mid;
+        break;
+      }
+      if (fStart * fMid <= 0) {
+        high = mid;
+        fEnd = fMid;
+      } else {
+        low = mid;
+        fStart = fMid;
+      }
+    }
+    const t = (low + high) / 2;
+    const hit = [start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t];
+    hits.push({ point: hit, segmentIndex: index - 1, t });
+  }
+  return hits;
 }
 
 function featureFromLine(line, properties = {}) {
@@ -1195,48 +1308,37 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       /(tigris|dicle)/u,
       anchorPoint(anchorsById, "nisibis")
     );
-    const arsamosataCellGeometry = groupB.cellByAnchorId.get("arsamosata");
-    if (!arsamosataCellGeometry) throw new Error("Group B Voronoi has no cell for Arsamosata.");
-    const arsamosataCell = geometryFeature(arsamosataCellGeometry);
-    const arsamosataLandPieces = await booleanOpStrict({
-      workDirectory,
-      tag: "group-b-arsamosata-land",
-      operation: "clip",
-      subjectFeatures: [arsamosataCell],
-      maskFeatures: [mesopotamiaLand],
-      expectNonEmpty: true
-    });
-    const arsamosataLand = await unionOne({ workDirectory, tag: "group-b-arsamosata-land-union", features: arsamosataLandPieces });
-    const euphratesInArs = await booleanOp({
-      workDirectory,
-      tag: "group-b-euphrates-in-arsamosata",
-      operation: "clip",
-      subjectFeatures: [featureFromLine(euphrates)],
-      maskFeatures: [arsamosataLand]
-    });
-    const tigrisInArs = await booleanOp({
-      workDirectory,
-      tag: "group-b-tigris-in-arsamosata",
-      operation: "clip",
-      subjectFeatures: [featureFromLine(tigris)],
-      maskFeatures: [arsamosataLand]
-    });
-    const endpointsFromLines = (lineFeatures) =>
-      lineFeatures.flatMap((feature) => {
-        const lines = feature.geometry?.type === "LineString" ? [feature.geometry.coordinates] : (feature.geometry?.coordinates ?? []);
-        return lines.flatMap((line) => (line.length >= 2 ? [line[0], line.at(-1)] : []));
-      });
-    const euphratesCrossing = endpointsFromLines(euphratesInArs).sort((left, right) => left[1] - right[1])[0];
-    const tigrisCrossing = endpointsFromLines(tigrisInArs).sort((left, right) => left[1] - right[1])[0];
-    if (!euphratesCrossing || !tigrisCrossing) {
-      throw new Error("Could not derive Mesopotamia north crossings from the Arsamosata Voronoi cell.");
+    const insideAnchors = ["edessa", "carrhae", "nisibis"].map((anchorId) => anchorPoint(anchorsById, anchorId));
+    const outsideAnchor = anchorPoint(anchorsById, "arsamosata");
+    const groupBLatitudes = [...GROUP_B_LABELS.keys()].map((anchorId) => anchorPoint(anchorsById, anchorId)[1]);
+    const cosPhi = Math.cos((groupBLatitudes.reduce((sum, latitude) => sum + latitude, 0) / groupBLatitudes.length) * Math.PI / 180);
+    const equidistantOptions = { insideAnchors, outsideAnchor, cosPhi };
+    const euphratesCrossings = riverEquidistantCrossings(euphrates, equidistantOptions)
+      .sort((left, right) => left.segmentIndex - right.segmentIndex);
+    const tigrisCrossings = riverEquidistantCrossings(tigris, equidistantOptions)
+      .sort((left, right) => left.segmentIndex - right.segmentIndex);
+    const euphratesCrossing = euphratesCrossings[0]?.point;
+    const tigrisCrossing = tigrisCrossings[0]?.point;
+    if (!euphratesCrossing || !tigrisCrossing) throw new Error("Could not derive Mesopotamia north crossings from equidistant anchors.");
+    const lonStart = Math.min(euphratesCrossing[0], tigrisCrossing[0]);
+    const lonEnd = Math.max(euphratesCrossing[0], tigrisCrossing[0]);
+    const northEdge = [];
+    for (let lon = lonStart; lon <= lonEnd + 1e-9; lon += 0.01) {
+      const solvedLat = solveEquidistantLatitudeAtLongitude(lon, { ...equidistantOptions, minLat: 37.2, maxLat: 38.9 });
+      if (!Number.isFinite(solvedLat)) continue;
+      northEdge.push([lon, solvedLat]);
     }
-    const arsRing = polygonsOf(arsamosataLand.geometry)[0]?.[0];
-    if (!arsRing || arsRing.length < 4) throw new Error("Arsamosata clipped cell has no usable outer ring.");
-    const northCandidates = ringPathsBetweenPoints(arsRing, euphratesCrossing, tigrisCrossing);
-    const northEdge = meanLatitudeOfLine(northCandidates.forward) < meanLatitudeOfLine(northCandidates.reverse)
-      ? northCandidates.forward
-      : northCandidates.reverse;
+    if (northEdge.length < 2) {
+      throw new Error("Could not solve Mesopotamia north equidistant line between Euphrates and Tigris.");
+    }
+    northEdge[0] = euphratesCrossing;
+    northEdge[northEdge.length - 1] = tigrisCrossing;
+    m520Diagnostics.mesopotamia = {
+      euphratesCrossing,
+      tigrisCrossing,
+      northEdgeMaxLat: maxLatitudeOfLine(northEdge),
+      northEdgeMinLat: northEdge.reduce((min, point) => Math.min(min, point[1]), Infinity)
+    };
     const babylonAnchor = anchorPoint(anchorsById, "babylon");
     const seleuciaAnchor = anchorPoint(anchorsById, "seleucia-tigris");
     const euphratesNearBabylon = nearestPointOnLine(euphrates, babylonAnchor).point;
