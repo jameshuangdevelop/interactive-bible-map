@@ -223,13 +223,13 @@ Complete example:
     },
     {
       "id": "jesus-1",
-      "title": "Jesus' journeys",
-      "fromYear": 28,
-      "toYear": 30,
+      "title": "Jesus' early ministry",
+      "fromYear": 26,
+      "toYear": 29,
       "structure": "standalone-segments",
-      "summary": "Well-attested movement segments listed without harmonizing the Gospels into one itinerary.",
+      "summary": "Well-attested movement segments of the early ministry, listed where each arrives, in the order of two public-domain harmonies of the Gospels.",
       "bibleText": "The route keeps only segments whose start and end places are clear in the cited passages.",
-      "notes": ["Segments are listed neutrally and do not assert one Gospel timeline."],
+      "notes": ["Each segment is shown only where a Gospel names both ends; this isn't a full harmonized itinerary."],
       "sources": ["scripture:Matthew 4:13", "bib:pleiades-place-resource"],
       "stages": [
         {
