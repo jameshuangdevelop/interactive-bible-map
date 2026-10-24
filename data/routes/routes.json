@@ -1754,22 +1754,19 @@
       ]
     },
     {
-      "id": "jesus",
-      "title": "Jesus' journeys",
+      "id": "jesus-1",
+      "title": "Jesus' early ministry",
       "fromYear": 26,
-      "toYear": 33,
+      "toYear": 29,
       "structure": "standalone-segments",
-      "summary": "This route gathers well-attested movements of Jesus across Galilee, Judea, Samaria and the regions around them, from his baptism in the Jordan to his resurrection, as the four Gospels record them. All four Gospels place his ministry and death in the time of Pontius Pilate, the Roman governor of Judea from AD 26 to 36, and his death is commonly dated between AD 30 and AD 33.",
-      "bibleText": "The Gospels tell of Jesus coming from Nazareth to John the Baptist at the Jordan, then being led by the Spirit into the wilderness before beginning to preach in Galilee, where he made his home at Capernaum. From there he traveled between Galilee and Jerusalem several times, passed through Samaria, and went into the regions of Tyre and Sidon and of Caesarea Philippi, teaching, healing and training his disciples, until a final journey brought him from Galilee, by way of Jericho, to Jerusalem for the Passover, where he was arrested and put to death, and, the Gospels report, rose from the dead and appeared to his disciples before his ascension near Bethany.",
+      "summary": "Jesus is baptized by John and tempted in the wilderness, gathers his first disciples, turns water into wine at Cana, and moves between Capernaum, Jerusalem, Judea, Samaria and Galilee before his Galilean ministry is fully under way.",
+      "bibleText": "Matthew 3:13-4:13, Mark 1:9-14, Luke 4:1-31 and John 1:28-4:46 together describe these early movements before Jesus' Galilean ministry is fully under way.",
       "notes": [
         "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
-        "These segments are well attested individually, each shown only where a Gospel names both ends of the movement, in the passage or its context, but they are not joined into one itinerary; no single order of events across the four Gospels is claimed. They are listed in five broad periods every Gospel shares, and within each period by each segment's first passage—a way of listing them, not a claim about when each happened.",
-        "About AD 26-33. The International Standard Bible Encyclopedia (1915) dates the baptism to AD 26 and the death to AD 30, with a ministry of probably three years after the first Passover, from the Passovers that John's Gospel names. It also notes that counting Tiberius's fifteenth year (Luke 3:1) from the death of Augustus, a common way of reckoning reigns, would give AD 28-29 for the start, and that an early tradition dates the death to AD 29. World History Encyclopedia's own account states that all the Gospels place Jesus' ministry and death within Pontius Pilate's time as governor (AD 26-36), and that the commonly agreed date for the death falls between AD 30 and AD 33, so the route's years run to AD 33 to cover that range. The length of the ministry can't be fixed with certainty.",
-        "Several places on this route—including Bethany beyond the Jordan, Cana, Bethsaida, the country of the Gadarenes, and Emmaus—have more than one proposed site; where sources point to one with the strongest support the route draws a line to it, and otherwise the stage is listed without a line.",
-        "Matthew, Mark and Luke's own manuscripts differ on the name of the region the boat crossed to—“Gergesenes,” “Gadarenes” or “Gerasenes”—so this route titles the stop “The country of the Gadarenes (Gerasenes/Gergesenes)”, giving all three names rather than choosing one.",
-        "Where a passage names only a region—such as Judea, Samaria, Galilee, the Decapolis, or “the borders of Tyre and Sidon”—rather than a town, the stage names the region; where a stage begins or ends at a region, or passes through one between two towns, its path isn't known, and its line runs straight between its ends.",
-        "At Mark 7:31 the WEB, like the KJV and NKJV, says Jesus left “the borders of Tyre and Sidon”; the NIV, ESV, NLT and CSB say he went by way of Sidon. This route follows the WEB, so Sidon is named on the map but not shown as a place he passed.",
-        "At three passages (Matthew 21:1; Mark 11:1; Luke 19:29) the WEB text reads “Bethsphage”; this route follows the spelling (“Bethphage”) that the other compared English versions agree on."
+        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
+        "About AD 26-29. Robertson's Chief Divisions places his Part VI in \"probably A.D. 26 and 27.\" ISBE dates the baptism to AD 26 and the first Passover to AD 27, and also reports a reckoning from Augustus's death that gives AD 28-29 for the start of the ministry, with an early tradition of AD 29 for the death. World History Encyclopedia places Jesus' ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range keeps AD 29 as its upper bound to cover ISBE's later-start view.",
+        "Bethany beyond the Jordan and Cana both have multiple proposed sites in this project's data, so the stages that begin or end at those places are listed without a line.",
+        "Where a passage names only a region—such as Judea, Samaria, or Galilee—rather than a town, the stage names the region; where a stage begins or ends at a region, its path isn't known, and its line runs straight between its ends."
       ],
       "sources": [
         "scripture:Matthew 3:13",
@@ -1785,7 +1782,9 @@
         "bib:nlt-2015-biblegateway",
         "bib:kjv-1987-biblegateway",
         "bib:nkjv-1982-biblegateway",
-        "bib:csb-2017-biblegateway"
+        "bib:csb-2017-biblegateway",
+        "bib:robertson-harmony-of-the-gospels",
+        "bib:stevens-burton-harmony-of-the-gospels"
       ],
       "stages": [
         {
@@ -1843,155 +1842,6 @@
             "scripture:Mark 1:9",
             "scripture:Matthew 3:13"
           ]
-        },
-        {
-          "id": "segment-02",
-          "from": {
-            "kind": "location",
-            "locationId": "bethany-beyond-the-jordan",
-            "candidateIndex": 0
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "galilee"
-          },
-          "scripture": [
-            {
-              "ref": "Matthew 4:1",
-              "book": "Matthew",
-              "textWEB": "Then Jesus was led up by the Spirit into the wilderness to be tempted by the devil."
-            },
-            {
-              "ref": "Matthew 4:11-12",
-              "book": "Matthew",
-              "textWEB": "Then the devil left him, and behold, angels came and served him. Now when Jesus heard that John was delivered up, he withdrew into Galilee."
-            },
-            {
-              "ref": "Mark 1:12-14",
-              "book": "Mark",
-              "textWEB": "Immediately the Spirit drove him out into the wilderness. He was there in the wilderness forty days, tempted by Satan. He was with the wild animals; and the angels were serving him. Now after John was taken into custody, Jesus came into Galilee, preaching the Good News of God’s Kingdom,"
-            },
-            {
-              "ref": "Luke 4:1",
-              "book": "Luke",
-              "textWEB": "Jesus, full of the Holy Spirit, returned from the Jordan and was led by the Spirit into the wilderness"
-            },
-            {
-              "ref": "Luke 4:14",
-              "book": "Luke",
-              "textWEB": "Jesus returned in the power of the Spirit into Galilee, and news about him spread through all the surrounding area."
-            }
-          ],
-          "travelMode": "unknown",
-          "attestation": {
-            "gospels": [
-              "Matthew",
-              "Mark",
-              "Luke"
-            ],
-            "rule": "All three have Jesus go from the Jordan (named in Luke 4:1) into the wilderness, a general place and not a stop (Mark 1:13: forty days), and then into Galilee; Matthew and Mark place this after John was taken into custody.",
-            "sources": [
-              "scripture:Luke 4:1",
-              "scripture:Luke 4:14",
-              "scripture:Mark 1:12-14",
-              "scripture:Matthew 4:1",
-              "scripture:Matthew 4:11-12"
-            ]
-          },
-          "noLineReason": "Bethany beyond the Jordan has two proposed sites, on opposite banks of the river, and this map favors neither, so no line is drawn.",
-          "sources": [
-            "scripture:Luke 4:1",
-            "scripture:Luke 4:14",
-            "scripture:Mark 1:12-14",
-            "scripture:Matthew 4:1",
-            "scripture:Matthew 4:11-12"
-          ]
-        },
-        {
-          "id": "segment-03",
-          "from": {
-            "kind": "location",
-            "locationId": "nazareth"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "capernaum"
-          },
-          "scripture": [
-            {
-              "ref": "Matthew 4:13",
-              "book": "Matthew",
-              "textWEB": "Leaving Nazareth, he came and lived in Capernaum, which is by the sea, in the region of Zebulun and Naphtali,"
-            },
-            {
-              "ref": "Luke 4:16",
-              "book": "Luke",
-              "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
-            },
-            {
-              "ref": "Luke 4:28-31",
-              "book": "Luke",
-              "textWEB": "They were all filled with wrath in the synagogue as they heard these things. They rose up, threw him out of the city, and led him to the brow of the hill that their city was built on, that they might throw him off the cliff. But he, passing through the middle of them, went his way. He came down to Capernaum, a city of Galilee. He was teaching them on the Sabbath day,"
-            }
-          ],
-          "travelMode": "land",
-          "attestation": {
-            "gospels": [
-              "Matthew",
-              "Luke"
-            ],
-            "rule": "Matthew states directly that, leaving Nazareth, Jesus came to live in Capernaum; Luke separately narrates Jesus leaving Nazareth after the synagogue's rejection of him and coming down to Capernaum.",
-            "sources": [
-              "scripture:Luke 4:16",
-              "scripture:Luke 4:28-31",
-              "scripture:Matthew 4:13"
-            ]
-          },
-          "sources": [
-            "scripture:Luke 4:16",
-            "scripture:Luke 4:28-31",
-            "scripture:Matthew 4:13"
-          ],
-          "lineId": "jesus-segment-03"
-        },
-        {
-          "from": {
-            "kind": "location",
-            "locationId": "galilee"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "nazareth"
-          },
-          "scripture": [
-            {
-              "ref": "Luke 4:14",
-              "book": "Luke",
-              "textWEB": "Jesus returned in the power of the Spirit into Galilee, and news about him spread through all the surrounding area."
-            },
-            {
-              "ref": "Luke 4:16",
-              "book": "Luke",
-              "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
-            }
-          ],
-          "travelMode": "unknown",
-          "attestation": {
-            "gospels": [
-              "Luke"
-            ],
-            "rule": "Luke states directly that Jesus returned in the power of the Spirit into Galilee, and then came to Nazareth, where he had been brought up.",
-            "sources": [
-              "scripture:Luke 4:14",
-              "scripture:Luke 4:16"
-            ]
-          },
-          "sources": [
-            "scripture:Luke 4:14",
-            "scripture:Luke 4:16"
-          ],
-          "id": "segment-04",
-          "lineId": "jesus-segment-04"
         },
         {
           "id": "segment-05",
@@ -2201,6 +2051,69 @@
           "lineId": "jesus-segment-09"
         },
         {
+          "id": "segment-02",
+          "from": {
+            "kind": "location",
+            "locationId": "bethany-beyond-the-jordan",
+            "candidateIndex": 0
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "galilee"
+          },
+          "scripture": [
+            {
+              "ref": "Matthew 4:1",
+              "book": "Matthew",
+              "textWEB": "Then Jesus was led up by the Spirit into the wilderness to be tempted by the devil."
+            },
+            {
+              "ref": "Matthew 4:11-12",
+              "book": "Matthew",
+              "textWEB": "Then the devil left him, and behold, angels came and served him. Now when Jesus heard that John was delivered up, he withdrew into Galilee."
+            },
+            {
+              "ref": "Mark 1:12-14",
+              "book": "Mark",
+              "textWEB": "Immediately the Spirit drove him out into the wilderness. He was there in the wilderness forty days, tempted by Satan. He was with the wild animals; and the angels were serving him. Now after John was taken into custody, Jesus came into Galilee, preaching the Good News of God’s Kingdom,"
+            },
+            {
+              "ref": "Luke 4:1",
+              "book": "Luke",
+              "textWEB": "Jesus, full of the Holy Spirit, returned from the Jordan and was led by the Spirit into the wilderness"
+            },
+            {
+              "ref": "Luke 4:14",
+              "book": "Luke",
+              "textWEB": "Jesus returned in the power of the Spirit into Galilee, and news about him spread through all the surrounding area."
+            }
+          ],
+          "travelMode": "unknown",
+          "attestation": {
+            "gospels": [
+              "Matthew",
+              "Mark",
+              "Luke"
+            ],
+            "rule": "All three have Jesus go from the Jordan (named in Luke 4:1) into the wilderness, a general place and not a stop (Mark 1:13: forty days), and then into Galilee; Matthew and Mark place this after John was taken into custody.",
+            "sources": [
+              "scripture:Luke 4:1",
+              "scripture:Luke 4:14",
+              "scripture:Mark 1:12-14",
+              "scripture:Matthew 4:1",
+              "scripture:Matthew 4:11-12"
+            ]
+          },
+          "noLineReason": "Bethany beyond the Jordan has two proposed sites, on opposite banks of the river, and this map favors neither, so no line is drawn.",
+          "sources": [
+            "scripture:Luke 4:1",
+            "scripture:Luke 4:14",
+            "scripture:Mark 1:12-14",
+            "scripture:Matthew 4:1",
+            "scripture:Matthew 4:11-12"
+          ]
+        },
+        {
           "id": "segment-10",
           "from": {
             "kind": "location",
@@ -2248,6 +2161,199 @@
             "scripture:John 4:43",
             "scripture:John 4:45-46"
           ]
+        },
+        {
+          "from": {
+            "kind": "location",
+            "locationId": "galilee"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "nazareth"
+          },
+          "scripture": [
+            {
+              "ref": "Luke 4:14",
+              "book": "Luke",
+              "textWEB": "Jesus returned in the power of the Spirit into Galilee, and news about him spread through all the surrounding area."
+            },
+            {
+              "ref": "Luke 4:16",
+              "book": "Luke",
+              "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
+            }
+          ],
+          "travelMode": "unknown",
+          "attestation": {
+            "gospels": [
+              "Luke"
+            ],
+            "rule": "Luke states directly that Jesus returned in the power of the Spirit into Galilee, and then came to Nazareth, where he had been brought up.",
+            "sources": [
+              "scripture:Luke 4:14",
+              "scripture:Luke 4:16"
+            ]
+          },
+          "sources": [
+            "scripture:Luke 4:14",
+            "scripture:Luke 4:16"
+          ],
+          "id": "segment-04",
+          "lineId": "jesus-segment-04"
+        },
+        {
+          "id": "segment-03",
+          "from": {
+            "kind": "location",
+            "locationId": "nazareth"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "capernaum"
+          },
+          "scripture": [
+            {
+              "ref": "Matthew 4:13",
+              "book": "Matthew",
+              "textWEB": "Leaving Nazareth, he came and lived in Capernaum, which is by the sea, in the region of Zebulun and Naphtali,"
+            },
+            {
+              "ref": "Luke 4:16",
+              "book": "Luke",
+              "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
+            },
+            {
+              "ref": "Luke 4:28-31",
+              "book": "Luke",
+              "textWEB": "They were all filled with wrath in the synagogue as they heard these things. They rose up, threw him out of the city, and led him to the brow of the hill that their city was built on, that they might throw him off the cliff. But he, passing through the middle of them, went his way. He came down to Capernaum, a city of Galilee. He was teaching them on the Sabbath day,"
+            }
+          ],
+          "travelMode": "land",
+          "attestation": {
+            "gospels": [
+              "Matthew",
+              "Luke"
+            ],
+            "rule": "Matthew states directly that, leaving Nazareth, Jesus came to live in Capernaum; Luke separately narrates Jesus leaving Nazareth after the synagogue's rejection of him and coming down to Capernaum.",
+            "sources": [
+              "scripture:Luke 4:16",
+              "scripture:Luke 4:28-31",
+              "scripture:Matthew 4:13"
+            ]
+          },
+          "sources": [
+            "scripture:Luke 4:16",
+            "scripture:Luke 4:28-31",
+            "scripture:Matthew 4:13"
+          ],
+          "lineId": "jesus-segment-03"
+        }
+      ]
+    },
+    {
+      "id": "jesus-2",
+      "title": "Jesus in Galilee",
+      "fromYear": 27,
+      "toYear": 32,
+      "structure": "standalone-segments",
+      "summary": "Jesus goes up to Jerusalem for an unnamed feast, then teaches and heals around Capernaum, Nain and the Sea of Galilee, including a crossing to the country of the Gadarenes and back.",
+      "bibleText": "John 5:1, Luke 7:1-8:40, Matthew 8:18-9:1 and Mark 4:35-5:21 describe these movements in and around Galilee.",
+      "notes": [
+        "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
+        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
+        "About AD 27-32. Robertson places this block within his Part VII (\"probably A.D. 27 to 29\"). ISBE ties this period's timing to the year before the last Passover and reports both an AD 28-29 start reckoning and an early AD 29 death tradition; World History Encyclopedia places the death between AD 30 and AD 33 within Pilate's AD 26-36 governorship. This part's range follows the widening approved for the six-part split.",
+        "The country of the Gadarenes (Gerasenes/Gergesenes) has multiple proposed sites in this project's data, so the crossing stages there and back are listed without a line.",
+        "Matthew, Mark and Luke's own manuscripts differ on the region name—\"Gergesenes,\" \"Gadarenes\" or \"Gerasenes\"—so this route keeps all three names rather than choosing one."
+      ],
+      "sources": [
+        "scripture:Matthew 3:13",
+        "scripture:Luke 24:50",
+        "scripture:Luke 24:34",
+        "bib:isbe-chronology-nt",
+        "bib:worldhistory-jesus-christ",
+        "bib:isbe-gadara",
+        "bib:isbe-gerasa",
+        "bib:isbe-bethphage",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway",
+        "bib:robertson-harmony-of-the-gospels",
+        "bib:stevens-burton-harmony-of-the-gospels"
+      ],
+      "stages": [
+        {
+          "id": "segment-20",
+          "from": {
+            "kind": "location",
+            "locationId": "galilee"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "jerusalem"
+          },
+          "scripture": [
+            {
+              "ref": "John 5:1",
+              "book": "John",
+              "textWEB": "After these things, there was a feast of the Jews, and Jesus went up to Jerusalem."
+            }
+          ],
+          "travelMode": "unknown",
+          "attestation": {
+            "gospels": [
+              "John"
+            ],
+            "rule": "John states directly that Jesus went up to Jerusalem for a feast, picking up from the Galilee setting of the previous chapter.",
+            "sources": [
+              "scripture:John 5:1"
+            ]
+          },
+          "sources": [
+            "scripture:John 5:1"
+          ],
+          "lineId": "jesus-segment-20"
+        },
+        {
+          "id": "segment-19",
+          "from": {
+            "kind": "location",
+            "locationId": "capernaum"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "nain"
+          },
+          "scripture": [
+            {
+              "ref": "Luke 7:1",
+              "book": "Luke",
+              "textWEB": "After he had finished speaking in the hearing of the people, he entered into Capernaum."
+            },
+            {
+              "ref": "Luke 7:11",
+              "book": "Luke",
+              "textWEB": "Soon afterwards, he went to a city called Nain. Many of his disciples, along with a great multitude, went with him."
+            }
+          ],
+          "travelMode": "land",
+          "attestation": {
+            "gospels": [
+              "Luke"
+            ],
+            "rule": "Luke states directly that, soon after entering Capernaum, Jesus went to a city called Nain.",
+            "sources": [
+              "scripture:Luke 7:1",
+              "scripture:Luke 7:11"
+            ]
+          },
+          "sources": [
+            "scripture:Luke 7:1",
+            "scripture:Luke 7:11"
+          ],
+          "lineId": "jesus-segment-19"
         },
         {
           "id": "segment-11",
@@ -2367,7 +2473,44 @@
             "scripture:Mark 5:21",
             "scripture:Matthew 9:1"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": "jesus-3",
+      "title": "Jesus beyond Galilee",
+      "fromYear": 28,
+      "toYear": 32,
+      "structure": "standalone-segments",
+      "summary": "Jesus travels to the borders of Tyre and Sidon, through the region of the Decapolis, and to Bethsaida and the villages of Caesarea Philippi, then returns to Capernaum and goes up to Jerusalem for the Feast of Booths.",
+      "bibleText": "Matthew 15:21-17:24, Mark 7:24-9:33 and John 7:1-14 describe these movements beyond Galilee and back to Jerusalem for the Feast of Booths.",
+      "notes": [
+        "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
+        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
+        "About AD 28-32. Robertson places this in his Part VIII (from the Passover of John 6 to Tabernacles) and the start of Part IX; ISBE says the timing markers from John 6:4 to 11:55 are \"definite and clear\" (7:2; 10:22), which places this part in the year before the last Passover. ISBE also reports an AD 28-29 start reckoning and an early AD 29 death tradition, while World History Encyclopedia gives AD 30-33 for the commonly agreed death range within Pilate's AD 26-36 term.",
+        "Bethsaida has two proposed sites in this project's data, so stages that begin or end there are listed without a line.",
+        "Where a passage names only a region—such as the Decapolis or \"the borders of Tyre and Sidon\"—rather than a town, the stage names the region; where a stage begins or ends at a region, its path isn't known, and its line runs straight between its ends.",
+        "At Mark 7:31 the WEB, like the KJV and NKJV, says Jesus left \"the borders of Tyre and Sidon\"; the NIV, ESV, NLT and CSB say he went by way of Sidon. This route follows the WEB, so Sidon is named on the map but not shown as a place he passed."
+      ],
+      "sources": [
+        "scripture:Matthew 3:13",
+        "scripture:Luke 24:50",
+        "scripture:Luke 24:34",
+        "bib:isbe-chronology-nt",
+        "bib:worldhistory-jesus-christ",
+        "bib:isbe-gadara",
+        "bib:isbe-gerasa",
+        "bib:isbe-bethphage",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway",
+        "bib:robertson-harmony-of-the-gospels",
+        "bib:stevens-burton-harmony-of-the-gospels"
+      ],
+      "stages": [
         {
           "id": "segment-13",
           "from": {
@@ -2705,77 +2848,6 @@
           "lineId": "jesus-segment-18"
         },
         {
-          "id": "segment-19",
-          "from": {
-            "kind": "location",
-            "locationId": "capernaum"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "nain"
-          },
-          "scripture": [
-            {
-              "ref": "Luke 7:1",
-              "book": "Luke",
-              "textWEB": "After he had finished speaking in the hearing of the people, he entered into Capernaum."
-            },
-            {
-              "ref": "Luke 7:11",
-              "book": "Luke",
-              "textWEB": "Soon afterwards, he went to a city called Nain. Many of his disciples, along with a great multitude, went with him."
-            }
-          ],
-          "travelMode": "land",
-          "attestation": {
-            "gospels": [
-              "Luke"
-            ],
-            "rule": "Luke states directly that, soon after entering Capernaum, Jesus went to a city called Nain.",
-            "sources": [
-              "scripture:Luke 7:1",
-              "scripture:Luke 7:11"
-            ]
-          },
-          "sources": [
-            "scripture:Luke 7:1",
-            "scripture:Luke 7:11"
-          ],
-          "lineId": "jesus-segment-19"
-        },
-        {
-          "id": "segment-20",
-          "from": {
-            "kind": "location",
-            "locationId": "galilee"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "jerusalem"
-          },
-          "scripture": [
-            {
-              "ref": "John 5:1",
-              "book": "John",
-              "textWEB": "After these things, there was a feast of the Jews, and Jesus went up to Jerusalem."
-            }
-          ],
-          "travelMode": "unknown",
-          "attestation": {
-            "gospels": [
-              "John"
-            ],
-            "rule": "John states directly that Jesus went up to Jerusalem for a feast, picking up from the Galilee setting of the previous chapter.",
-            "sources": [
-              "scripture:John 5:1"
-            ]
-          },
-          "sources": [
-            "scripture:John 5:1"
-          ],
-          "lineId": "jesus-segment-20"
-        },
-        {
           "id": "segment-21",
           "from": {
             "kind": "location",
@@ -2820,6 +2892,164 @@
             "scripture:John 7:14"
           ],
           "lineId": "jesus-segment-21"
+        }
+      ]
+    },
+    {
+      "id": "jesus-4",
+      "title": "Jesus' final journey to Jerusalem",
+      "fromYear": 28,
+      "toYear": 33,
+      "structure": "standalone-segments",
+      "summary": "In John, Jesus withdraws beyond the Jordan after the Feast of Dedication, returns to Bethany to raise Lazarus, withdraws to Ephraim and comes back to Bethany six days before the Passover; in Matthew and Mark, he leaves Galilee and goes up by way of Jericho, through which Luke also has him pass. All four Gospels then tell of his entry into Jerusalem.",
+      "bibleText": "Matthew 19:1-21:10, Mark 10:1-11:11, Luke 18:35-19:45 and John 10:22-12:12 provide these final-journey movements before the last week.",
+      "notes": [
+        "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
+        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
+        "About AD 28-33. Robertson places these movements across his Parts IX-X, and ISBE places John 10:22 (Dedication) in the year before the last Passover while also reporting an AD 28-29 reckoning for the ministry's start and an early AD 29 death tradition. World History Encyclopedia places the commonly agreed death range at AD 30-33 within Pilate's AD 26-36 term, so this part's range runs through AD 33.",
+        "Bethany beyond the Jordan has multiple proposed sites in this project's data, so stages that begin or end there are listed without a line.",
+        "Where a passage names only a region—such as Galilee—rather than a town, the stage names the region; where a stage begins or ends at a region, its path isn't known, and its line runs straight between its ends.",
+        "At Matthew 21:1, Mark 11:1 and Luke 19:29 the WEB text reads \"Bethsphage\"; this route follows the spelling (\"Bethphage\") that the other compared English versions agree on."
+      ],
+      "sources": [
+        "scripture:Matthew 3:13",
+        "scripture:Luke 24:50",
+        "scripture:Luke 24:34",
+        "bib:isbe-chronology-nt",
+        "bib:worldhistory-jesus-christ",
+        "bib:isbe-gadara",
+        "bib:isbe-gerasa",
+        "bib:isbe-bethphage",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway",
+        "bib:robertson-harmony-of-the-gospels",
+        "bib:stevens-burton-harmony-of-the-gospels"
+      ],
+      "stages": [
+        {
+          "id": "segment-25",
+          "from": {
+            "kind": "location",
+            "locationId": "jerusalem"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "bethany-beyond-the-jordan",
+            "candidateIndex": 0
+          },
+          "scripture": [
+            {
+              "ref": "John 10:22-23",
+              "book": "John",
+              "textWEB": "It was the Feast of the Dedication at Jerusalem. It was winter, and Jesus was walking in the temple, in Solomon’s porch."
+            },
+            {
+              "ref": "John 10:40",
+              "book": "John",
+              "textWEB": "He went away again beyond the Jordan into the place where John was baptizing at first, and he stayed there."
+            }
+          ],
+          "travelMode": "land",
+          "attestation": {
+            "gospels": [
+              "John"
+            ],
+            "rule": "John states directly that, from the Feast of Dedication at Jerusalem, Jesus went away again beyond the Jordan into the place where John was baptizing at first, the same place as segment-01.",
+            "sources": [
+              "scripture:John 10:22-23",
+              "scripture:John 10:40"
+            ]
+          },
+          "noLineReason": "Bethany beyond the Jordan has two proposed sites, on opposite banks of the river, and this map favors neither, so no line is drawn.",
+          "sources": [
+            "scripture:John 10:22-23",
+            "scripture:John 10:40"
+          ]
+        },
+        {
+          "id": "segment-26",
+          "from": {
+            "kind": "location",
+            "locationId": "bethany-beyond-the-jordan",
+            "candidateIndex": 0
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "bethany"
+          },
+          "scripture": [
+            {
+              "ref": "John 11:7",
+              "book": "John",
+              "textWEB": "Then after this he said to the disciples, “Let’s go into Judea again.”"
+            },
+            {
+              "ref": "John 11:17-18",
+              "book": "John",
+              "textWEB": "So when Jesus came, he found that he had been in the tomb four days already. Now Bethany was near Jerusalem, about fifteen stadia away."
+            }
+          ],
+          "travelMode": "unknown",
+          "namedRegions": [
+            {
+              "name": "Judea",
+              "locationId": "judea",
+              "sources": [
+                "scripture:John 11:7"
+              ]
+            }
+          ],
+          "attestation": {
+            "gospels": [
+              "John"
+            ],
+            "rule": "John states directly that Jesus said 'let's go into Judea again', and the narrative continues at Bethany, which John itself distinguishes as 'near Jerusalem' from Bethany beyond the Jordan.",
+            "sources": [
+              "scripture:John 11:17-18",
+              "scripture:John 11:7"
+            ]
+          },
+          "noLineReason": "Bethany beyond the Jordan has two proposed sites, on opposite banks of the river, and this map favors neither, so no line is drawn.",
+          "sources": [
+            "scripture:John 11:17-18",
+            "scripture:John 11:7"
+          ]
+        },
+        {
+          "id": "segment-27",
+          "from": {
+            "kind": "location",
+            "locationId": "bethany"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "ephraim"
+          },
+          "scripture": [
+            {
+              "ref": "John 11:54",
+              "book": "John",
+              "textWEB": "Jesus therefore walked no more openly among the Jews, but departed from there into the country near the wilderness, to a city called Ephraim. He stayed there with his disciples."
+            }
+          ],
+          "travelMode": "land",
+          "attestation": {
+            "gospels": [
+              "John"
+            ],
+            "rule": "John states directly that Jesus departed from there into the country near the wilderness, to a city called Ephraim.",
+            "sources": [
+              "scripture:John 11:54"
+            ]
+          },
+          "sources": [
+            "scripture:John 11:54"
+          ],
+          "lineId": "jesus-segment-27"
         },
         {
           "id": "segment-22",
@@ -2884,6 +3114,38 @@
             "scripture:Matthew 20:29"
           ],
           "lineId": "jesus-segment-22"
+        },
+        {
+          "id": "segment-28",
+          "from": {
+            "kind": "location",
+            "locationId": "ephraim"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "bethany"
+          },
+          "scripture": [
+            {
+              "ref": "John 12:1",
+              "book": "John",
+              "textWEB": "Then, six days before the Passover, Jesus came to Bethany, where Lazarus was, who had been dead, whom he raised from the dead."
+            }
+          ],
+          "travelMode": "land",
+          "attestation": {
+            "gospels": [
+              "John"
+            ],
+            "rule": "John states directly that, six days before the Passover, Jesus came to Bethany, where Lazarus was.",
+            "sources": [
+              "scripture:John 12:1"
+            ]
+          },
+          "sources": [
+            "scripture:John 12:1"
+          ],
+          "lineId": "jesus-segment-28"
         },
         {
           "id": "segment-23",
@@ -3046,160 +3308,41 @@
             }
           ],
           "lineId": "jesus-segment-24"
-        },
-        {
-          "id": "segment-25",
-          "from": {
-            "kind": "location",
-            "locationId": "jerusalem"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "bethany-beyond-the-jordan",
-            "candidateIndex": 0
-          },
-          "scripture": [
-            {
-              "ref": "John 10:22-23",
-              "book": "John",
-              "textWEB": "It was the Feast of the Dedication at Jerusalem. It was winter, and Jesus was walking in the temple, in Solomon’s porch."
-            },
-            {
-              "ref": "John 10:40",
-              "book": "John",
-              "textWEB": "He went away again beyond the Jordan into the place where John was baptizing at first, and he stayed there."
-            }
-          ],
-          "travelMode": "land",
-          "attestation": {
-            "gospels": [
-              "John"
-            ],
-            "rule": "John states directly that, from the Feast of Dedication at Jerusalem, Jesus went away again beyond the Jordan into the place where John was baptizing at first, the same place as segment-01.",
-            "sources": [
-              "scripture:John 10:22-23",
-              "scripture:John 10:40"
-            ]
-          },
-          "noLineReason": "Bethany beyond the Jordan has two proposed sites, on opposite banks of the river, and this map favors neither, so no line is drawn.",
-          "sources": [
-            "scripture:John 10:22-23",
-            "scripture:John 10:40"
-          ]
-        },
-        {
-          "id": "segment-26",
-          "from": {
-            "kind": "location",
-            "locationId": "bethany-beyond-the-jordan",
-            "candidateIndex": 0
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "bethany"
-          },
-          "scripture": [
-            {
-              "ref": "John 11:7",
-              "book": "John",
-              "textWEB": "Then after this he said to the disciples, “Let’s go into Judea again.”"
-            },
-            {
-              "ref": "John 11:17-18",
-              "book": "John",
-              "textWEB": "So when Jesus came, he found that he had been in the tomb four days already. Now Bethany was near Jerusalem, about fifteen stadia away."
-            }
-          ],
-          "travelMode": "unknown",
-          "namedRegions": [
-            {
-              "name": "Judea",
-              "locationId": "judea",
-              "sources": [
-                "scripture:John 11:7"
-              ]
-            }
-          ],
-          "attestation": {
-            "gospels": [
-              "John"
-            ],
-            "rule": "John states directly that Jesus said 'let's go into Judea again', and the narrative continues at Bethany, which John itself distinguishes as 'near Jerusalem' from Bethany beyond the Jordan.",
-            "sources": [
-              "scripture:John 11:17-18",
-              "scripture:John 11:7"
-            ]
-          },
-          "noLineReason": "Bethany beyond the Jordan has two proposed sites, on opposite banks of the river, and this map favors neither, so no line is drawn.",
-          "sources": [
-            "scripture:John 11:17-18",
-            "scripture:John 11:7"
-          ]
-        },
-        {
-          "id": "segment-27",
-          "from": {
-            "kind": "location",
-            "locationId": "bethany"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "ephraim"
-          },
-          "scripture": [
-            {
-              "ref": "John 11:54",
-              "book": "John",
-              "textWEB": "Jesus therefore walked no more openly among the Jews, but departed from there into the country near the wilderness, to a city called Ephraim. He stayed there with his disciples."
-            }
-          ],
-          "travelMode": "land",
-          "attestation": {
-            "gospels": [
-              "John"
-            ],
-            "rule": "John states directly that Jesus departed from there into the country near the wilderness, to a city called Ephraim.",
-            "sources": [
-              "scripture:John 11:54"
-            ]
-          },
-          "sources": [
-            "scripture:John 11:54"
-          ],
-          "lineId": "jesus-segment-27"
-        },
-        {
-          "id": "segment-28",
-          "from": {
-            "kind": "location",
-            "locationId": "ephraim"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "bethany"
-          },
-          "scripture": [
-            {
-              "ref": "John 12:1",
-              "book": "John",
-              "textWEB": "Then, six days before the Passover, Jesus came to Bethany, where Lazarus was, who had been dead, whom he raised from the dead."
-            }
-          ],
-          "travelMode": "land",
-          "attestation": {
-            "gospels": [
-              "John"
-            ],
-            "rule": "John states directly that, six days before the Passover, Jesus came to Bethany, where Lazarus was.",
-            "sources": [
-              "scripture:John 12:1"
-            ]
-          },
-          "sources": [
-            "scripture:John 12:1"
-          ],
-          "lineId": "jesus-segment-28"
-        },
+        }
+      ]
+    },
+    {
+      "id": "jesus-5",
+      "title": "Jesus' last week in Jerusalem",
+      "fromYear": 29,
+      "toYear": 33,
+      "structure": "standalone-segments",
+      "summary": "Jesus teaches daily in the temple at Jerusalem and goes out of the city each night (to Bethany, Matthew and Mark say; to the mountain called Olivet, Luke says), until the night of the Last Supper, when he goes out to Gethsemane to pray.",
+      "bibleText": "Matthew 21:17-26:36, Mark 11:11-14:32, Luke 21:37-22:39 and John 18:1 narrate these movements in Jerusalem during the last week.",
+      "notes": [
+        "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
+        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
+        "About AD 29-33. Robertson labels these sections \"A.D. 30 or 29.\" ISBE also reports an early AD 29 death tradition and an AD 28-29 start reckoning depending on how Luke 3:1 is counted; World History Encyclopedia gives AD 30-33 as the commonly agreed death range within Pilate's AD 26-36 term. This part keeps AD 29-33 to cover all cited views."
+      ],
+      "sources": [
+        "scripture:Matthew 3:13",
+        "scripture:Luke 24:50",
+        "scripture:Luke 24:34",
+        "bib:isbe-chronology-nt",
+        "bib:worldhistory-jesus-christ",
+        "bib:isbe-gadara",
+        "bib:isbe-gerasa",
+        "bib:isbe-bethphage",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway",
+        "bib:robertson-harmony-of-the-gospels",
+        "bib:stevens-burton-harmony-of-the-gospels"
+      ],
+      "stages": [
         {
           "id": "segment-29",
           "from": {
@@ -3338,7 +3481,42 @@
             "scripture:Matthew 26:36"
           ],
           "lineId": "jesus-segment-30"
-        },
+        }
+      ]
+    },
+    {
+      "id": "jesus-6",
+      "title": "Jesus after the resurrection",
+      "fromYear": 29,
+      "toYear": 33,
+      "structure": "standalone-segments",
+      "summary": "The risen Jesus joins two disciples on the road to Emmaus, and later leads his disciples out to Bethany, where he blesses them and is carried up into heaven.",
+      "bibleText": "Luke 24:13-51 describes the Emmaus road and the movement to Bethany before the ascension.",
+      "notes": [
+        "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
+        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
+        "About AD 29-33. Robertson places these scenes in his Part XIV (\"forty days ... A.D. 30 or 29\"). ISBE reports both an AD 28-29 start reckoning and an early AD 29 death tradition, and World History Encyclopedia gives AD 30-33 as the commonly agreed death range within Pilate's AD 26-36 term. This part keeps AD 29-33 to cover all cited views.",
+        "Emmaus has multiple proposed sites in this project's data, so the Emmaus stage is listed without a line."
+      ],
+      "sources": [
+        "scripture:Matthew 3:13",
+        "scripture:Luke 24:50",
+        "scripture:Luke 24:34",
+        "bib:isbe-chronology-nt",
+        "bib:worldhistory-jesus-christ",
+        "bib:isbe-gadara",
+        "bib:isbe-gerasa",
+        "bib:isbe-bethphage",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway",
+        "bib:robertson-harmony-of-the-gospels",
+        "bib:stevens-burton-harmony-of-the-gospels"
+      ],
+      "stages": [
         {
           "id": "segment-31",
           "from": {
