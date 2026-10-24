@@ -1175,3 +1175,21 @@ RC-F1 touches only Mesopotamia's build, so the other five outlines don't move. I
   - the gap along the west edge by latitude band, and the empire edge against Natural Earth's river and `syria`'s boundary;
   - Lake Tuz's grid;
   - Pleiades `1001911` (JSON) and Wikidata `Q622598`.
+
+#### Mesopotamia confirmed (phase 4 re-check)
+- **Checked:** `8dac4d6`, whose outlines are byte-identical to `70b8012`'s, after RC-F1, RC-F2, RC-S1, RC-F3 and RC-S2. Since `e2350ef` only Mesopotamia has changed, and its note hasn't. Checked on 2026-10-24 (UTC).
+- **The log, reproduced.** My own `check:ancient-geo` run under the lock passed (a)–(g) and rebuilt `data/geo/` byte for byte in 148 s. It printed the same figures: overlap 0.000 km², and a maximum gap of 0.000 km at [39.26857, 35.80797], with 12 samples excluded near the hand-off.
+- **Measured without the check:**
+  - an exact mapshaper clip against every drawn area finds no overlap;
+  - every Mesopotamia west-edge vertex from 35.80°N to 37.92°N lies 0.000 km from the drawn boundary;
+  - 1,651 samples of the empire edge (every 200 m or less, on the drawn boundary, within 5 km of the river, more than 1 km from the hand-off) all lie 0.000 km from Mesopotamia;
+  - the hairpin triangle's centroid (39.27142°E 35.80047°N) lies in `syria` and not in Mesopotamia, so it is Syria's land.
+- **Area:** 148,662.4 km², within §10's 100,000–180,000.
+- **RC-S1, RC-F3 and RC-S2:** `awmc:roman-empire-ad-69-extent` is in Mesopotamia's `sources`. `DATA_LICENSE_TEXT` and `docs/LICENSES.md` match my text verbatim, and no test pins the old wording.
+
+| Region | Verdict | Still required |
+|---|---|---|
+| Mesopotamia | Signed off | — |
+| Licensing | Signed off (O1 met) | — |
+
+All six outlines, `region-anchors.json`, `lycaonia.json` and the licensing are now signed off.
