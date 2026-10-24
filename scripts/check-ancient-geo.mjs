@@ -513,6 +513,34 @@ function nearestAnchor(point, anchorCoordinatesById) {
   return best;
 }
 
+function nearestPointOnSegmentForPoint(point, start, end) {
+  const latRadians = (point[1] * Math.PI) / 180;
+  const projectKm = ([lon, lat]) => [
+    (lon - point[0]) * 111.32 * Math.cos(latRadians),
+    (lat - point[1]) * 110.574
+  ];
+  const a = projectKm(start);
+  const b = projectKm(end);
+  const vx = b[0] - a[0];
+  const vy = b[1] - a[1];
+  const wx = -a[0];
+  const wy = -a[1];
+  const denominator = vx * vx + vy * vy;
+  const t = denominator === 0 ? 0 : Math.max(0, Math.min(1, (wx * vx + wy * vy) / denominator));
+  const nearest = [start[0] + t * (end[0] - start[0]), start[1] + t * (end[1] - start[1])];
+  return { point: nearest, distanceKm: Math.hypot(a[0] + t * vx, a[1] + t * vy) };
+}
+
+function nearestPointOnGeometryForPoint(point, geometry) {
+  const segments = segmentsFromGeometry(geometry);
+  let best = null;
+  for (const [start, end] of segments) {
+    const candidate = nearestPointOnSegmentForPoint(point, start, end);
+    if (!best || candidate.distanceKm < best.distanceKm) best = candidate;
+  }
+  return best;
+}
+
 function validateAllowedInputKinds({
   allowedTagged,
   anchorCoordinatesById,
@@ -579,14 +607,17 @@ function validateAllowedInputKinds({
         failures.push("(f) anchor-river-connector has no endpoint within 1 m of a manifest anchor.");
         continue;
       }
-      const nearestRiverKm = nearestGeometryDistanceKm(riverEnd, riverSliceGeometries);
-      if (!Number.isFinite(nearestRiverKm) || nearestRiverKm > 0.001) {
+      const touchingRiver = riverSliceGeometries
+        .map((geometry) => ({ geometry, distanceKm: nearestGeometryDistanceKm(riverEnd, [geometry]) }))
+        .sort((left, right) => left.distanceKm - right.distanceKm)[0];
+      if (!touchingRiver || touchingRiver.distanceKm > 0.001) {
         failures.push("(f) anchor-river-connector river endpoint is not within 1 m of a validated river slice.");
         continue;
       }
       const anchorPoint = anchorEnd.coordinates;
       const connectorLengthKm = segmentLengthKm(start, end);
-      const trueDistanceKm = nearestGeometryDistanceKm(anchorPoint, riverSliceGeometries);
+      const nearestOnRiver = nearestPointOnGeometryForPoint(anchorPoint, touchingRiver.geometry);
+      const trueDistanceKm = nearestOnRiver?.distanceKm ?? Number.POSITIVE_INFINITY;
       if (Math.abs(connectorLengthKm - trueDistanceKm) > 0.001) {
         failures.push(
           `(f) anchor-river-connector length ${connectorLengthKm.toFixed(4)} km differs from true anchor→river distance ${trueDistanceKm.toFixed(4)} km by over 1 m.`
