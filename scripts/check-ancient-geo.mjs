@@ -541,6 +541,13 @@ function nearestPointOnGeometryForPoint(point, geometry) {
   return best;
 }
 
+function distanceBetweenPointsKm(origin, other) {
+  const latRadians = (origin[1] * Math.PI) / 180;
+  const dx = (other[0] - origin[0]) * 111.32 * Math.cos(latRadians);
+  const dy = (other[1] - origin[1]) * 110.574;
+  return Math.hypot(dx, dy);
+}
+
 function validateAllowedInputKinds({
   allowedTagged,
   anchorCoordinatesById,
@@ -615,7 +622,7 @@ function validateAllowedInputKinds({
         continue;
       }
       const anchorPoint = anchorEnd.coordinates;
-      const connectorLengthKm = segmentLengthKm(start, end);
+      const connectorLengthKm = distanceBetweenPointsKm(anchorPoint, riverEnd);
       const nearestOnRiver = nearestPointOnGeometryForPoint(anchorPoint, touchingRiver.geometry);
       const trueDistanceKm = nearestOnRiver?.distanceKm ?? Number.POSITIVE_INFINITY;
       if (Math.abs(connectorLengthKm - trueDistanceKm) > 0.001) {
