@@ -109,6 +109,23 @@ const COAST_EXCEPTIONS = Object.freeze(new Set([
   "malta:mljet"
 ]));
 const EPSILON = 1e-9;
+const M520_MEDIA_GUARDS = Object.freeze({
+  inside: [
+    { name: "Mughan", point: [48.0, 39.5] },
+    { name: "Parsabad", point: [47.92, 39.62] },
+    { name: "Aslanduz", point: [47.42, 39.42] },
+    { name: "Jolfa", point: [45.62, 38.93] }
+  ],
+  outside: [
+    { name: "Salyan", point: [48.98, 39.6] },
+    { name: "Nakhchivan", point: [45.41, 39.21] }
+  ]
+});
+const M520_EXTRA_OUTSIDE_CHECKS = Object.freeze([
+  { name: "Ctesiphon", point: [44.581331, 33.096501], regionId: "mesopotamia" },
+  { name: "Arbela", point: [44.010508, 36.190276], regionId: "mesopotamia" },
+  { name: "Lake Tatta", point: [33.75, 38.85], regionIds: ["lycaonia", "phrygia"] }
+]);
 
 function changedGeoFiles() {
   const trackedTargets = [
@@ -132,6 +149,7 @@ function parseArguments(argv) {
   let seededError = null;
   let proofFOnFe27276 = false;
   let proofEgOn20320e9 = false;
+  let proofM520On8a8f467 = false;
   for (const argument of argv) {
     if (argument.startsWith("--seed-error=")) {
       seededError = argument.slice("--seed-error=".length).trim();
@@ -145,12 +163,16 @@ function parseArguments(argv) {
       proofEgOn20320e9 = true;
       continue;
     }
+    if (argument === "--proof-m520-on-8a8f467") {
+      proofM520On8a8f467 = true;
+      continue;
+    }
     throw new Error(`Unknown argument '${argument}'.`);
   }
   if (seededError && !["b", "d", "e"].includes(seededError)) {
     throw new Error("--seed-error supports only b, d or e.");
   }
-  return { seededError, proofFOnFe27276, proofEgOn20320e9 };
+  return { seededError, proofFOnFe27276, proofEgOn20320e9, proofM520On8a8f467 };
 }
 
 function ringsOf(geometry) {
@@ -203,6 +225,60 @@ function distanceToAnyGeometryKm(point, geometry) {
     return Math.min(...(geometry.coordinates ?? []).map((line) => distanceToAnyGeometryKm(point, { type: "LineString", coordinates: line })));
   }
   return Number.POSITIVE_INFINITY;
+}
+
+function geometryBbox(geometry) {
+  let minLon = Infinity;
+  let minLat = Infinity;
+  let maxLon = -Infinity;
+  let maxLat = -Infinity;
+  const scan = (position) => {
+    minLon = Math.min(minLon, position[0]);
+    minLat = Math.min(minLat, position[1]);
+    maxLon = Math.max(maxLon, position[0]);
+    maxLat = Math.max(maxLat, position[1]);
+  };
+  if (geometry?.type === "LineString") {
+    for (const point of geometry.coordinates ?? []) scan(point);
+  } else if (geometry?.type === "MultiLineString") {
+    for (const line of geometry.coordinates ?? []) for (const point of line ?? []) scan(point);
+  } else if (geometry?.type === "Polygon") {
+    for (const ring of geometry.coordinates ?? []) for (const point of ring ?? []) scan(point);
+  } else if (geometry?.type === "MultiPolygon") {
+    for (const polygon of geometry.coordinates ?? []) for (const ring of polygon ?? []) for (const point of ring ?? []) scan(point);
+  }
+  return [minLon, minLat, maxLon, maxLat];
+}
+
+function pointNearBbox(point, box, expandKm) {
+  if (!box) return true;
+  const latMargin = expandKm / 110.574;
+  const lonMargin = expandKm / (111.32 * Math.cos((point[1] * Math.PI) / 180));
+  return point[0] >= box[0] - lonMargin && point[0] <= box[2] + lonMargin && point[1] >= box[1] - latMargin && point[1] <= box[3] + latMargin;
+}
+
+function segmentLengthKm(start, end) {
+  const midLatRad = (((start[1] + end[1]) / 2) * Math.PI) / 180;
+  const dx = (end[0] - start[0]) * 111.32 * Math.cos(midLatRad);
+  const dy = (end[1] - start[1]) * 110.574;
+  return Math.hypot(dx, dy);
+}
+
+function densifiedEdgeSamples(geometry, maxStepKm = 1) {
+  const samples = [];
+  for (const ring of ringsOf(geometry)) {
+    for (let index = 1; index < ring.length; index += 1) {
+      const start = ring[index - 1];
+      const end = ring[index];
+      const lengthKm = Math.max(segmentLengthKm(start, end), 1e-6);
+      const steps = Math.max(1, Math.ceil(lengthKm / maxStepKm));
+      for (let step = 0; step <= steps; step += 1) {
+        const t = step / steps;
+        samples.push([start[0] + t * (end[0] - start[0]), start[1] + t * (end[1] - start[1])]);
+      }
+    }
+  }
+  return samples;
 }
 
 function candidateExceptionKey(locationId, candidate) {
@@ -443,23 +519,137 @@ async function runRegionOutlineChecks({ seededError }) {
     }
   }
 
-  // (f) Every vertex is from an allowed input edge/line (within 100 m).
-  const allowed = rebuilt.allowedInputGeometries;
+  // (e) Group-derived seed checks for M5-20 groups.
+  const groupSeedChecks = [
+    { groupName: "group-a", labels: GROUP_A_LABELS, regions: ["pisidia", "lycaonia", "mysia", "phrygia"] },
+    { groupName: "group-b", labels: GROUP_B_LABELS, regions: ["media", "mesopotamia"] }
+  ];
+  for (const group of groupSeedChecks) {
+    for (const [anchorId, label] of group.labels.entries()) {
+      const coordinates = anchorCoordinatesById.get(anchorId);
+      if (!Array.isArray(coordinates) || coordinates.length < 2) {
+        failures.push(`(e) ${group.groupName}: missing seed '${anchorId}'.`);
+        continue;
+      }
+      const insideRegions = group.regions.filter((regionId) => {
+        const feature = featureById.get(regionId);
+        return feature ? pointInGeometry(coordinates, feature.geometry) : false;
+      });
+      if (label === "outside") {
+        if (insideRegions.length > 0) {
+          failures.push(`(e) ${group.groupName}: outside seed '${anchorId}' falls inside ${insideRegions.join(", ")}.`);
+        }
+        continue;
+      }
+      if (!insideRegions.includes(label)) {
+        failures.push(`(e) ${group.groupName}: seed '${anchorId}' labelled '${label}' is not inside ${label}.`);
+      }
+      const wrongRegions = insideRegions.filter((regionId) => regionId !== label);
+      if (wrongRegions.length > 0) {
+        failures.push(`(e) ${group.groupName}: seed '${anchorId}' labelled '${label}' also lies in ${wrongRegions.join(", ")}.`);
+      }
+    }
+  }
+
+  for (const check of M520_EXTRA_OUTSIDE_CHECKS) {
+    if (Array.isArray(check.regionIds)) {
+      for (const regionId of check.regionIds) {
+        const feature = featureById.get(regionId);
+        if (feature && pointInGeometry(check.point, feature.geometry)) {
+          failures.push(`(e) ${check.name} expected outside ${regionId}.`);
+        }
+      }
+      continue;
+    }
+    const feature = featureById.get(check.regionId);
+    if (feature && pointInGeometry(check.point, feature.geometry)) {
+      failures.push(`(e) ${check.name} expected outside ${check.regionId}.`);
+    }
+  }
+  const mediaFeature = featureById.get("media");
+  if (mediaFeature) {
+    for (const guard of M520_MEDIA_GUARDS.inside) {
+      if (!pointInGeometry(guard.point, mediaFeature.geometry)) {
+        failures.push(`(e) media guard '${guard.name}' expected inside media.`);
+      }
+    }
+    for (const guard of M520_MEDIA_GUARDS.outside) {
+      if (pointInGeometry(guard.point, mediaFeature.geometry)) {
+        failures.push(`(e) media guard '${guard.name}' expected outside media.`);
+      }
+    }
+  }
+
+  // (f) Every boundary sample (<=1 km step) is from a permitted input edge/line.
+  const allowedTagged = rebuilt.allowedInputGeometriesTagged ?? rebuilt.allowedInputGeometries.map((geometry) => ({ kind: "legacy", geometry }));
+  const allowedKinds = new Set([
+    "area-edge",
+    "ne-land",
+    "ne-river-slice",
+    "ne-lake-slice",
+    "anchor-segment",
+    "anchor-river-connector",
+    "m5-19-g11-line",
+    "m5-19-pontus-halys",
+    "m5-19-gaza-face",
+    "legacy"
+  ]);
+  for (const entry of allowedTagged) {
+    if (!allowedKinds.has(entry.kind)) {
+      failures.push(`(f) unsupported permitted-input kind '${entry.kind}'.`);
+    }
+    if (entry.kind === "anchor-segment") {
+      const [start, end] = entry.geometry?.coordinates ?? [];
+      const nearestAnchor = (point) =>
+        [...anchorCoordinatesById.values()].reduce((best, anchor) => {
+          const d = Math.hypot(point[0] - anchor[0], point[1] - anchor[1]);
+          return Math.min(best, d);
+        }, Number.POSITIVE_INFINITY);
+      const maxAnchorDelta = Math.max(nearestAnchor(start), nearestAnchor(end));
+      if (maxAnchorDelta > 1 / 111320) {
+        failures.push(`(f) anchor-segment endpoint is not within 1 m of a manifest anchor (Δ≈${(maxAnchorDelta * 111320).toFixed(2)} m).`);
+      }
+    }
+  }
+  const allowedWithBbox = allowedTagged.map((entry) => ({ ...entry, bbox: geometryBbox(entry.geometry) }));
   const bisectors = [
     ...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_A_LABELS, marginDegrees: 6 }),
     ...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_B_LABELS, marginDegrees: 8 })
   ];
+  const bisectorsWithBbox = bisectors.map((geometry) => ({ geometry, bbox: geometryBbox(geometry) }));
+  const simplifyIntervalMetres = Object.freeze({
+    samaria: 25,
+    galilee: 25,
+    judea: 25,
+    pisidia: 150,
+    lycaonia: 150,
+    mysia: 100,
+    phrygia: 150,
+    media: 200,
+    mesopotamia: 150,
+    pontus: 600,
+    crete: 600,
+    libya: 600,
+    chios: 600,
+    cos: 600,
+    malta: 600,
+    rhodes: 600,
+    samos: 600
+  });
   for (const feature of features) {
-    for (const vertex of vertexList(feature.geometry)) {
+    const toleranceKm = (simplifyIntervalMetres[feature.id] ?? 600) / 1000 + 0.1;
+    for (const vertex of densifiedEdgeSamples(feature.geometry, 1)) {
       let nearest = Infinity;
-      for (const geometry of allowed) {
-        nearest = Math.min(nearest, distanceToAnyGeometryKm(vertex, geometry));
+      for (const allowed of allowedWithBbox) {
+        if (!pointNearBbox(vertex, allowed.bbox, toleranceKm + 5)) continue;
+        nearest = Math.min(nearest, distanceToAnyGeometryKm(vertex, allowed.geometry));
       }
-      for (const geometry of bisectors) {
-        nearest = Math.min(nearest, distanceToAnyGeometryKm(vertex, geometry));
+      for (const geometry of bisectorsWithBbox) {
+        if (!pointNearBbox(vertex, geometry.bbox, toleranceKm + 5)) continue;
+        nearest = Math.min(nearest, distanceToAnyGeometryKm(vertex, geometry.geometry));
       }
-      if (nearest > 0.1) {
-        failures.push(`(f) ${feature.id} has vertex ${JSON.stringify(vertex)} farther than 100 m from permitted inputs (${nearest.toFixed(3)} km).`);
+      if (nearest > toleranceKm) {
+        failures.push(`(f) ${feature.id} has sample ${JSON.stringify(vertex)} farther than permitted inputs (${nearest.toFixed(3)} km > ${toleranceKm.toFixed(3)} km).`);
         break;
       }
     }
@@ -527,6 +717,62 @@ async function proofEgOn20320e9() {
   for (const failure of failures) console.log(`- ${failure}`);
 }
 
+async function proofM520On8a8f467() {
+  const previous = spawnSync("git", ["show", "8a8f467:data/geo/region-outlines.geojson"], {
+    cwd: repositoryRoot,
+    encoding: "utf8"
+  });
+  if (previous.status !== 0) throw new Error(`git show failed: ${previous.stderr}`);
+  const oldCollection = JSON.parse(previous.stdout);
+  const oldById = new Map((oldCollection.features ?? []).map((feature) => [feature.id, feature]));
+  const rebuilt = await buildRegionOutlinesData({ writeOutput: false });
+  const failures = [];
+  const media = oldById.get("media");
+  if (media) {
+    for (const guard of M520_MEDIA_GUARDS.inside) {
+      if (!pointInGeometry(guard.point, media.geometry)) failures.push(`(e) media guard '${guard.name}' expected inside media.`);
+    }
+    for (const guard of M520_MEDIA_GUARDS.outside) {
+      if (pointInGeometry(guard.point, media.geometry)) failures.push(`(e) media guard '${guard.name}' expected outside media.`);
+    }
+  }
+  const allowedTagged = rebuilt.allowedInputGeometriesTagged ?? rebuilt.allowedInputGeometries.map((geometry) => ({ kind: "legacy", geometry }));
+  const allowedWithBbox = allowedTagged.map((entry) => ({ ...entry, bbox: geometryBbox(entry.geometry) }));
+  const anchors = JSON.parse(await fs.readFile(anchorsPath, "utf8"));
+  const anchorsById = new Map((anchors.anchors ?? []).map((anchor) => [anchor.id, anchor]));
+  const bisectors = [
+    ...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_A_LABELS, marginDegrees: 6 }),
+    ...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_B_LABELS, marginDegrees: 8 })
+  ];
+  const bisectorsWithBbox = bisectors.map((geometry) => ({ geometry, bbox: geometryBbox(geometry) }));
+  const simplifyIntervalMetres = { media: 200, mesopotamia: 150 };
+  for (const regionId of ["media", "mesopotamia"]) {
+    const feature = oldById.get(regionId);
+    if (!feature) continue;
+    const toleranceKm = (simplifyIntervalMetres[regionId] ?? 600) / 1000 + 0.1;
+    for (const sample of densifiedEdgeSamples(feature.geometry, 1)) {
+      let nearest = Infinity;
+      for (const allowed of allowedWithBbox) {
+        if (!pointNearBbox(sample, allowed.bbox, toleranceKm + 5)) continue;
+        nearest = Math.min(nearest, distanceToAnyGeometryKm(sample, allowed.geometry));
+      }
+      for (const geometry of bisectorsWithBbox) {
+        if (!pointNearBbox(sample, geometry.bbox, toleranceKm + 5)) continue;
+        nearest = Math.min(nearest, distanceToAnyGeometryKm(sample, geometry.geometry));
+      }
+      if (nearest > toleranceKm) {
+        failures.push(`(f) ${regionId} sample ${JSON.stringify(sample)} is ${nearest.toFixed(3)} km from permitted inputs.`);
+        break;
+      }
+    }
+  }
+  if (failures.length === 0) {
+    throw new Error("Expected 8a8f467 to fail strengthened M5-20 checks, but it passed.");
+  }
+  console.log("Proof for strengthened M5-20 checks on 8a8f467:");
+  for (const failure of failures) console.log(`- ${failure}`);
+}
+
 async function verifyGazaFaceReproducibility(cacheRoot) {
   const committed = JSON.parse(await fs.readFile(gazaFacePath, "utf8"));
   const regenerated = await regenerateGazaRhinocoluraFaceFromCache(cacheRoot);
@@ -540,7 +786,12 @@ async function verifyGazaFaceReproducibility(cacheRoot) {
 }
 
 async function main() {
-  const { seededError, proofFOnFe27276: runProof, proofEgOn20320e9: runProofEg } = parseArguments(process.argv.slice(2));
+  const {
+    seededError,
+    proofFOnFe27276: runProof,
+    proofEgOn20320e9: runProofEg,
+    proofM520On8a8f467: runProofM520
+  } = parseArguments(process.argv.slice(2));
   const before = changedGeoFiles();
   if (before.length > 0) throw new Error(`data/geo/ has uncommitted changes, so the rebuild can't be compared with it:\n${before.join("\n")}`);
   const cache = await fs.mkdtemp(path.join(os.tmpdir(), "ibm-ancient-geo-check-"));
@@ -561,6 +812,9 @@ async function main() {
     }
     if (runProofEg) {
       await proofEgOn20320e9();
+    }
+    if (runProofM520) {
+      await proofM520On8a8f467();
     }
     console.log(`Reproduced data/geo/ byte for byte from an empty cache in ${Math.round((Date.now() - started) / 1000)} s.`);
   } finally {

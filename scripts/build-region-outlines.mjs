@@ -8,7 +8,7 @@ import booleanValid from "@turf/boolean-valid";
 import { pointInGeometry } from "./lib/ancient-area-checks.mjs";
 import { ancientGeoCache, fetchPinnedInputs, readJsonFile } from "./lib/ancient-geo-inputs.mjs";
 import { geometryAreaKm2, polygonsOf } from "./lib/geometry-cleanup.mjs";
-import { buildGroupVoronoi, bisectorLinesByLabel } from "./lib/local-equirect-voronoi.mjs";
+import { buildGroupVoronoi } from "./lib/local-equirect-voronoi.mjs";
 import { GROUP_A_LABELS, GROUP_B_LABELS } from "./lib/m5-20-region-groups.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -353,14 +353,40 @@ function findArasKuraChain(riversMain) {
   if (arasCandidates.length === 0) throw new Error("Could not find Aras/Araxes in Natural Earth rivers.");
   if (kuraCandidates.length === 0) throw new Error("Could not find Kura/Cyrus in Natural Earth rivers.");
   const aras = arasCandidates.sort((left, right) => lineLengthSquared(right.line) - lineLengthSquared(left.line))[0].line;
-  const kura = kuraCandidates.sort((left, right) => lineLengthSquared(right.line) - lineLengthSquared(left.line))[0].line;
-  const chain = connectLines(aras, kura);
-  const eastEnd = chain.reduce((best, point, index) => (point[0] > chain[best][0] ? index : best), 0);
-  const oriented = eastEnd === chain.length - 1 ? chain : [...chain].reverse();
+  const kuraLines = kuraCandidates
+    .map((entry) => entry.line)
+    // Keep the connected lower-Kura chain to the Caspian; short upper tributary fragments
+    // (all points north of ~40.5°N in this Natural Earth build) are not part of that chain.
+    .filter((line) => Math.min(...line.map((point) => point[1])) <= 40.5);
+  const firstKura = [...kuraLines].sort(
+    (left, right) => endpointDistanceSquared(aras, left) - endpointDistanceSquared(aras, right)
+  )[0];
+  const used = new Set([firstKura]);
+  let kuraChain = [...firstKura];
+  while (used.size < kuraLines.length) {
+    const next = kuraLines
+      .filter((line) => !used.has(line))
+      .map((line) => ({ line, d2: endpointDistanceSquared(kuraChain, line) }))
+      .sort((left, right) => left.d2 - right.d2)[0];
+    if (!next || next.d2 > 0.05) break;
+    kuraChain = connectLines(kuraChain, next.line);
+    used.add(next.line);
+  }
+  const seaPoint = kuraChain.reduce((best, point) => (point[0] > best[0] ? point : best), kuraChain[0]);
+  const confluenceHit = polylineIntersections(aras, kuraChain)[0]?.point;
+  const confluence = confluenceHit ?? aras.reduce((best, point) => {
+    const nearest = nearestPointOnLine(kuraChain, point);
+    if (!best || nearest.d2 < best.d2) return nearest;
+    return best;
+  }, null).point;
+  const kuraToConfluence = sliceLineBetweenPoints(kuraChain, seaPoint, confluence);
+  const arasWestEnd = aras.reduce((best, point) => (point[0] < best[0] ? point : best), aras[0]);
+  const arasFromConfluence = sliceLineBetweenPoints(aras, confluence, arasWestEnd);
+  const oriented = [...kuraToConfluence, ...arasFromConfluence.slice(1)];
   return {
     chain: oriented,
     arasLine: aras,
-    kuraLine: kura
+    kuraLine: kuraToConfluence
   };
 }
 
@@ -411,14 +437,14 @@ function orientLineFromNearPoint(line, point) {
   return startDistance <= endDistance ? line : [...line].reverse();
 }
 
-function stitchNamedRiverChain(riversMain, pattern, startPoint) {
+function stitchNamedRiverChain(riversMain, pattern, anchorCoordinates) {
   const candidates = riverCandidateLines(riversMain, (name) => pattern.test(name)).map((entry) => entry.line);
   if (candidates.length === 0) throw new Error(`Could not find named river segments for ${pattern}.`);
   const ordered = [...candidates].sort(
-    (left, right) => nearestPointDistanceSquared(left, startPoint) - nearestPointDistanceSquared(right, startPoint)
+    (left, right) => nearestPointDistanceSquared(left, anchorCoordinates) - nearestPointDistanceSquared(right, anchorCoordinates)
   );
   const used = new Set();
-  let chain = orientLineFromNearPoint(ordered[0], startPoint);
+  let chain = orientLineFromNearPoint(ordered[0], anchorCoordinates);
   used.add(ordered[0]);
   while (used.size < candidates.length) {
     const next = candidates
@@ -431,6 +457,194 @@ function stitchNamedRiverChain(riversMain, pattern, startPoint) {
     used.add(next.candidate);
   }
   return chain;
+}
+
+function nearestPointOnSegment(point, start, end) {
+  const vx = end[0] - start[0];
+  const vy = end[1] - start[1];
+  const wx = point[0] - start[0];
+  const wy = point[1] - start[1];
+  const denominator = vx * vx + vy * vy;
+  const t = denominator < VORONOI_EPSILON ? 0 : Math.max(0, Math.min(1, (wx * vx + wy * vy) / denominator));
+  return [start[0] + t * vx, start[1] + t * vy, t];
+}
+
+function nearestPointOnLine(line, point) {
+  let best = null;
+  for (let index = 1; index < line.length; index += 1) {
+    const [lon, lat, t] = nearestPointOnSegment(point, line[index - 1], line[index]);
+    const d2 = (lon - point[0]) ** 2 + (lat - point[1]) ** 2;
+    if (!best || d2 < best.d2) {
+      best = { point: [lon, lat], segmentIndex: index - 1, t, d2 };
+    }
+  }
+  if (!best) return { point: line[0], segmentIndex: 0, t: 0, d2: 0 };
+  return best;
+}
+
+function insertPointOnLine(line, insertion) {
+  const out = [];
+  for (let index = 0; index < line.length; index += 1) {
+    out.push(line[index]);
+    if (index === insertion.segmentIndex) {
+      const last = out.at(-1);
+      if (Math.abs(last[0] - insertion.point[0]) > VORONOI_EPSILON || Math.abs(last[1] - insertion.point[1]) > VORONOI_EPSILON) {
+        out.push(insertion.point);
+      }
+    }
+  }
+  return out;
+}
+
+function sliceLineBetweenPoints(line, start, end) {
+  const startNearest = nearestPointOnLine(line, start);
+  const endNearest = nearestPointOnLine(line, end);
+  const withStart = insertPointOnLine(line, startNearest);
+  const startIndex = withStart.findIndex(
+    (point) => Math.abs(point[0] - startNearest.point[0]) < VORONOI_EPSILON && Math.abs(point[1] - startNearest.point[1]) < VORONOI_EPSILON
+  );
+  const endNearestAdjusted = nearestPointOnLine(withStart, endNearest.point);
+  const withBoth = insertPointOnLine(withStart, endNearestAdjusted);
+  const startIndexFinal = withBoth.findIndex(
+    (point) => Math.abs(point[0] - startNearest.point[0]) < VORONOI_EPSILON && Math.abs(point[1] - startNearest.point[1]) < VORONOI_EPSILON
+  );
+  const endIndexFinal = withBoth.findIndex(
+    (point) => Math.abs(point[0] - endNearest.point[0]) < VORONOI_EPSILON && Math.abs(point[1] - endNearest.point[1]) < VORONOI_EPSILON
+  );
+  if (startIndexFinal <= endIndexFinal) return withBoth.slice(startIndexFinal, endIndexFinal + 1);
+  return [...withBoth.slice(endIndexFinal, startIndexFinal + 1)].reverse();
+}
+
+function segmentIntersection(a1, a2, b1, b2) {
+  const denominator = (a1[0] - a2[0]) * (b1[1] - b2[1]) - (a1[1] - a2[1]) * (b1[0] - b2[0]);
+  if (Math.abs(denominator) < VORONOI_EPSILON) return null;
+  const numeratorA = a1[0] * a2[1] - a1[1] * a2[0];
+  const numeratorB = b1[0] * b2[1] - b1[1] * b2[0];
+  const x = (numeratorA * (b1[0] - b2[0]) - (a1[0] - a2[0]) * numeratorB) / denominator;
+  const y = (numeratorA * (b1[1] - b2[1]) - (a1[1] - a2[1]) * numeratorB) / denominator;
+  const within = (value, left, right) => value >= Math.min(left, right) - 1e-8 && value <= Math.max(left, right) + 1e-8;
+  if (!within(x, a1[0], a2[0]) || !within(y, a1[1], a2[1])) return null;
+  if (!within(x, b1[0], b2[0]) || !within(y, b1[1], b2[1])) return null;
+  return [x, y];
+}
+
+function polylineIntersections(lineA, lineB) {
+  const intersections = [];
+  for (let i = 1; i < lineA.length; i += 1) {
+    for (let j = 1; j < lineB.length; j += 1) {
+      const hit = segmentIntersection(lineA[i - 1], lineA[i], lineB[j - 1], lineB[j]);
+      if (!hit) continue;
+      intersections.push({ point: hit, segmentA: i - 1, segmentB: j - 1 });
+    }
+  }
+  return intersections;
+}
+
+function eastOfSegmentMask(start, end, extent = 30) {
+  const dx = end[0] - start[0];
+  const dy = end[1] - start[1];
+  const length = Math.hypot(dx, dy);
+  const ux = dx / Math.max(length, VORONOI_EPSILON);
+  const uy = dy / Math.max(length, VORONOI_EPSILON);
+  const mid = [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
+  const eastReference = [Math.max(start[0], end[0]) + 2, mid[1]];
+  const normals = [
+    [uy, -ux],
+    [-uy, ux]
+  ];
+  const { candidateX: nx, candidateY: ny } = normals
+    .map(([candidateX, candidateY]) => ({
+      candidateX,
+      candidateY,
+      score: (eastReference[0] - mid[0]) * candidateX + (eastReference[1] - mid[1]) * candidateY
+    }))
+    .sort((left, right) => right.score - left.score)[0];
+  const a = [start[0] - ux * extent, start[1] - uy * extent];
+  const b = [end[0] + ux * extent, end[1] + uy * extent];
+  const c = [b[0] + nx * extent, b[1] + ny * extent];
+  const d = [a[0] + nx * extent, a[1] + ny * extent];
+  return geometryFeature({ type: "Polygon", coordinates: [[a, b, c, d, a]] });
+}
+
+function southOfLineMask(line, margin = 6) {
+  const ordered = line[0][0] <= line.at(-1)[0] ? line : [...line].reverse();
+  const lons = ordered.map((point) => point[0]);
+  const lats = ordered.map((point) => point[1]);
+  const minLon = Math.min(...lons) - margin;
+  const maxLon = Math.max(...lons) + margin;
+  const minLat = Math.min(...lats) - margin;
+  const ring = normalizeRing([
+    [minLon, minLat],
+    [maxLon, minLat],
+    [maxLon, ordered.at(-1)[1]],
+    ...[...ordered].reverse(),
+    [minLon, ordered[0][1]]
+  ]);
+  return geometryFeature({ type: "Polygon", coordinates: [ring] });
+}
+
+function northOfLineMask(line, margin = 6) {
+  const ordered = line[0][0] <= line.at(-1)[0] ? line : [...line].reverse();
+  const lons = ordered.map((point) => point[0]);
+  const lats = ordered.map((point) => point[1]);
+  const minLon = Math.min(...lons) - margin;
+  const maxLon = Math.max(...lons) + margin;
+  const maxLat = Math.max(...lats) + margin;
+  const ring = normalizeRing([
+    [minLon, maxLat],
+    [maxLon, maxLat],
+    [maxLon, ordered.at(-1)[1]],
+    ...[...ordered].reverse(),
+    [minLon, ordered[0][1]]
+  ]);
+  return geometryFeature({ type: "Polygon", coordinates: [ring] });
+}
+
+function sideQuadsFromLine(line, { side = "right", extentDegrees = 8 } = {}) {
+  const quads = [];
+  for (let index = 1; index < line.length; index += 1) {
+    const start = line[index - 1];
+    const end = line[index];
+    const dx = end[0] - start[0];
+    const dy = end[1] - start[1];
+    const length = Math.hypot(dx, dy);
+    if (length < VORONOI_EPSILON) continue;
+    const rightNormal = [dy / length, -dx / length];
+    const normal = side === "right" ? rightNormal : [-rightNormal[0], -rightNormal[1]];
+    const offsetStart = [start[0] + normal[0] * extentDegrees, start[1] + normal[1] * extentDegrees];
+    const offsetEnd = [end[0] + normal[0] * extentDegrees, end[1] + normal[1] * extentDegrees];
+    quads.push(
+      geometryFeature({
+        type: "Polygon",
+        coordinates: [[start, end, offsetEnd, offsetStart, start]]
+      })
+    );
+  }
+  return quads;
+}
+
+function ringPathsBetweenPoints(ring, start, end) {
+  const startNearest = nearestPointOnLine(ring, start);
+  const withStart = insertPointOnLine(ring, startNearest);
+  const endNearest = nearestPointOnLine(withStart, end);
+  const withBoth = insertPointOnLine(withStart, endNearest);
+  const startIndex = withBoth.findIndex(
+    (point) => Math.abs(point[0] - startNearest.point[0]) < VORONOI_EPSILON && Math.abs(point[1] - startNearest.point[1]) < VORONOI_EPSILON
+  );
+  const endIndex = withBoth.findIndex(
+    (point) => Math.abs(point[0] - endNearest.point[0]) < VORONOI_EPSILON && Math.abs(point[1] - endNearest.point[1]) < VORONOI_EPSILON
+  );
+  const forward = startIndex <= endIndex
+    ? withBoth.slice(startIndex, endIndex + 1)
+    : [...withBoth.slice(startIndex), ...withBoth.slice(0, endIndex + 1)];
+  const reverse = endIndex <= startIndex
+    ? withBoth.slice(endIndex, startIndex + 1).reverse()
+    : [...withBoth.slice(endIndex), ...withBoth.slice(0, startIndex + 1)].reverse();
+  return { forward, reverse };
+}
+
+function meanLatitudeOfLine(line) {
+  return line.reduce((sum, point) => sum + point[1], 0) / Math.max(line.length, 1);
 }
 
 function featureFromLine(line, properties = {}) {
@@ -446,7 +660,6 @@ function partCount(geometry) {
 
 function pruneSmallParts(feature) {
   if (ISLAND_REGION_IDS.has(feature.id)) return feature;
-  if (feature.id === "media") return feature;
   const polygons = polygonsOf(feature.geometry);
   if (polygons.length <= 1) return feature;
   const measured = polygons.map((polygon) => ({
@@ -555,10 +768,13 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const landMask = (naturalEarthLand.features ?? []).filter((feature) => feature.geometry);
 
     const features = [];
-    const allowedInputGeometries = [
-      ...(areas.features ?? []).map((feature) => feature.geometry),
-      ...landMask.map((feature) => feature.geometry)
-    ];
+    const allowedInputGeometries = [];
+    const allowInput = (kind, geometry, meta = {}) => {
+      if (!geometry) return;
+      allowedInputGeometries.push({ kind, geometry, ...meta });
+    };
+    for (const feature of areas.features ?? []) allowInput("area-edge", feature.geometry);
+    for (const feature of landMask) allowInput("ne-land", feature.geometry);
 
     // Unchanged region/part extractions.
     addFeature(features, {
@@ -592,7 +808,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const judeaSamariaIdumea = areaById(areas, "judea-samaria-idumea");
     const gazaFaceFeatures = geometriesAsFeatures(gazaFaceSource);
     if (gazaFaceFeatures.length === 0) throw new Error("Missing gaza-rhinocolura-face source geometry.");
-    allowedInputGeometries.push(...gazaFaceFeatures.map((feature) => feature.geometry));
+    for (const feature of gazaFaceFeatures) allowInput("m5-19-gaza-face", feature.geometry);
     const [minX, , maxX, maxY] = bbox(judeaSamariaIdumea.geometry);
     const g11Line = [
       [minX - 1, 32.0954],
@@ -600,7 +816,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       [35.3125, 32.1704],
       [maxX + 1, 32.1704]
     ];
-    allowedInputGeometries.push({ type: "LineString", coordinates: g11Line });
+    allowInput("m5-19-g11-line", { type: "LineString", coordinates: g11Line });
     const g11NorthMask = geometryFeature({
       type: "Polygon",
       coordinates: [[
@@ -675,7 +891,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       ? kizilirmak.geometry.coordinates
       : (kizilirmak.geometry?.coordinates?.[0] ?? []);
     const halysLine = lowerHalysFromTripoint(riverCoordinates, [35.621, 41.287]);
-    allowedInputGeometries.push({ type: "LineString", coordinates: halysLine });
+    allowInput("m5-19-pontus-halys", { type: "LineString", coordinates: halysLine });
     const halysMouth = pointAtMaxLatitude(halysLine);
     const eastMask = geometryFeature({
       type: "Polygon",
@@ -742,7 +958,6 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     }
 
     const groupA = buildGroupVoronoi({ anchorsById, labelsByAnchorId: GROUP_A_LABELS, marginDegrees: 6 });
-    allowedInputGeometries.push(...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_A_LABELS, marginDegrees: 6 }));
 
     let pisidia = await unionLabelCells({ groupVoronoi: groupA, label: "pisidia", tag: "group-a-pisidia" });
     pisidia = await unionOne({
@@ -838,33 +1053,19 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       })
     });
     phrygia = await keepComponentWithAnchor({ feature: phrygia, anchorId: "synnada", tag: "group-a-phrygia-main" });
-    const lakeTattaCut = bboxFeatureFromPoints([anchorPoint(anchorsById, "lake-tatta")], { marginLon: 0.35, marginLat: 0.25 });
-    phrygia = await unionOne({
-      workDirectory,
-      tag: "group-a-phrygia-minus-tatta",
-      features: await booleanOpStrict({
-        workDirectory,
-        tag: "group-a-phrygia-minus-tatta",
-        operation: "erase",
-        subjectFeatures: [phrygia],
-        maskFeatures: [lakeTattaCut],
-        expectNonEmpty: true
-      })
-    });
     addFeature(features, {
       id: "phrygia",
       geometry: phrygia.geometry,
       sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-phrygia", "bib:isbe-lycaonia", "pleiades:609420", "pleiades:638901"],
       confidence: "low",
-      note: "Phrygia as the trans-provincial region Strabo and ISBE describe across Asian and Galatian Phrygia (Strabo 12.8.13–17; ISBE, 'Phrygia'), with Iconium inside per M5-19 ruling P5 and the Carian side constrained by Carura. Strabo and Pliny disagree on several compass placements and on Cadi's side; this outline follows the project's PO rulings and keeps confidence low."
+      note: "Phrygia as the trans-provincial region Strabo and ISBE describe across Asian and Galatian Phrygia (Strabo 12.8.13–17; ISBE, 'Phrygia'), with Iconium inside per M5-19 ruling P5. Carura is treated as an outside anchor fallback where a through-point shared line is not explicit (Strabo 12.8.16; R23/A12). Strabo and Pliny disagree on several compass placements and on Cadi's side; this outline follows the project's PO rulings and keeps confidence low."
     });
 
     const groupB = buildGroupVoronoi({ anchorsById, labelsByAnchorId: GROUP_B_LABELS, marginDegrees: 8 });
-    allowedInputGeometries.push(...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_B_LABELS, marginDegrees: 8 }));
 
     const arasKura = findArasKuraChain(naturalEarthRiversMain);
     const arasKuraFeature = featureFromLine(arasKura.chain);
-    allowedInputGeometries.push(arasKuraFeature.geometry);
+    allowInput("ne-river-slice", arasKuraFeature.geometry, { source: "aras-kura-chain" });
 
     let media = await unionLabelCells({ groupVoronoi: groupB, label: "media", tag: "group-b-media" });
     media = await unionOne({
@@ -879,13 +1080,82 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
         expectNonEmpty: true
       })
     });
+    const artaxataCellGeometry = groupB.cellByAnchorId.get("artaxata");
+    if (!artaxataCellGeometry) throw new Error("Group B Voronoi has no cell for Artaxata.");
+    const artaxataCell = geometryFeature(artaxataCellGeometry);
+    const artaxataLandPieces = await booleanOpStrict({
+      workDirectory,
+      tag: "group-b-artaxata-land",
+      operation: "clip",
+      subjectFeatures: [artaxataCell],
+      maskFeatures: [mediaLand],
+      expectNonEmpty: true
+    });
+    const artaxataLand = await unionOne({ workDirectory, tag: "group-b-artaxata-land-union", features: artaxataLandPieces });
+    const artaxataPoint = anchorPoint(anchorsById, "artaxata");
+    const gazacaPoint = anchorPoint(anchorsById, "gazaca");
+    const artaxataGazacaSegment = [artaxataPoint, gazacaPoint];
+    allowInput("anchor-segment", { type: "LineString", coordinates: artaxataGazacaSegment }, { anchors: ["artaxata", "gazaca"] });
+    const artaxataEastMask = eastOfSegmentMask(artaxataPoint, gazacaPoint);
+    const artaxataEastPieces = await booleanOpStrict({
+      workDirectory,
+      tag: "group-b-artaxata-east",
+      operation: "clip",
+      subjectFeatures: [artaxataLand],
+      maskFeatures: [artaxataEastMask],
+      expectNonEmpty: true
+    });
+    const artaxataEast = await unionOne({ workDirectory, tag: "group-b-artaxata-east-union", features: artaxataEastPieces });
+    const segmentAndRiverHits = polylineIntersections(artaxataGazacaSegment, arasKura.chain);
+    const artaxataGazacaMidpoint = [(artaxataPoint[0] + gazacaPoint[0]) / 2, (artaxataPoint[1] + gazacaPoint[1]) / 2];
+    const meetingPoint = segmentAndRiverHits[0]?.point ?? nearestPointOnLine(arasKura.chain, artaxataGazacaMidpoint).point;
+    const seaEnd = arasKura.chain[0][0] >= arasKura.chain.at(-1)[0] ? arasKura.chain[0] : arasKura.chain.at(-1);
+    const arasToMeeting = sliceLineBetweenPoints(arasKura.chain, seaEnd, meetingPoint);
+    allowInput("ne-river-slice", { type: "LineString", coordinates: arasToMeeting }, { source: "aras-kura-sea-to-artaxata-gazaca" });
+    const southOfAraxesMask = southOfLineMask(arasToMeeting, 8);
+    const northOfAraxesMask = northOfLineMask(arasToMeeting, 8);
+    const rightBankMask = await unionOne({
+      workDirectory,
+      tag: "group-b-media-araxes-right-bank",
+      features: sideQuadsFromLine(arasToMeeting, { side: "right", extentDegrees: 8 })
+    });
+    const leftBankMask = await unionOne({
+      workDirectory,
+      tag: "group-b-media-araxes-left-bank",
+      features: sideQuadsFromLine(arasToMeeting, { side: "left", extentDegrees: 8 })
+    });
+    const mediaKeepGuard = gazacaPoint;
+    const mediaDropGuard = artaxataPoint;
+    const selectedAraxesMask = [rightBankMask, leftBankMask, southOfAraxesMask, northOfAraxesMask].find(
+      (candidate) => pointInGeometry(mediaKeepGuard, candidate.geometry) && !pointInGeometry(mediaDropGuard, candidate.geometry)
+    );
+    if (!selectedAraxesMask) {
+      throw new Error("Could not resolve the Media Aras/Kura side mask from guard points.");
+    }
+    media = await unionOne({
+      workDirectory,
+      tag: "group-b-media-with-artaxata-east",
+      features: [media, artaxataEast]
+    });
+    media = await unionOne({
+      workDirectory,
+      tag: "group-b-media-south-of-araxes",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "group-b-media-south-of-araxes",
+        operation: "clip",
+        subjectFeatures: [media],
+        maskFeatures: [selectedAraxesMask],
+        expectNonEmpty: true
+      })
+    });
     media = await keepComponentsWithAnchors({ feature: media, anchorIds: ["ecbatana", "gazaca", "rhagae"], tag: "group-b-media-main" });
     addFeature(features, {
       id: "media",
       geometry: media.geometry,
       sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-media", "naturalearth:ne-10m-rivers-lake-centerlines", "pleiades:874361", "pleiades:884148", "pleiades:903104"],
       confidence: "medium",
-      note: "Media including Atropatene as Strabo 11.13 and ISBE describe it, with Rhagae kept inside (PO-2). The north and north-east follow the Caspian side and the Araxes/Kura frontier against Armenia (PO-7), while the east and south are equidistant constructions from sourced anchors against Parthia/Persis/Susiana. Gazaca's site and Rhagae's side are disputed in the sources and are named here."
+      note: "Media including Atropatene as Strabo 11.13 and ISBE describe it, with Rhagae kept inside (PO-2). The north-west follows the Aras→Kura chain to the Artaxata→Gazaca segment (PO-7/R50), then closes by the Artaxata/Gazaca equidistant construction against Armenia. The east and south remain equidistant constructions from sourced anchors against Parthia/Persis/Susiana. Gazaca's site and Rhagae's side are disputed in the sources and are named here."
     });
 
     let mesopotamia = await unionLabelCells({ groupVoronoi: groupB, label: "mesopotamia", tag: "group-b-mesopotamia" });
@@ -901,35 +1171,95 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
         expectNonEmpty: true
       })
     });
-    const euphrates = stitchNamedRiverChain(naturalEarthRiversMain, /(euphrates|firat|alfurat)/u, [39.0, 37.9]);
-    const tigris = stitchNamedRiverChain(naturalEarthRiversMain, /(tigris|dicle)/u, [40.3, 37.8]);
-    const euphratesCrossIndex = nearestLinePointIndex(euphrates, [39.04, 37.93]);
-    const tigrisCrossIndex = nearestLinePointIndex(tigris, [40.34, 37.83]);
-    const babylonIndex = nearestLinePointIndex(euphrates, anchorPoint(anchorsById, "babylon"));
-    const seleuciaIndex = nearestLinePointIndex(tigris, anchorPoint(anchorsById, "seleucia-tigris"));
-    const euphratesEdge = sliceLineByIndices(euphrates, euphratesCrossIndex, babylonIndex);
-    const tigrisEdge = sliceLineByIndices(tigris, tigrisCrossIndex, seleuciaIndex);
-    const northBridge = [euphrates[euphratesCrossIndex], tigris[tigrisCrossIndex]];
-    const southBridge = [anchorPoint(anchorsById, "babylon"), anchorPoint(anchorsById, "seleucia-tigris")];
-    allowedInputGeometries.push(
-      featureFromLine(euphratesEdge).geometry,
-      featureFromLine(tigrisEdge).geometry,
-      featureFromLine(northBridge).geometry,
-      featureFromLine(southBridge).geometry
+    const euphrates = stitchNamedRiverChain(
+      naturalEarthRiversMain,
+      /(euphrates|firat|alfurat)/u,
+      anchorPoint(anchorsById, "arsamosata")
     );
+    const tigris = stitchNamedRiverChain(
+      naturalEarthRiversMain,
+      /(tigris|dicle)/u,
+      anchorPoint(anchorsById, "nisibis")
+    );
+    const arsamosataCellGeometry = groupB.cellByAnchorId.get("arsamosata");
+    if (!arsamosataCellGeometry) throw new Error("Group B Voronoi has no cell for Arsamosata.");
+    const arsamosataCell = geometryFeature(arsamosataCellGeometry);
+    const arsamosataLandPieces = await booleanOpStrict({
+      workDirectory,
+      tag: "group-b-arsamosata-land",
+      operation: "clip",
+      subjectFeatures: [arsamosataCell],
+      maskFeatures: [mesopotamiaLand],
+      expectNonEmpty: true
+    });
+    const arsamosataLand = await unionOne({ workDirectory, tag: "group-b-arsamosata-land-union", features: arsamosataLandPieces });
+    const euphratesInArs = await booleanOp({
+      workDirectory,
+      tag: "group-b-euphrates-in-arsamosata",
+      operation: "clip",
+      subjectFeatures: [featureFromLine(euphrates)],
+      maskFeatures: [arsamosataLand]
+    });
+    const tigrisInArs = await booleanOp({
+      workDirectory,
+      tag: "group-b-tigris-in-arsamosata",
+      operation: "clip",
+      subjectFeatures: [featureFromLine(tigris)],
+      maskFeatures: [arsamosataLand]
+    });
+    const endpointsFromLines = (lineFeatures) =>
+      lineFeatures.flatMap((feature) => {
+        const lines = feature.geometry?.type === "LineString" ? [feature.geometry.coordinates] : (feature.geometry?.coordinates ?? []);
+        return lines.flatMap((line) => (line.length >= 2 ? [line[0], line.at(-1)] : []));
+      });
+    const euphratesCrossing = endpointsFromLines(euphratesInArs).sort((left, right) => left[1] - right[1])[0];
+    const tigrisCrossing = endpointsFromLines(tigrisInArs).sort((left, right) => left[1] - right[1])[0];
+    if (!euphratesCrossing || !tigrisCrossing) {
+      throw new Error("Could not derive Mesopotamia north crossings from the Arsamosata Voronoi cell.");
+    }
+    const arsRing = polygonsOf(arsamosataLand.geometry)[0]?.[0];
+    if (!arsRing || arsRing.length < 4) throw new Error("Arsamosata clipped cell has no usable outer ring.");
+    const northCandidates = ringPathsBetweenPoints(arsRing, euphratesCrossing, tigrisCrossing);
+    const northEdge = meanLatitudeOfLine(northCandidates.forward) < meanLatitudeOfLine(northCandidates.reverse)
+      ? northCandidates.forward
+      : northCandidates.reverse;
+    const babylonAnchor = anchorPoint(anchorsById, "babylon");
+    const seleuciaAnchor = anchorPoint(anchorsById, "seleucia-tigris");
+    const euphratesNearBabylon = nearestPointOnLine(euphrates, babylonAnchor).point;
+    const tigrisNearSeleucia = nearestPointOnLine(tigris, seleuciaAnchor).point;
+    const euphratesEdge = sliceLineBetweenPoints(euphrates, euphratesCrossing, euphratesNearBabylon);
+    const tigrisEdge = sliceLineBetweenPoints(tigris, tigrisCrossing, tigrisNearSeleucia);
+    const southBridge = [babylonAnchor, seleuciaAnchor];
+    const babylonConnector = [babylonAnchor, euphratesNearBabylon];
+    const seleuciaConnector = [seleuciaAnchor, tigrisNearSeleucia];
+    allowInput("ne-river-slice", featureFromLine(euphratesEdge).geometry, { source: "euphrates" });
+    allowInput("ne-river-slice", featureFromLine(tigrisEdge).geometry, { source: "tigris" });
+    allowInput("anchor-segment", featureFromLine(southBridge).geometry, { anchors: ["babylon", "seleucia-tigris"] });
+    allowInput("anchor-river-connector", featureFromLine(babylonConnector).geometry, { anchor: "babylon" });
+    allowInput("anchor-river-connector", featureFromLine(seleuciaConnector).geometry, { anchor: "seleucia-tigris" });
     const mesopotamiaRing = normalizeRing([
-      ...northBridge,
+      ...northEdge,
       ...tigrisEdge.slice(1),
-      ...southBridge.slice().reverse(),
+      ...seleuciaConnector.slice().reverse().slice(1),
+      ...southBridge.slice().reverse().slice(1),
+      ...babylonConnector,
       ...euphratesEdge.slice().reverse().slice(1)
     ]);
     const mesopotamiaRivers = geometryFeature({ type: "Polygon", coordinates: [mesopotamiaRing] });
-    const mesopotamiaPieces = await booleanOpStrict({
+    const mesopotamiaRiverPieces = await booleanOpStrict({
       workDirectory,
       tag: "mesopotamia-river-clip",
       operation: "clip",
       subjectFeatures: [mesopotamiaRivers],
-      maskFeatures: [mesopotamia, mesopotamiaLand],
+      maskFeatures: [mesopotamia],
+      expectNonEmpty: true
+    });
+    const mesopotamiaPieces = await booleanOpStrict({
+      workDirectory,
+      tag: "mesopotamia-river-clip-land",
+      operation: "clip",
+      subjectFeatures: mesopotamiaRiverPieces,
+      maskFeatures: [mesopotamiaLand],
       expectNonEmpty: true
     });
     mesopotamia = await unionOne({ workDirectory, tag: "mesopotamia-union", features: mesopotamiaPieces });
@@ -975,12 +1305,13 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
 
     return {
       collection: cleanedCollection,
-      allowedInputGeometries,
+      allowedInputGeometries: allowedInputGeometries.map((entry) => entry.geometry),
+      allowedInputGeometriesTagged: allowedInputGeometries,
       sanity: {
         pontusBaseAreaKm2: geometryAreaKm2(pontusArea.geometry),
         judeaSamariaCombinedKm2: geometryAreaKm2(samaria.geometry) + geometryAreaKm2(judea.geometry),
         partCounts: Object.fromEntries(cleanedFeatures.map((feature) => [feature.id, partCount(feature.geometry)])),
-        nonIslandIds: cleanedFeatures.map((feature) => feature.id).filter((id) => !ISLAND_REGION_IDS.has(id) && id !== "media")
+        nonIslandIds: cleanedFeatures.map((feature) => feature.id).filter((id) => !ISLAND_REGION_IDS.has(id))
       }
     };
   } finally {
