@@ -1094,7 +1094,7 @@ P4-F1, P4-F2 and P4-F4 change group A's mean latitude, so all four Asia Minor ou
 ### The PO's decisions (phase 4)
 - **P4-F1 to P4-F8:** accepted as written. The PO has added the two research rows (§3 West, Balbura; §6 North-east, Bithynium) and the `docs/LICENSES.md` wording, verbatim.
 - **P4-S1:** accepted. Lake Tatta's whole lake, Natural Earth's "Lake Tuz", is erased from Lycaonia and from Phrygia, so it lies in neither outline (PO-3).
-- **Q1 / P4-S2:** accepted. `lycaonia.json`'s label point is now Pleiades' "Lykaonia" (`pleiades:1001911`, 32.5°E 37.5°N), and its `support` says the point is approximate. Check (b) no longer needs the PO-4 exception. The PO will check in the browser that the name doesn't hide Lystra's. If it does, the change is reverted, and a display-only label point goes to the backlog.
+- **Q1 / P4-S2:** accepted. `lycaonia.json`'s label point is now Pleiades' "Lykaonia" (`pleiades:1001911`, 32.5°E 37.5°N), and its `support` says the point is approximate. Check (b) no longer needs the PO-4 exception. The PO will check in the browser that the name doesn't hide Lystra's. If it does, the change is reverted, and a display-only label point goes to the backlog. **Update after the check:** at zoom 6 the new point does hide Lystra's name, but on the live site the old point hides Iconium's at zoom 6 and 6.5. With the new point every name shows from zoom 6.5; with the old, only from zoom 7. More names show overall, and the name now sits inside its own region, so the PO keeps the change and drops the rule above.
 - **Q2:** accepted. The P4-F7 test is added: Pitane inside Mysia, or within 1 km of it.
 - **Q3 and Q5:** accepted.
 - **Q4:** fixed by P4-F1.
