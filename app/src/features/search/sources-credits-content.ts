@@ -152,7 +152,7 @@ export const UPSTREAM_SOURCES: UpstreamSourceItem[] = [
     url: "https://collections.louvre.fr/en/ark:/53355/cl010252531"
   },
   {
-    name: "Public-domain texts cited in `data/bibliography.json`: Loeb translations of Cassius Dio, Suetonius, Tacitus and Strabo (hosted on LacusCurtius), Josephus in Whiston's translation (hosted by CCEL), the *International Standard Bible Encyclopedia* (1915), Smith's *Dictionary of Greek and Roman Antiquities* (1875, hosted on LacusCurtius), the *Jewish Encyclopedia* (1906), Smith's *Dictionary of Greek and Roman Geography* (1854, hosted on the Perseus Digital Library), and Pliny the Elder's *Natural History* in Bostock and Riley's translation (1855, hosted on the Perseus Digital Library)",
+    name: "Public-domain texts cited in `data/bibliography.json`: Loeb translations of Cassius Dio, Suetonius, Tacitus and Strabo (hosted on LacusCurtius), Josephus in Whiston's translation (hosted by CCEL), the *International Standard Bible Encyclopedia* (1915), Smith's *Dictionary of Greek and Roman Antiquities* (1875, hosted on LacusCurtius), the *Jewish Encyclopedia* (1906), Smith's *Dictionary of Greek and Roman Geography* (1854, hosted on the Perseus Digital Library), Pliny the Elder's *Natural History* in Bostock and Riley's translation (1855, hosted on the Perseus Digital Library), A. T. Robertson's *A Harmony of the Gospels* (1922, transcribed by Project Gutenberg), and Stevens and Burton's *A Harmony of the Gospels for Historical Study* (1904, hosted on the Internet Archive)",
     url: null,
     note: "See each entry's `url` in `data/bibliography.json`."
   },

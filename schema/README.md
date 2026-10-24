@@ -222,7 +222,7 @@ Complete example:
       ]
     },
     {
-      "id": "jesus",
+      "id": "jesus-1",
       "title": "Jesus' journeys",
       "fromYear": 28,
       "toYear": 30,
