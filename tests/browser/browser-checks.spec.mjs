@@ -395,6 +395,21 @@ async function selectedAreaLabelCount(page, placeId) {
   );
 }
 
+async function selectedAreaLabelLayerCount(page, placeId) {
+  return page.evaluate(
+    ({ testHookKey, selectedPlaceId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        return 0;
+      }
+      return map
+        .queryRenderedFeatures(undefined, { layers: ["ibm-selected-area-label"] })
+        .filter((feature) => String(feature.properties?.placeId ?? "") === selectedPlaceId).length;
+    },
+    { testHookKey: mapTestHookKey, selectedPlaceId: placeId }
+  );
+}
+
 async function selectedPlacePinCount(page, placeId) {
   return page.evaluate(
     ({ testHookKey, selectedPlaceId }) => {
@@ -1979,6 +1994,98 @@ test("selected region updates holder label and overlay when the year changes @na
   expect(after.selectedHolderCount + after.selectedAreaCount).toBe(1);
   expect(after.veilCount).toBeGreaterThan(0);
   expect(after.outlineCount).toBeGreaterThan(0);
+});
+
+test("desktop deep link keeps Malta's selected candidate above the timeline card after fit @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`${baseUrl}/?tab=map&place=malta&year=50`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await expect.poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 }).toBe("malta");
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).outlineCount, { timeout: 30_000 }).toBeGreaterThan(0);
+
+  await expect
+    .poll(async () => {
+      const fitProbe = await page.evaluate((testHookKey) => {
+        const map = window[testHookKey];
+        const card = document.querySelector("[data-timeline-card='true']");
+        if (!map || !(card instanceof HTMLElement)) {
+          return null;
+        }
+        const candidatePoint = map.project([14.4, 35.9]);
+        const cardRect = card.getBoundingClientRect();
+        return {
+          candidateY: candidatePoint.y,
+          cardTop: cardRect.top
+        };
+      }, mapTestHookKey);
+      return fitProbe !== null && fitProbe.candidateY < fitProbe.cardTop - 4;
+    }, { timeout: 30_000 })
+    .toBe(true);
+});
+
+test("desktop Malta deep link refits above timeline card when timeline payload loads after style ready @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  let timelineRequestCount = 0;
+  await page.route("**/generated/ancient.timeline.json", async (route) => {
+    timelineRequestCount += 1;
+    await page.waitForFunction(
+      (testHookKey) => {
+        const map = window[testHookKey];
+        return Boolean(map && typeof map.isStyleLoaded === "function" && map.isStyleLoaded());
+      },
+      mapTestHookKey,
+      { timeout: 60_000 }
+    );
+    await route.fallback();
+  });
+
+  await page.goto(`${baseUrl}/?tab=map&place=malta&year=50`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await expect.poll(async () => timelineRequestCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  await expect.poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 }).toBe("malta");
+  await expect
+    .poll(async () => {
+      return page.evaluate((testHookKey) => {
+        const map = window[testHookKey];
+        const card = document.querySelector("[data-timeline-card='true']");
+        if (!map || !(card instanceof HTMLElement)) {
+          return false;
+        }
+        const candidatePoint = map.project([14.4, 35.9]);
+        const cardRect = card.getBoundingClientRect();
+        return candidatePoint.y < cardRect.top - 4;
+      }, mapTestHookKey);
+    }, { timeout: 30_000 })
+    .toBe(true);
+});
+
+test("selected region deep links render the selected area label layer for Judea and Malta @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  for (const placeId of ["judea", "malta"]) {
+    await page.goto(`${baseUrl}/?tab=map&place=${placeId}&year=50`, {
+      waitUntil: "domcontentloaded",
+      timeout: 120_000
+    });
+    await expect.poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 }).toBe(placeId);
+    await expect.poll(async () => selectedAreaLabelLayerCount(page, placeId), { timeout: 30_000 }).toBe(1);
+  }
+});
+
+test("Judea selection still allows Jerusalem label placement at zoom 12 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&place=judea&year=50`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await expect.poll(async () => selectedAreaLabelLayerCount(page, "judea"), { timeout: 30_000 }).toBe(1);
+  await jumpMap(page, [35.23, 31.78], 12);
+  await expect.poll(async () => selectedAreaLabelLayerCount(page, "judea"), { timeout: 10_000 }).toBe(0);
+  await expect.poll(async () => {
+    const visibleNames = await renderedPlaceNames(page);
+    return visibleNames.some((entry) => entry.placeId === "jerusalem");
+  }, { timeout: 10_000 }).toBe(true);
 });
 
 test("clicking PROVINCE OF GALATIA shows one blue rendered region name @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
