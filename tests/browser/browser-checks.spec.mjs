@@ -1791,7 +1791,7 @@ test("clicking Cos keeps camera fixed in ancient mode, then shows pin in modern 
   await expect.poll(async () => (await selectedRegionOverlayCounts(page)).veilCount, { timeout: 10_000 }).toBe(0);
 });
 
-test("Pisidia stays name-only when no held land and no own outline are available @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+test("the Parthian Empire stays name-only when no held land and no own outline are available @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   const regionOutlinesRequests = [];
   page.on("request", (request) => {
     if (request.url().includes("/generated/ancient.region-outlines.json")) {
@@ -1799,7 +1799,7 @@ test("Pisidia stays name-only when no held land and no own outline are available
     }
   });
 
-  await page.goto(`${baseUrl}/?tab=map&year=50&place=pisidia`, {
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=parthian-empire`, {
     waitUntil: "domcontentloaded",
     timeout: 120_000
   });
@@ -1809,7 +1809,7 @@ test("Pisidia stays name-only when no held land and no own outline are available
     veilCount: 0,
     outlineCount: 0
   });
-  await expect.poll(async () => selectedAreaLabelCount(page, "pisidia"), { timeout: 10_000 }).toBe(1);
+  await expect.poll(async () => selectedAreaLabelCount(page, "parthian-empire"), { timeout: 10_000 }).toBe(1);
   expect(regionOutlinesRequests).toHaveLength(0);
 });
 

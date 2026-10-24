@@ -18,12 +18,12 @@
     {
       "label": "Lycaonia (label point)",
       "coordinates": [
-        33,
-        38
+        32.5,
+        37.5
       ],
-      "coordinateSource": "wikidata:Q622598",
+      "coordinateSource": "pleiades:1001911",
       "confidence": "high",
-      "support": "Lycaonia's identity as the region containing Lystra and Derbe is undisputed. The label point is Wikidata's point for the region, in the Lycaonian plain north of Lystra and Derbe and about 47 km from Iconium's pin. Pleiades' 'Lykaonia', after the Barrington Atlas, has only an approximate point about 70 km to the southwest, near Lystra's pin.",
+      "support": "Lycaonia's identity as the region containing Lystra and Derbe is undisputed. The label point is approximate: it is Pleiades' point for 'Lykaonia', the centre of a rough area after the Barrington Atlas, about 17 km from Lystra's pin and inside this map's outline of Lycaonia. Wikidata's point for the region (33°E 38°N), about 70 km to the northeast, falls on Phrygia's side of the line this map draws between Iconium and Lystra.",
       "sources": [
         "wikidata:Q622598",
         "pleiades:1001911",
