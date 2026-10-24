@@ -460,17 +460,17 @@ function stitchNamedRiverChain(riversMain, pattern, anchorCoordinates) {
 }
 
 function nearestPointOnSegment(point, start, end) {
-  const cosPhi = Math.cos((point[1] * Math.PI) / 180);
-  const sx = start[0] * cosPhi;
-  const sy = start[1];
-  const ex = end[0] * cosPhi;
-  const ey = end[1];
-  const px = point[0] * cosPhi;
-  const py = point[1];
-  const vx = ex - sx;
-  const vy = ey - sy;
-  const wx = px - sx;
-  const wy = py - sy;
+  const latRadians = (point[1] * Math.PI) / 180;
+  const projectKm = ([lon, lat]) => [
+    (lon - point[0]) * 111.32 * Math.cos(latRadians),
+    (lat - point[1]) * 110.574
+  ];
+  const a = projectKm(start);
+  const b = projectKm(end);
+  const vx = b[0] - a[0];
+  const vy = b[1] - a[1];
+  const wx = -a[0];
+  const wy = -a[1];
   const denominator = vx * vx + vy * vy;
   const t = denominator < VORONOI_EPSILON ? 0 : Math.max(0, Math.min(1, (wx * vx + wy * vy) / denominator));
   return [start[0] + t * (end[0] - start[0]), start[1] + t * (end[1] - start[1]), t];
