@@ -768,6 +768,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const landMask = (naturalEarthLand.features ?? []).filter((feature) => feature.geometry);
 
     const features = [];
+    const m520Diagnostics = {};
     const allowedInputGeometries = [];
     const allowInput = (kind, geometry, meta = {}) => {
       if (!geometry) return;
@@ -1106,7 +1107,8 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       expectNonEmpty: true
     });
     const artaxataEast = await unionOne({ workDirectory, tag: "group-b-artaxata-east-union", features: artaxataEastPieces });
-    const segmentAndRiverHits = polylineIntersections(artaxataGazacaSegment, arasKura.chain);
+    const segmentAndRiverHits = polylineIntersections(artaxataGazacaSegment, arasKura.chain)
+      .sort((left, right) => left.segmentB - right.segmentB);
     const artaxataGazacaMidpoint = [(artaxataPoint[0] + gazacaPoint[0]) / 2, (artaxataPoint[1] + gazacaPoint[1]) / 2];
     const meetingPoint = segmentAndRiverHits[0]?.point ?? nearestPointOnLine(arasKura.chain, artaxataGazacaMidpoint).point;
     const seaEnd = arasKura.chain[0][0] >= arasKura.chain.at(-1)[0] ? arasKura.chain[0] : arasKura.chain.at(-1);
@@ -1126,12 +1128,24 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     });
     const mediaKeepGuard = gazacaPoint;
     const mediaDropGuard = artaxataPoint;
-    const selectedAraxesMask = [rightBankMask, leftBankMask, southOfAraxesMask, northOfAraxesMask].find(
-      (candidate) => pointInGeometry(mediaKeepGuard, candidate.geometry) && !pointInGeometry(mediaDropGuard, candidate.geometry)
+    const namedAraxesMasks = [
+      { name: "right-bank-mask", feature: rightBankMask },
+      { name: "left-bank-mask", feature: leftBankMask },
+      { name: "south-of-line-mask", feature: southOfAraxesMask },
+      { name: "north-of-line-mask", feature: northOfAraxesMask }
+    ];
+    const selectedAraxesMask = namedAraxesMasks.find(
+      (candidate) => pointInGeometry(mediaKeepGuard, candidate.feature.geometry) && !pointInGeometry(mediaDropGuard, candidate.feature.geometry)
     );
     if (!selectedAraxesMask) {
       throw new Error("Could not resolve the Media Aras/Kura side mask from guard points.");
     }
+    m520Diagnostics.media = {
+      artaxataGazacaCrossings: segmentAndRiverHits.length,
+      crossingRule: "first-upstream-from-sea",
+      usedCrossingSegmentB: segmentAndRiverHits[0]?.segmentB ?? null,
+      selectedMask: selectedAraxesMask.name
+    };
     media = await unionOne({
       workDirectory,
       tag: "group-b-media-with-artaxata-east",
@@ -1145,7 +1159,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
         tag: "group-b-media-south-of-araxes",
         operation: "clip",
         subjectFeatures: [media],
-        maskFeatures: [selectedAraxesMask],
+        maskFeatures: [selectedAraxesMask.feature],
         expectNonEmpty: true
       })
     });
@@ -1246,19 +1260,11 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       ...euphratesEdge.slice().reverse().slice(1)
     ]);
     const mesopotamiaRivers = geometryFeature({ type: "Polygon", coordinates: [mesopotamiaRing] });
-    const mesopotamiaRiverPieces = await booleanOpStrict({
-      workDirectory,
-      tag: "mesopotamia-river-clip",
-      operation: "clip",
-      subjectFeatures: [mesopotamiaRivers],
-      maskFeatures: [mesopotamia],
-      expectNonEmpty: true
-    });
     const mesopotamiaPieces = await booleanOpStrict({
       workDirectory,
       tag: "mesopotamia-river-clip-land",
       operation: "clip",
-      subjectFeatures: mesopotamiaRiverPieces,
+      subjectFeatures: [mesopotamiaRivers],
       maskFeatures: [mesopotamiaLand],
       expectNonEmpty: true
     });
@@ -1311,7 +1317,8 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
         pontusBaseAreaKm2: geometryAreaKm2(pontusArea.geometry),
         judeaSamariaCombinedKm2: geometryAreaKm2(samaria.geometry) + geometryAreaKm2(judea.geometry),
         partCounts: Object.fromEntries(cleanedFeatures.map((feature) => [feature.id, partCount(feature.geometry)])),
-        nonIslandIds: cleanedFeatures.map((feature) => feature.id).filter((id) => !ISLAND_REGION_IDS.has(id))
+        nonIslandIds: cleanedFeatures.map((feature) => feature.id).filter((id) => !ISLAND_REGION_IDS.has(id)),
+        m520Diagnostics
       }
     };
   } finally {
