@@ -1,24 +1,748 @@
 {
   "anchors": [
-    { "id": "anouath-borkeos", "sourceId": "pleiades:687825", "coordinates": [35.265455, 32.095369] },
-    { "id": "akrabatta", "sourceId": "pleiades:687820", "coordinates": [35.342849, 32.127218] },
-    { "id": "sychem", "sourceId": "pleiades:678403", "coordinates": [35.2815224, 32.2135568] },
-    { "id": "ginaia", "sourceId": "pleiades:678163", "coordinates": [35.302465, 32.461848] },
-    { "id": "scythopolis", "sourceId": "pleiades:678378", "coordinates": [35.504002, 32.504649] },
-    { "id": "samaria-point", "sourceId": "pleiades:44836840", "coordinates": [35.190436, 32.276529] },
-    { "id": "raphia", "sourceId": "pleiades:688015", "coordinates": [34.242503, 31.290688] },
-
-    { "id": "amisus", "sourceId": "pleiades:857024", "coordinates": [36.3313, 41.292721] },
-    { "id": "themiscyra", "sourceId": "pleiades:857350", "coordinates": [36.967737, 41.215176] },
-    { "id": "nicomedia", "sourceId": "wikidata:Q209349", "coordinates": [29.9175, 40.7625] },
-    { "id": "claudiopolis-bithynia", "sourceId": "wikidata:Q65088749", "coordinates": [31.611561, 40.739479] },
-    { "id": "prusa", "sourceId": "pleiades:511384", "coordinates": [29.063819, 40.182899] },
-    { "id": "sinope-west-halys", "sourceId": "wikidata:Q599416", "coordinates": [35.151111, 42.026667] },
-    { "id": "rhinocolura", "sourceId": "wikidata:Q2148121", "coordinates": [33.79694444, 31.11166667] },
-    { "id": "ptolemais", "sourceId": "openbible:ptolemais", "coordinates": [35.0692, 32.9214] },
-    { "id": "tyre", "sourceId": "wikidata:Q82070", "coordinates": [35.2, 33.26666667] },
-
-    { "id": "cauda", "sourceId": "pleiades:589858", "coordinates": [24.090099, 34.841661] },
-    { "id": "mljet", "sourceId": "wikidata:Q211306", "coordinates": [17.535, 42.745] }
+    {
+      "id": "adada",
+      "sourceId": "pleiades:638733",
+      "coordinates": [
+        30.984032,
+        37.577527
+      ]
+    },
+    {
+      "id": "aizani",
+      "sourceId": "pleiades:609292",
+      "coordinates": [
+        29.609445,
+        39.201251
+      ]
+    },
+    {
+      "id": "akrabatta",
+      "sourceId": "pleiades:687820",
+      "coordinates": [
+        35.342849,
+        32.127218
+      ]
+    },
+    {
+      "id": "amblada",
+      "sourceId": "pleiades:638741",
+      "coordinates": [
+        31.7386345,
+        37.518578
+      ]
+    },
+    {
+      "id": "amisus",
+      "sourceId": "pleiades:857024",
+      "coordinates": [
+        36.3313,
+        41.292721
+      ]
+    },
+    {
+      "id": "amorium",
+      "sourceId": "pleiades:609302",
+      "coordinates": [
+        31.295562595,
+        39.0201828675
+      ]
+    },
+    {
+      "id": "anabura",
+      "sourceId": "pleiades:638742",
+      "coordinates": [
+        31.285104,
+        37.990797
+      ]
+    },
+    {
+      "id": "ancyra",
+      "sourceId": "pleiades:619103",
+      "coordinates": [
+        32.859333,
+        39.9437925
+      ]
+    },
+    {
+      "id": "anouath-borkeos",
+      "sourceId": "pleiades:687825",
+      "coordinates": [
+        35.265455,
+        32.095369
+      ]
+    },
+    {
+      "id": "antioch-maeander",
+      "sourceId": "pleiades:638748",
+      "coordinates": [
+        28.548284,
+        37.873542
+      ]
+    },
+    {
+      "id": "antioch-near-pisidia",
+      "sourceId": "pleiades:609307",
+      "coordinates": [
+        31.1898699486,
+        38.3053740186
+      ]
+    },
+    {
+      "id": "apamea-cibotus",
+      "sourceId": "pleiades:638751",
+      "coordinates": [
+        30.1716213761,
+        38.07007556
+      ]
+    },
+    {
+      "id": "apamea-myrlea",
+      "sourceId": "pleiades:511194",
+      "coordinates": [
+        28.88274275,
+        40.37557275
+      ]
+    },
+    {
+      "id": "apollonia-phrygia",
+      "sourceId": "pleiades:638758",
+      "coordinates": [
+        30.46384,
+        38.0757215
+      ]
+    },
+    {
+      "id": "apollonia-rhyndacum",
+      "sourceId": "pleiades:511151",
+      "coordinates": [
+        28.6808035,
+        40.175097
+      ]
+    },
+    {
+      "id": "arbela",
+      "sourceId": "pleiades:874341",
+      "coordinates": [
+        44.0093802856,
+        36.1913174532
+      ]
+    },
+    {
+      "id": "arsamosata",
+      "sourceId": "pleiades:874354",
+      "coordinates": [
+        39.5109175,
+        38.6608665
+      ]
+    },
+    {
+      "id": "artaxata",
+      "sourceId": "pleiades:874361",
+      "coordinates": [
+        44.5751884575,
+        39.8818755331
+      ]
+    },
+    {
+      "id": "aspendus",
+      "sourceId": "pleiades:638776",
+      "coordinates": [
+        31.169703019,
+        36.9403723356
+      ]
+    },
+    {
+      "id": "attalia",
+      "sourceId": "pleiades:638778",
+      "coordinates": [
+        30.699968,
+        36.8903095
+      ]
+    },
+    {
+      "id": "balbura",
+      "sourceId": "pleiades:638789",
+      "coordinates": [
+        29.58230975,
+        36.95264135
+      ]
+    },
+    {
+      "id": "babylon",
+      "sourceId": "pleiades:893951",
+      "coordinates": [
+        44.42497815,
+        32.53729695
+      ]
+    },
+    {
+      "id": "cadi",
+      "sourceId": "pleiades:609420",
+      "coordinates": [
+        29.402473,
+        39.0141695
+      ]
+    },
+    {
+      "id": "carrhae",
+      "sourceId": "pleiades:658427",
+      "coordinates": [
+        39.0307496505,
+        36.8635943094
+      ]
+    },
+    {
+      "id": "carura",
+      "sourceId": "pleiades:638901",
+      "coordinates": [
+        28.822929,
+        37.940338
+      ]
+    },
+    {
+      "id": "catacecaumene",
+      "sourceId": "pleiades:609427",
+      "coordinates": [
+        28.52,
+        38.577222
+      ]
+    },
+    {
+      "id": "cauda",
+      "sourceId": "pleiades:589858",
+      "coordinates": [
+        24.090099,
+        34.841661
+      ]
+    },
+    {
+      "id": "claudiopolis-bithynia",
+      "sourceId": "wikidata:Q65088749",
+      "coordinates": [
+        31.611561,
+        40.739479
+      ]
+    },
+    {
+      "id": "colossae-pleiades",
+      "sourceId": "pleiades:638811",
+      "coordinates": [
+        29.2599208967,
+        37.7867946862
+      ]
+    },
+    {
+      "id": "coropassus",
+      "sourceId": "pleiades:619194",
+      "coordinates": [
+        33.7920235,
+        38.3077
+      ]
+    },
+    {
+      "id": "cotiaeum",
+      "sourceId": "pleiades:609444",
+      "coordinates": [
+        29.98451115,
+        39.41814785
+      ]
+    },
+    {
+      "id": "cremna",
+      "sourceId": "pleiades:638814",
+      "coordinates": [
+        30.689022848,
+        37.4987716792
+      ]
+    },
+    {
+      "id": "ctesiphon",
+      "sourceId": "pleiades:893976",
+      "coordinates": [
+        44.5812226667,
+        33.094703
+      ]
+    },
+    {
+      "id": "cyme",
+      "sourceId": "pleiades:550506",
+      "coordinates": [
+        26.938319355,
+        38.7601928185
+      ]
+    },
+    {
+      "id": "cyzicus",
+      "sourceId": "pleiades:511218",
+      "coordinates": [
+        27.883191,
+        40.3855645
+      ]
+    },
+    {
+      "id": "derbe-pleiades",
+      "sourceId": "pleiades:648620",
+      "coordinates": [
+        33.361778847,
+        37.3492074605
+      ]
+    },
+    {
+      "id": "dorylaeum",
+      "sourceId": "pleiades:609367",
+      "coordinates": [
+        30.51684,
+        39.77489
+      ]
+    },
+    {
+      "id": "ecbatana",
+      "sourceId": "pleiades:903021",
+      "coordinates": [
+        48.51640575,
+        34.80555515
+      ]
+    },
+    {
+      "id": "edessa",
+      "sourceId": "pleiades:658457",
+      "coordinates": [
+        38.786696,
+        37.148633
+      ]
+    },
+    {
+      "id": "elaea",
+      "sourceId": "pleiades:550523",
+      "coordinates": [
+        27.055256,
+        38.941644
+      ]
+    },
+    {
+      "id": "garsaura",
+      "sourceId": "pleiades:619164",
+      "coordinates": [
+        34.026907,
+        38.3705416
+      ]
+    },
+    {
+      "id": "gazaca",
+      "sourceId": "pleiades:884148",
+      "coordinates": [
+        46.201883,
+        37.012264
+      ]
+    },
+    {
+      "id": "ginaia",
+      "sourceId": "pleiades:678163",
+      "coordinates": [
+        35.302465,
+        32.461848
+      ]
+    },
+    {
+      "id": "hecatompylos",
+      "sourceId": "pleiades:942276",
+      "coordinates": [
+        54.0382895,
+        35.9610935
+      ]
+    },
+    {
+      "id": "hyrcania",
+      "sourceId": "pleiades:942333",
+      "coordinates": [
+        56.3,
+        37.1
+      ]
+    },
+    {
+      "id": "iconium-phrygia",
+      "sourceId": "pleiades:648647",
+      "coordinates": [
+        32.4922950123,
+        37.8724559041
+      ]
+    },
+    {
+      "id": "isaura-nova",
+      "sourceId": "pleiades:648651",
+      "coordinates": [
+        32.3535445983,
+        37.1903530979
+      ]
+    },
+    {
+      "id": "isaura-vetus",
+      "sourceId": "pleiades:648652",
+      "coordinates": [
+        32.24503,
+        37.190126
+      ]
+    },
+    {
+      "id": "kibyra",
+      "sourceId": "pleiades:638804",
+      "coordinates": [
+        29.49215475,
+        37.15943905
+      ]
+    },
+    {
+      "id": "lake-tatta",
+      "sourceId": "pleiades:619268",
+      "coordinates": [
+        33.4515678789,
+        38.79939251
+      ]
+    },
+    {
+      "id": "laodicea-phrygia",
+      "sourceId": "wikidata:Q849709",
+      "coordinates": [
+        29.1075,
+        37.835833333333
+      ]
+    },
+    {
+      "id": "laranda",
+      "sourceId": "pleiades:648693",
+      "coordinates": [
+        33.2158195,
+        37.1824925
+      ]
+    },
+    {
+      "id": "lystra-pleiades",
+      "sourceId": "pleiades:648699",
+      "coordinates": [
+        32.3444725,
+        37.588278
+      ]
+    },
+    {
+      "id": "magnesia-ad-sipylum",
+      "sourceId": "pleiades:550706",
+      "coordinates": [
+        27.4333969,
+        38.6125793
+      ]
+    },
+    {
+      "id": "midaeum",
+      "sourceId": "pleiades:609473",
+      "coordinates": [
+        30.84518185,
+        39.80007435
+      ]
+    },
+    {
+      "id": "miletopolis",
+      "sourceId": "pleiades:511318",
+      "coordinates": [
+        28.316486,
+        40.083458
+      ]
+    },
+    {
+      "id": "milyas",
+      "sourceId": "pleiades:638996",
+      "coordinates": [
+        29.9877244096,
+        36.7644826966
+      ]
+    },
+    {
+      "id": "mljet",
+      "sourceId": "wikidata:Q211306",
+      "coordinates": [
+        17.535,
+        42.745
+      ]
+    },
+    {
+      "id": "nacolia",
+      "sourceId": "pleiades:609484",
+      "coordinates": [
+        30.7072267333,
+        39.4583577333
+      ]
+    },
+    {
+      "id": "nicomedia",
+      "sourceId": "wikidata:Q209349",
+      "coordinates": [
+        29.9175,
+        40.7625
+      ]
+    },
+    {
+      "id": "nisibis",
+      "sourceId": "pleiades:874623",
+      "coordinates": [
+        41.2154466667,
+        37.0675116667
+      ]
+    },
+    {
+      "id": "pasargadae",
+      "sourceId": "pleiades:922693",
+      "coordinates": [
+        53.1743200402,
+        30.1952191647
+      ]
+    },
+    {
+      "id": "pednelissus",
+      "sourceId": "pleiades:639046",
+      "coordinates": [
+        30.9350826667,
+        37.213573
+      ]
+    },
+    {
+      "id": "pergamum",
+      "sourceId": "wikidata:Q18986",
+      "coordinates": [
+        27.18412,
+        39.12947
+      ]
+    },
+    {
+      "id": "perge",
+      "sourceId": "wikidata:Q719815",
+      "coordinates": [
+        30.853686,
+        36.960353
+      ]
+    },
+    {
+      "id": "persepolis",
+      "sourceId": "pleiades:922695",
+      "coordinates": [
+        52.8904279399,
+        29.9351972978
+      ]
+    },
+    {
+      "id": "pessinus",
+      "sourceId": "pleiades:609500",
+      "coordinates": [
+        31.5835606226,
+        39.3328818668
+      ]
+    },
+    {
+      "id": "philadelphia-lydia",
+      "sourceId": "pleiades:550822",
+      "coordinates": [
+        28.516621,
+        38.35037355
+      ]
+    },
+    {
+      "id": "philomelium",
+      "sourceId": "pleiades:609501",
+      "coordinates": [
+        31.429822,
+        38.356716
+      ]
+    },
+    {
+      "id": "pitane",
+      "sourceId": "pleiades:550833",
+      "coordinates": [
+        26.937453,
+        38.928297
+      ]
+    },
+    {
+      "id": "prusa",
+      "sourceId": "pleiades:511384",
+      "coordinates": [
+        29.063819,
+        40.182899
+      ]
+    },
+    {
+      "id": "ptolemais",
+      "sourceId": "openbible:ptolemais",
+      "coordinates": [
+        35.0692,
+        32.9214
+      ]
+    },
+    {
+      "id": "raphia",
+      "sourceId": "pleiades:688015",
+      "coordinates": [
+        34.242503,
+        31.290688
+      ]
+    },
+    {
+      "id": "rhagae",
+      "sourceId": "pleiades:903104",
+      "coordinates": [
+        51.447163,
+        35.594267
+      ]
+    },
+    {
+      "id": "rhinocolura",
+      "sourceId": "wikidata:Q2148121",
+      "coordinates": [
+        33.79694444,
+        31.11166667
+      ]
+    },
+    {
+      "id": "sagalassus",
+      "sourceId": "pleiades:639087",
+      "coordinates": [
+        30.514161,
+        37.6728872
+      ]
+    },
+    {
+      "id": "samaria-point",
+      "sourceId": "pleiades:44836840",
+      "coordinates": [
+        35.190436,
+        32.276529
+      ]
+    },
+    {
+      "id": "scythopolis",
+      "sourceId": "pleiades:678378",
+      "coordinates": [
+        35.504002,
+        32.504649
+      ]
+    },
+    {
+      "id": "seleucia-tigris",
+      "sourceId": "pleiades:894084",
+      "coordinates": [
+        44.523773,
+        33.097898
+      ]
+    },
+    {
+      "id": "selge",
+      "sourceId": "pleiades:639100",
+      "coordinates": [
+        31.126315,
+        37.225411
+      ]
+    },
+    {
+      "id": "side",
+      "sourceId": "pleiades:639105",
+      "coordinates": [
+        31.3921629383,
+        36.7683613799
+      ]
+    },
+    {
+      "id": "sillyon",
+      "sourceId": "pleiades:639109",
+      "coordinates": [
+        30.9876208736,
+        36.991633082
+      ]
+    },
+    {
+      "id": "sinda",
+      "sourceId": "pleiades:639111",
+      "coordinates": [
+        29.6045,
+        37.120499
+      ]
+    },
+    {
+      "id": "sinope-west-halys",
+      "sourceId": "wikidata:Q599416",
+      "coordinates": [
+        35.151111,
+        42.026667
+      ]
+    },
+    {
+      "id": "susa",
+      "sourceId": "pleiades:912936",
+      "coordinates": [
+        48.2535370543,
+        32.1899344716
+      ]
+    },
+    {
+      "id": "sychem",
+      "sourceId": "pleiades:678403",
+      "coordinates": [
+        35.2815224,
+        32.2135568
+      ]
+    },
+    {
+      "id": "synnada",
+      "sourceId": "pleiades:609538",
+      "coordinates": [
+        30.5461288,
+        38.5339612
+      ]
+    },
+    {
+      "id": "termessus",
+      "sourceId": "pleiades:639139",
+      "coordinates": [
+        30.4629393696,
+        36.9836622795
+      ]
+    },
+    {
+      "id": "teuthrania",
+      "sourceId": "pleiades:550916",
+      "coordinates": [
+        27.054771,
+        39.035223
+      ]
+    },
+    {
+      "id": "themiscyra",
+      "sourceId": "pleiades:857350",
+      "coordinates": [
+        36.967737,
+        41.215176
+      ]
+    },
+    {
+      "id": "tyana",
+      "sourceId": "pleiades:648801",
+      "coordinates": [
+        34.57222,
+        37.823151
+      ]
+    },
+    {
+      "id": "tyre",
+      "sourceId": "wikidata:Q82070",
+      "coordinates": [
+        35.2,
+        33.26666667
+      ]
+    },
+    {
+      "id": "zeugma",
+      "sourceId": "pleiades:658636",
+      "coordinates": [
+        37.8702201109,
+        37.0577331987
+      ]
+    }
   ]
 }
