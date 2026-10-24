@@ -241,23 +241,6 @@ function timelineTickPosition(fraction: number) {
   return `calc(${clamped * 100}% + ${thumbInsetOffset}px)`;
 }
 
-type LinelessPrototypeVariant = "a" | "b";
-type RouteListPrototypeVariant = "plain" | "grouped";
-
-function parseLinelessPrototypeVariantFromSearch(search: string): LinelessPrototypeVariant | null {
-  const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
-  const value = params.get("lineless")?.trim().toLowerCase();
-  if (value === "a" || value === "b") {
-    return value;
-  }
-  return null;
-}
-
-function parseRouteListPrototypeVariantFromSearch(search: string): RouteListPrototypeVariant {
-  const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
-  return params.get("routeList")?.trim().toLowerCase() === "grouped" ? "grouped" : "plain";
-}
-
 function MapLoadingPlaceholder() {
   return (
     <div
@@ -487,14 +470,6 @@ export function AppShell() {
     () => hydratedRoutes.find((entry) => entry.route.id === selectedRouteId) ?? null,
     [hydratedRoutes, selectedRouteId]
   );
-  const linelessPrototypeVariant =
-    typeof window === "undefined"
-      ? null
-      : parseLinelessPrototypeVariantFromSearch(window.location.search);
-  const routeListPrototypeVariant =
-    typeof window === "undefined"
-      ? "plain"
-      : parseRouteListPrototypeVariantFromSearch(window.location.search);
   const selectedRouteTimelineStop = useMemo(() => {
     if (!selectedRoute || !ancientTimeline || ancientTimeline.stops.length === 0) {
       return null;
@@ -1511,73 +1486,19 @@ export function AppShell() {
       return (resolved.place?.candidates.length ?? 0) > 1;
     };
 
-    const routeStopNeutralCoordinate = (resolved: RouteStopResolved): [number, number] | null => {
-      const candidates =
-        resolved.kind === "route-stop"
-          ? (resolved.stop?.candidates ?? [])
-          : (resolved.place?.candidates ?? []);
-      if (candidates.length <= 1) {
-        return (resolved.coordinates as [number, number] | null) ?? null;
-      }
-
-      const totals = candidates.reduce(
-        (accumulator, candidate) => {
-          accumulator.lon += candidate.coordinates[0];
-          accumulator.lat += candidate.coordinates[1];
-          return accumulator;
-        },
-        { lon: 0, lat: 0 }
-      );
-      return [totals.lon / candidates.length, totals.lat / candidates.length];
-    };
-
     const linelessPillCoordinate = (stage: (typeof selectedRouteEntry.stages)[number]) => {
-      if (!linelessPrototypeVariant) {
-        return { coordinate: null as [number, number] | null, variant: "standard" as const };
-      }
-
       const from = resolveRouteStop(stage.from, placesById, routeStopsById);
       const to = resolveRouteStop(stage.to, placesById, routeStopsById);
       const fromDisputed = routeStopHasMultipleCandidates(from);
       const toDisputed = routeStopHasMultipleCandidates(to);
-
-      if (linelessPrototypeVariant === "a") {
-        const anchor =
-          fromDisputed && !toDisputed
-            ? to
-            : !fromDisputed && toDisputed
-              ? from
-              : to;
-        const fallback = anchor.id === from.id ? to : from;
-        return {
-          coordinate:
-            routeStopNeutralCoordinate(anchor) ??
-            routeStopNeutralCoordinate(fallback) ??
-            null,
-          variant: "standard" as const
-        };
-      }
-
-      const fromCoordinate = routeStopNeutralCoordinate(from);
-      const toCoordinate = routeStopNeutralCoordinate(to);
-      if (!fromCoordinate || !toCoordinate) {
-        return { coordinate: null as [number, number] | null, variant: "lineless-floating" as const };
-      }
-      return {
-        coordinate: [
-          (fromCoordinate[0] + toCoordinate[0]) / 2,
-          (fromCoordinate[1] + toCoordinate[1]) / 2
-        ] as [number, number],
-        variant: "lineless-floating" as const
-      };
-    };
-
-    const stagePillOffsetSlotForCounts = (count: number) => {
-      if (count <= 0) {
-        return 0;
-      }
-      const slots = [0, 1, 2, 3, 4, 5, 6, 7];
-      return slots[count % slots.length] ?? 0;
+      const anchor =
+        fromDisputed && !toDisputed
+          ? to
+          : !fromDisputed && toDisputed
+            ? from
+            : to;
+      const fallback = anchor.id === from.id ? to : from;
+      return (anchor.coordinates ?? fallback.coordinates ?? null) as [number, number] | null;
     };
 
     const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
@@ -1863,81 +1784,104 @@ export function AppShell() {
       );
     }
 
-    if (linelessPrototypeVariant) {
-      const slotCountsByCoordinate = new Map<string, number>();
-      for (const [stageIndex, stage] of selectedRouteEntry.stages.entries()) {
-        if (stage.lineId) {
-          continue;
-        }
-        const linelessPill = linelessPillCoordinate(stage);
-        if (!linelessPill.coordinate) {
-          continue;
-        }
+    const selectedStage = selectedStageId
+      ? selectedRouteEntry.stages.find((stage) => stage.id === selectedStageId) ?? null
+      : null;
+    const highlightedStage = highlightedStageId
+      ? selectedRouteEntry.stages.find((stage) => stage.id === highlightedStageId) ?? null
+      : null;
+    const selectedLinelessAnchor = selectedStage && !selectedStage.lineId
+      ? linelessPillCoordinate(selectedStage)
+      : null;
+    const highlightedLinelessAnchor = highlightedStage && !highlightedStage.lineId
+      ? linelessPillCoordinate(highlightedStage)
+      : null;
+    const showBothLinelessPills =
+      Boolean(
+        selectedStage &&
+          highlightedStage &&
+          selectedStage.id !== highlightedStage.id &&
+          !selectedStage.lineId &&
+          !highlightedStage.lineId &&
+          selectedLinelessAnchor &&
+          highlightedLinelessAnchor &&
+          selectedLinelessAnchor[0] === highlightedLinelessAnchor[0] &&
+          selectedLinelessAnchor[1] === highlightedLinelessAnchor[1]
+      );
 
-        const coordinateKey = `${linelessPill.coordinate[0].toFixed(6)}:${linelessPill.coordinate[1].toFixed(6)}`;
-        const currentCount = slotCountsByCoordinate.get(coordinateKey) ?? 0;
-        slotCountsByCoordinate.set(coordinateKey, currentCount + 1);
+    const stagesWithPills = selectedRouteEntry.stages.filter((stage) => {
+      if (selectedStageId === stage.id) {
+        return true;
+      }
+      if (highlightedStageId !== stage.id) {
+        return false;
+      }
+      return showBothLinelessPills || !selectedStageId;
+    });
 
-        pointFeatures.push({
-          type: "Feature",
-          geometry: { type: "Point", coordinates: linelessPill.coordinate },
-          properties: {
-            id: `${selectedRouteId}:${stage.id}:pill`,
-            routeId: selectedRouteId,
-            stageId: stage.id,
-            stageIndex,
-            kind: "stage-pill",
-            stopKind: "location",
-            stopId: stage.id,
-            label: `${Math.max(1, stageIndex + 1)}`,
-            isInSelectedRoute: true as const,
-            isSelectedStage: selectedStageId === stage.id,
-            isHighlightedStage: highlightedStageId === stage.id,
-            isDimmed: false,
-            isSelectedPlace: false,
-            stagePillVariant: linelessPill.variant,
-            stagePillOffsetSlot: stagePillOffsetSlotForCounts(currentCount)
-          }
-        });
+    const stagePillFeatures: RouteMapOverlayData["points"]["features"] = [];
+    const linelessPillsByAnchorKey = new Map<string, number[]>();
+    for (const stage of stagesWithPills) {
+      const lineFeature = lineFeatureByStageId.get(stage.id) ?? null;
+      const stageIndex = selectedRouteEntry.stages.findIndex((candidate) => candidate.id === stage.id);
+      if (stageIndex < 0) {
+        continue;
+      }
+      const pillCoordinate = lineFeature ? midpointOfGeometry(lineFeature.geometry) : linelessPillCoordinate(stage);
+      if (!pillCoordinate) {
+        continue;
+      }
 
-        if (selectedStageId === stage.id && !selectedStageCenter) {
-          selectedStageCenter = linelessPill.coordinate;
+      const pillFeatureIndex = stagePillFeatures.length;
+      stagePillFeatures.push({
+        type: "Feature",
+        geometry: { type: "Point", coordinates: pillCoordinate },
+        properties: {
+          id: `${selectedRouteId}:${stage.id}:pill`,
+          routeId: selectedRouteId,
+          stageId: stage.id,
+          stageIndex,
+          kind: "stage-pill",
+          stopKind: "location",
+          stopId: stage.id,
+          label: `${Math.max(1, stageIndex + 1)}`,
+          isInSelectedRoute: true as const,
+          isSelectedStage: selectedStageId === stage.id,
+          isHighlightedStage: highlightedStageId === stage.id,
+          isDimmed: false,
+          isSelectedPlace: false,
+          stagePillRowIndex: 0,
+          stagePillRowSize: stage.lineId ? 0 : 1
         }
+      });
+
+      if (!stage.lineId) {
+        const anchorKey = `${pillCoordinate[0].toFixed(6)}:${pillCoordinate[1].toFixed(6)}`;
+        const anchorIndices = linelessPillsByAnchorKey.get(anchorKey) ?? [];
+        anchorIndices.push(pillFeatureIndex);
+        linelessPillsByAnchorKey.set(anchorKey, anchorIndices);
+      }
+
+      if (selectedStageId === stage.id) {
+        selectedStageCenter = pillCoordinate;
       }
     }
 
-    const pillStage = selectedRouteEntry.stages.find((stage) => stage.id === emphasizedStageId) ?? null;
-    const pillFeature = pillStage ? lineFeatureByStageId.get(pillStage.id) ?? null : null;
-    if (pillStage && pillFeature) {
-      const pillCoordinate = midpointOfGeometry(pillFeature.geometry);
-      if (pillCoordinate) {
-        const stageIndex = selectedRouteEntry.stages.findIndex((stage) => stage.id === pillStage.id);
-        pointFeatures.push({
-          type: "Feature",
-          geometry: { type: "Point", coordinates: pillCoordinate },
-          properties: {
-            id: `${selectedRouteId}:${pillStage.id}:pill-selected`,
-            routeId: selectedRouteId,
-            stageId: pillStage.id,
-            stageIndex: stageIndex >= 0 ? stageIndex : 0,
-            kind: "stage-pill",
-            stopKind: "location",
-            stopId: pillStage.id,
-            label: `${Math.max(1, stageIndex + 1)}`,
-            isInSelectedRoute: true as const,
-            isSelectedStage: selectedStageId === pillStage.id,
-            isHighlightedStage: highlightedStageId === pillStage.id,
-            isDimmed: false,
-            isSelectedPlace: false,
-            stagePillVariant: "standard"
-          }
-        });
-
-        if (selectedStageId === pillStage.id && !selectedStageCenter) {
-          selectedStageCenter = pillCoordinate;
+    for (const anchorIndices of linelessPillsByAnchorKey.values()) {
+      if (anchorIndices.length <= 1) {
+        continue;
+      }
+      for (const [rowIndex, pillFeatureIndex] of anchorIndices.entries()) {
+        const stagePillFeature = stagePillFeatures[pillFeatureIndex];
+        if (!stagePillFeature) {
+          continue;
         }
+        stagePillFeature.properties.stagePillRowIndex = rowIndex;
+        stagePillFeature.properties.stagePillRowSize = anchorIndices.length;
       }
     }
+
+    pointFeatures.push(...stagePillFeatures);
 
     let minLon = Number.POSITIVE_INFINITY;
     let minLat = Number.POSITIVE_INFINITY;
@@ -1998,7 +1942,6 @@ export function AppShell() {
     };
   }, [
     highlightedStageIndex,
-    linelessPrototypeVariant,
     placesById,
     routeStopsById,
     routesData,
@@ -2911,7 +2854,6 @@ export function AppShell() {
               routeStopsById={routeStopsById}
               routesData={routesData}
               routesLoadState={routesLoadState}
-              routeListVariant={routeListPrototypeVariant}
               selectedRoute={selectedRoute}
               selectedRouteBorderYear={selectedRoute?.route.fromYear ?? null}
               selectedStageIndex={selectedStageIndex}

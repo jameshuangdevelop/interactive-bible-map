@@ -120,8 +120,7 @@ export function RoutesPanel({
   onSelectStage,
   onBackToAllRoutes,
   onResolveStopSelection,
-  onHighlightStage,
-  routeListVariant = "plain"
+  onHighlightStage
 }: {
   routesLoadState: RoutesLoadState;
   routesData: LoadedRoutesData | null;
@@ -137,7 +136,6 @@ export function RoutesPanel({
   onBackToAllRoutes: () => void;
   onResolveStopSelection: (resolved: RouteStopResolved, stageIndex: number) => void;
   onHighlightStage: (stageIndex: number | null) => void;
-  routeListVariant?: "plain" | "grouped";
 }) {
   const stageItemRefs = useRef(new Map<number, HTMLLIElement | null>());
   const suppressScrollStageIndexRef = useRef<number | null>(null);
@@ -200,29 +198,25 @@ export function RoutesPanel({
   }
 
   if (!selectedRoute) {
-    const groupedRoutes =
-      routeListVariant === "grouped"
-        ? [
-            {
-              id: "paul",
-              heading: "Paul's journeys",
-              routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("paul-"))
-            },
-            {
-              id: "jesus",
-              heading: "Jesus' journeys",
-              routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("jesus-"))
-            },
-            {
-              id: "other",
-              heading: "Other routes",
-              routes: hydratedRoutes.filter(
-                (entry) =>
-                  !entry.route.id.startsWith("paul-") && !entry.route.id.startsWith("jesus-")
-              )
-            }
-          ].filter((group) => group.routes.length > 0)
-        : [];
+    const groupedRoutes = [
+      {
+        id: "paul",
+        heading: "Paul's journeys",
+        routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("paul-"))
+      },
+      {
+        id: "jesus",
+        heading: "Jesus' journeys",
+        routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("jesus-"))
+      },
+      {
+        id: "other",
+        heading: "Other routes",
+        routes: hydratedRoutes.filter(
+          (entry) => !entry.route.id.startsWith("paul-") && !entry.route.id.startsWith("jesus-")
+        )
+      }
+    ].filter((group) => group.routes.length > 0);
     const routesList = (entries: HydratedRoute[]) => (
       <ul style={{ listStyle: "none", padding: 0, margin: `${tokens.spacing.sm}px 0 0` }}>
         {entries.map((entry) => (
@@ -254,24 +248,22 @@ export function RoutesPanel({
     return (
       <div>
         <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>Routes</h2>
-        {routeListVariant === "grouped"
-          ? groupedRoutes.map((group) => (
-              <section key={group.id} style={{ marginTop: `${tokens.spacing.sm}px` }}>
-                <h3
-                  style={{
-                    margin: 0,
-                    fontSize: `${tokens.typography.captionSize}px`,
-                    letterSpacing: "0.02em",
-                    textTransform: "uppercase",
-                    color: tokens.color.textSecondary
-                  }}
-                >
-                  {group.heading}
-                </h3>
-                {routesList(group.routes)}
-              </section>
-            ))
-          : routesList(hydratedRoutes)}
+        {groupedRoutes.map((group) => (
+          <section key={group.id} style={{ marginTop: `${tokens.spacing.sm}px` }}>
+            <h3
+              style={{
+                margin: 0,
+                fontSize: `${tokens.typography.captionSize}px`,
+                letterSpacing: "0.02em",
+                textTransform: "uppercase",
+                color: tokens.color.textSecondary
+              }}
+            >
+              {group.heading}
+            </h3>
+            {routesList(group.routes)}
+          </section>
+        ))}
       </div>
     );
   }
@@ -325,7 +317,10 @@ export function RoutesPanel({
           {selectedRoute.route.bibleText}
         </p>
       </div>
-      <ol style={{ paddingLeft: "20px", margin: `${tokens.spacing.sm}px 0 0` }}>
+      <ol
+        onMouseLeave={() => onHighlightStage(null)}
+        style={{ paddingLeft: "20px", margin: `${tokens.spacing.sm}px 0 0` }}
+      >
         {selectedRoute.stages.map((stage, stageIndex) => {
           const from = resolveRouteStop(stage.from, placesById, routeStopsById);
           const to = resolveRouteStop(stage.to, placesById, routeStopsById);
@@ -370,6 +365,12 @@ export function RoutesPanel({
               }}
               onMouseEnter={() => onHighlightStage(stageIndex)}
               onMouseLeave={() => onHighlightStage(null)}
+              onMouseOut={(event) => {
+                if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                  return;
+                }
+                onHighlightStage(null);
+              }}
               ref={(element) => {
                 stageItemRefs.current.set(stageIndex, element);
               }}

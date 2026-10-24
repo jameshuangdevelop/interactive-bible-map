@@ -260,6 +260,60 @@ async function clickRouteStageCard(page, stageIndex) {
   await card.click({ position: clickOffset });
 }
 
+async function renderedStagePills(page) {
+  return page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+    return map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stage-pill-icon"] }).map((feature) => {
+      const properties = feature.properties ?? {};
+      const point = feature.geometry?.type === "Point" ? map.project(feature.geometry.coordinates) : null;
+      return {
+        routeId: typeof properties.routeId === "string" ? properties.routeId : null,
+        stageId: typeof properties.stageId === "string" ? properties.stageId : null,
+        stageIndex: Number.isFinite(Number(properties.stageIndex)) ? Number(properties.stageIndex) : null,
+        label: typeof properties.label === "string" ? properties.label : null,
+        x: point?.x ?? null,
+        y: point?.y ?? null
+      };
+    });
+  }, mapTestHookKey);
+}
+
+async function routeStopScreenPoint(page, stopId) {
+  return page.evaluate(
+    ({ testHookKey, targetStopId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      const features = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] });
+      const stopFeature = features.find((feature) => String(feature.properties?.stopId ?? "") === targetStopId);
+      if (!stopFeature || stopFeature.geometry?.type !== "Point") {
+        return null;
+      }
+      const projected = map.project(stopFeature.geometry.coordinates);
+      return { x: projected.x, y: projected.y };
+    },
+    { testHookKey: mapTestHookKey, targetStopId: stopId }
+  );
+}
+
+async function waitForRenderedPillCount(page, expectedCount) {
+  await page.waitForFunction(
+    ({ testHookKey, count }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        return false;
+      }
+      return map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stage-pill-icon"] }).length === count;
+    },
+    { testHookKey: mapTestHookKey, count: expectedCount },
+    { timeout: 5_000 }
+  );
+}
+
 function clipAroundPoint(page, x, y, width = 180, height = 72) {
   const viewport = page.viewportSize();
   const viewportWidth = viewport?.width ?? 1280;
@@ -3227,6 +3281,164 @@ test("each real route renders lines, stops, and panel content (replaces routesRe
     expect(snapshot.stopCount).toBeGreaterThan(0);
     expect(snapshot.renderedLabelTexts).toContain(expectedStopLabel);
   }
+});
+
+test("lineless stages show one anchored pill on select, and remove it when deselected @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  const scenarios = [
+    { routeId: "jesus-1", stageIndex: 1, stageId: "segment-01", label: "1", anchorStopId: "nazareth" },
+    { routeId: "jesus-1", stageIndex: 2, stageId: "segment-05", label: "2", anchorStopId: "cana" },
+    { routeId: "jesus-1", stageIndex: 3, stageId: "segment-06", label: "3", anchorStopId: "capernaum" },
+    { routeId: "jesus-1", stageIndex: 7, stageId: "segment-02", label: "7", anchorStopId: "galilee" },
+    { routeId: "jesus-1", stageIndex: 8, stageId: "segment-10", label: "8", anchorStopId: "sychar" },
+    { routeId: "jesus-2", stageIndex: 3, stageId: "segment-11", label: "3", anchorStopId: "capernaum" },
+    { routeId: "jesus-2", stageIndex: 4, stageId: "segment-12", label: "4", anchorStopId: "capernaum" },
+    { routeId: "jesus-6", stageIndex: 1, stageId: "segment-31", label: "1", anchorStopId: "jerusalem" }
+  ];
+
+  for (const scenario of scenarios) {
+    await page.goto(`${baseUrl}/?tab=routes&route=${scenario.routeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+    await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await waitForMapIdle(page);
+    await clickRouteStageCard(page, scenario.stageIndex);
+    await waitForMapIdle(page);
+    await expect(page.locator(`[data-route-stage-index='${scenario.stageIndex}'][data-route-stage-selected='true']`)).toBeVisible();
+    const visiblePills = await renderedStagePills(page);
+    const matchingPills = visiblePills.filter(
+      (pill) => pill.routeId === scenario.routeId && pill.stageId === scenario.stageId && pill.label === scenario.label
+    );
+    expect(matchingPills, `expected exactly one pill for ${scenario.routeId} stage ${scenario.stageIndex}`).toHaveLength(1);
+    expect(visiblePills, `expected only one visible pill for ${scenario.routeId} stage ${scenario.stageIndex}`).toHaveLength(1);
+    const anchorPoint = await routeStopScreenPoint(page, scenario.anchorStopId);
+    expect(anchorPoint, `expected rendered stop point for ${scenario.anchorStopId}`).toBeTruthy();
+    const pill = matchingPills[0];
+    expect(pill.x).not.toBeNull();
+    expect(pill.y).not.toBeNull();
+    const dx = Math.abs((pill.x ?? 0) - anchorPoint.x);
+    const dy = Math.abs((pill.y ?? 0) - anchorPoint.y);
+    expect(dx, `pill x offset for ${scenario.stageId} should stay on anchor stop`).toBeLessThanOrEqual(4);
+    expect(dy, `pill y offset for ${scenario.stageId} should stay on anchor stop`).toBeLessThanOrEqual(4);
+
+    await page.goto(`${baseUrl}/?tab=routes&route=${scenario.routeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+    await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await waitForMapIdle(page);
+    expect(await renderedStagePills(page), `expected no visible pills after deselect on ${scenario.routeId}`).toHaveLength(0);
+  }
+});
+
+test("hovering lineless stages shows a pill, and unhovering hides it @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  const scenarios = [
+    { routeId: "jesus-1", stageIndex: 2, stageId: "segment-05" },
+    { routeId: "jesus-2", stageIndex: 3, stageId: "segment-11" },
+    { routeId: "jesus-6", stageIndex: 1, stageId: "segment-31" }
+  ];
+
+  for (const scenario of scenarios) {
+    await page.goto(`${baseUrl}/?tab=routes&route=${scenario.routeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+    await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await waitForMapIdle(page);
+    expect(await renderedStagePills(page), `expected no initial pills for ${scenario.routeId}`).toHaveLength(0);
+
+    const stageItem = page.locator(`[data-route-stage-index='${scenario.stageIndex}']`);
+    await stageItem.hover();
+    await waitForRenderedPillCount(page, 1);
+    const hoveredPills = await renderedStagePills(page);
+    expect(
+      hoveredPills.some((pill) => pill.routeId === scenario.routeId && pill.stageId === scenario.stageId),
+      `expected hover pill for ${scenario.stageId}`
+    ).toBe(true);
+
+    await stageItem.evaluate((element) => {
+      element.dispatchEvent(new MouseEvent("mouseout", { bubbles: true, relatedTarget: document.body }));
+    });
+    await waitForRenderedPillCount(page, 0);
+    expect(await renderedStagePills(page), `expected hover pill to clear for ${scenario.stageId}`).toHaveLength(0);
+  }
+});
+
+test("selected + hovered lineless stages sharing one stop render two non-overlapping pills @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await waitForMapIdle(page);
+
+  await clickRouteStageCard(page, 3);
+  await waitForMapIdle(page);
+  await page.locator("[data-route-stage-index='4']").hover();
+  await waitForMapIdle(page);
+
+  const visiblePills = await renderedStagePills(page);
+  const targetPills = visiblePills.filter((pill) => pill.routeId === "jesus-2" && (pill.stageId === "segment-11" || pill.stageId === "segment-12"));
+  expect(targetPills).toHaveLength(2);
+
+  const anchorPoint = await routeStopScreenPoint(page, "capernaum");
+  expect(anchorPoint).toBeTruthy();
+  const iconSizePx = 30;
+  const pillWidthPx = 30;
+  const pillHeightPx = 18;
+  const stageBoxes = targetPills.map((pill) => {
+    const centerX = anchorPoint.x + ((pill.stageId === "segment-11" ? -1.2 : 1.2) * iconSizePx);
+    const centerY = anchorPoint.y + 1.4 * iconSizePx;
+    return {
+      stageId: pill.stageId,
+      left: centerX - pillWidthPx / 2,
+      right: centerX + pillWidthPx / 2,
+      top: centerY - pillHeightPx / 2,
+      bottom: centerY + pillHeightPx / 2
+    };
+  });
+  const [a, b] = stageBoxes;
+  const overlapsHorizontally = a.left < b.right && b.left < a.right;
+  const overlapsVertically = a.top < b.bottom && b.top < a.bottom;
+  expect(overlapsHorizontally && overlapsVertically, "expected paired pills to use non-overlapping screen boxes").toBe(false);
+});
+
+test("with no hovered or selected stage, routes show no stage pills @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  for (const routeId of ["jesus-1", "jesus-2", "jesus-6", "paul-2"]) {
+    await page.goto(`${baseUrl}/?tab=routes&route=${routeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+    await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await waitForMapIdle(page);
+    expect(await renderedStagePills(page), `expected no visible stage pills for ${routeId}`).toHaveLength(0);
+  }
+});
+
+test("line stages still show pills on selection (Paul unchanged) @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=paul-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await waitForMapIdle(page);
+  await clickRouteStageCard(page, 2);
+  await waitForMapIdle(page);
+  const pills = await renderedStagePills(page);
+  expect(pills).toHaveLength(1);
+  expect(pills[0]?.routeId).toBe("paul-2");
+  expect(pills[0]?.label).toBe("2");
+  const lineCount = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length;
+  }, mapTestHookKey);
+  expect(lineCount).toBeGreaterThan(0);
+});
+
+test("routes list groups Paul then Jesus headings with expected route counts @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+
+  const groups = await page.evaluate(() => {
+    return [...document.querySelectorAll("[data-routes-panel='true'] section")].map((section) => ({
+      heading: section.querySelector("h3")?.textContent?.trim() ?? "",
+      routes: [...section.querySelectorAll("button > div:first-child")].map((node) => node.textContent?.trim() ?? "")
+    }));
+  });
+
+  expect(groups).toHaveLength(2);
+  expect(groups[0]?.heading).toBe("Paul's journeys");
+  expect(groups[1]?.heading).toBe("Jesus' journeys");
+  expect(groups[0]?.routes).toHaveLength(4);
+  expect(groups[1]?.routes).toHaveLength(6);
+  expect(groups[0]?.routes).toEqual([
+    "Paul's first journey",
+    "Paul's second journey",
+    "Paul's third journey",
+    "Paul's voyage to Rome"
+  ]);
 });
 
 // The sheet's handle tap and drags are covered by tests/browser/phone-sheet.spec.mjs.

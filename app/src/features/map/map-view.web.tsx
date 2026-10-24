@@ -168,7 +168,6 @@ const layerRoutesStagePillIconId = "ibm-routes-stage-pill-icon";
 const layerRoutesStagePillLabelId = "ibm-routes-stage-pill-label";
 
 const routeStagePillImageId = "ibm-route-stage-pill-image";
-const routeStagePillLinelessImageId = "ibm-route-stage-pill-lineless-image";
 const routeDirectionArrowImageId = "ibm-route-direction-arrow-image";
 const selectedPlacePinImageId = "ibm-selected-place-pin-icon";
 const townDotMajorImageId = "ibm-town-dot-major";
@@ -221,6 +220,7 @@ const interactiveLayerIds = [
   layerRoutesStopsId,
   layerRoutesViaId,
   layerRoutesMentionedId,
+  layerRoutesStagePillIconId,
   layerRoutesLinesHighlightId,
   layerRoutesLinesForegroundId
 ] as const;
@@ -992,7 +992,7 @@ function createCandidateIconImage({
   });
 }
 
-function createRouteStagePillImage(variant: "standard" | "lineless-floating" = "standard") {
+function createRouteStagePillImage() {
   return createCanvasImage(30, 30, (context, canvasWidth, canvasHeight) => {
     const canvasSize = Math.min(canvasWidth, canvasHeight);
     const width = canvasSize - 2;
@@ -1001,12 +1001,9 @@ function createRouteStagePillImage(variant: "standard" | "lineless-floating" = "
     const y = (canvasSize - height) / 2;
     const radius = height / 2;
 
-    context.fillStyle = variant === "standard" ? "#FFFFFF" : "rgba(26, 115, 232, 0.07)";
-    context.strokeStyle = variant === "standard" ? "#1A73E8" : "#8AA9E6";
+    context.fillStyle = "#FFFFFF";
+    context.strokeStyle = "#1A73E8";
     context.lineWidth = 1.5;
-    if (variant === "lineless-floating") {
-      context.setLineDash([3, 2]);
-    }
     context.beginPath();
     context.moveTo(x + radius, y);
     context.lineTo(x + width - radius, y);
@@ -1020,9 +1017,6 @@ function createRouteStagePillImage(variant: "standard" | "lineless-floating" = "
     context.closePath();
     context.fill();
     context.stroke();
-    if (variant === "lineless-floating") {
-      context.setLineDash([]);
-    }
   });
 }
 
@@ -1114,15 +1108,9 @@ function ensureTownDotImages(map: MapLibreMap) {
 
 function ensureRouteStagePillImage(map: MapLibreMap) {
   if (!map.hasImage(routeStagePillImageId)) {
-    const image = createRouteStagePillImage("standard");
+    const image = createRouteStagePillImage();
     if (image) {
       map.addImage(routeStagePillImageId, image.image, { pixelRatio: image.pixelRatio });
-    }
-  }
-  if (!map.hasImage(routeStagePillLinelessImageId)) {
-    const image = createRouteStagePillImage("lineless-floating");
-    if (image) {
-      map.addImage(routeStagePillLinelessImageId, image.image, { pixelRatio: image.pixelRatio });
     }
   }
 }
@@ -1850,30 +1838,18 @@ function ensureMapLayers(map: MapLibreMap) {
       type: "symbol",
       filter: toLayerFilter(["==", ["get", "kind"], "stage-pill"]),
       layout: {
-        "icon-image": [
-          "case",
-          ["==", ["get", "stagePillVariant"], "lineless-floating"],
-          routeStagePillLinelessImageId,
-          routeStagePillImageId
-        ],
+        "icon-image": routeStagePillImageId,
         "icon-anchor": "center",
         "icon-offset": [
-          "match",
-          ["get", "stagePillOffsetSlot"],
-          1,
-          ["literal", [0, -1.5]],
-          2,
-          ["literal", [1.5, 0]],
-          3,
-          ["literal", [0, 1.5]],
-          4,
-          ["literal", [-1.5, 0]],
-          5,
-          ["literal", [1.2, -1.2]],
-          6,
-          ["literal", [-1.2, -1.2]],
-          7,
-          ["literal", [1.2, 1.2]],
+          "case",
+          [">", ["coalesce", ["get", "stagePillRowSize"], 0], 1],
+          [
+            "match",
+            ["coalesce", ["get", "stagePillRowIndex"], 0],
+            0,
+            ["literal", [-1.2, 1.4]],
+            ["literal", [1.2, 1.4]]
+          ],
           ["literal", [0, 0]]
         ],
         "icon-size": 1,
@@ -1898,34 +1874,22 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-size": 10,
         "text-anchor": "center",
         "text-offset": [
-          "match",
-          ["get", "stagePillOffsetSlot"],
-          1,
-          ["literal", [0, -1.5]],
-          2,
-          ["literal", [1.5, 0]],
-          3,
-          ["literal", [0, 1.5]],
-          4,
-          ["literal", [-1.5, 0]],
-          5,
-          ["literal", [1.2, -1.2]],
-          6,
-          ["literal", [-1.2, -1.2]],
-          7,
-          ["literal", [1.2, 1.2]],
+          "case",
+          [">", ["coalesce", ["get", "stagePillRowSize"], 0], 1],
+          [
+            "match",
+            ["coalesce", ["get", "stagePillRowIndex"], 0],
+            0,
+            ["literal", [-1.2, 1.4]],
+            ["literal", [1.2, 1.4]]
+          ],
           ["literal", [0, 0]]
         ],
         "text-allow-overlap": true,
         "text-ignore-placement": true
       },
       paint: {
-        "text-color": [
-          "case",
-          ["==", ["get", "stagePillVariant"], "lineless-floating"],
-          "#6F8FCC",
-          "#1A73E8"
-        ],
+        "text-color": "#1A73E8",
         "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.6, 1]
       }
     });
@@ -4110,7 +4074,13 @@ export function MapView({
         if (routesModeEnabledRef.current) {
           const routeFeatures = map
             .queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
-              layers: [layerRoutesStopsId, layerRoutesViaId, layerRoutesMentionedId, layerRoutesLinesForegroundId]
+              layers: [
+                layerRoutesStopsId,
+                layerRoutesViaId,
+                layerRoutesMentionedId,
+                layerRoutesStagePillIconId,
+                layerRoutesLinesForegroundId
+              ]
             });
           const routeFeature = routeFeatures.find(
             (feature) => feature.layer?.id !== layerRoutesLinesForegroundId
@@ -4800,6 +4770,7 @@ export function MapView({
             layerRoutesStopsId,
             layerRoutesViaId,
             layerRoutesMentionedId,
+            layerRoutesStagePillIconId,
             layerRoutesLinesHighlightId,
             layerRoutesLinesForegroundId
           ]
@@ -4831,6 +4802,24 @@ export function MapView({
               stopKind,
               stopId,
               origin: "map-dot"
+            });
+            return;
+          }
+        }
+
+        const pillMatch = routeFeatures.find((feature) => feature.layer?.id === layerRoutesStagePillIconId);
+        if (pillMatch) {
+          const properties = asObject(pillMatch.properties);
+          const routeId = asString(properties?.routeId);
+          const stageId = asString(properties?.stageId);
+          const stageIndex = asNumber(properties?.stageIndex);
+          if (routeId && stageId && stageIndex !== null) {
+            onSelectRouteMapEntry({
+              kind: "line",
+              routeId,
+              stageId,
+              stageIndex,
+              origin: "map-line"
             });
             return;
           }
