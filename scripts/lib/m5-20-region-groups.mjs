@@ -17,5 +17,5 @@ export const GROUP_A_LABELS = labelMap([
 export const GROUP_B_LABELS = labelMap([
   ["media", ["gazaca", "ecbatana", "rhagae"]],
   ["mesopotamia", ["edessa", "carrhae", "nisibis"]],
-  ["outside", ["artaxata", "hecatompylos", "hyrcania", "persepolis", "pasargadae", "susa", "arbela", "arsamosata", "babylon", "seleucia-tigris", "ctesiphon", "zeugma", "matiane"]]
+  ["outside", ["artaxata", "hecatompylos", "hyrcania", "persepolis", "pasargadae", "susa", "arbela", "arsamosata", "babylon", "seleucia-tigris", "ctesiphon", "zeugma"]]
 ]);
