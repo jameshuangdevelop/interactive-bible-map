@@ -16,6 +16,8 @@ import { distancePointToSegmentKm, distanceToGeometryKm, pointInGeometry } from 
 import { buildRegionOutlinesData } from "./build-region-outlines.mjs";
 import { geometryAreaKm2, polygonsOf } from "./lib/geometry-cleanup.mjs";
 import { regenerateGazaRhinocoluraFaceFromCache } from "./lib/gaza-rhinocolura-face.mjs";
+import { bisectorLinesByLabel } from "./lib/local-equirect-voronoi.mjs";
+import { GROUP_A_LABELS, GROUP_B_LABELS } from "./lib/m5-20-region-groups.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const regionOutlinePath = path.join(repositoryRoot, "data", "geo", "region-outlines.geojson");
@@ -322,6 +324,7 @@ async function runRegionOutlineChecks({ seededError }) {
       .filter((anchor) => typeof anchor?.id === "string" && Array.isArray(anchor?.coordinates))
       .map((anchor) => [anchor.id, anchor.coordinates])
   );
+  const anchorsById = new Map((anchors.anchors ?? []).map((anchor) => [anchor.id, anchor]));
   const failures = [];
   const rebuiltBytes = `${JSON.stringify(rebuilt.collection, null, 2)}\n`;
   const committedBytes = await fs.readFile(regionOutlinePath, "utf8");
@@ -442,10 +445,17 @@ async function runRegionOutlineChecks({ seededError }) {
 
   // (f) Every vertex is from an allowed input edge/line (within 100 m).
   const allowed = rebuilt.allowedInputGeometries;
+  const bisectors = [
+    ...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_A_LABELS, marginDegrees: 6 }),
+    ...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_B_LABELS, marginDegrees: 8 })
+  ];
   for (const feature of features) {
     for (const vertex of vertexList(feature.geometry)) {
       let nearest = Infinity;
       for (const geometry of allowed) {
+        nearest = Math.min(nearest, distanceToAnyGeometryKm(vertex, geometry));
+      }
+      for (const geometry of bisectors) {
         nearest = Math.min(nearest, distanceToAnyGeometryKm(vertex, geometry));
       }
       if (nearest > 0.1) {

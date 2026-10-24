@@ -5,10 +5,11 @@ import { fileURLToPath } from "node:url";
 
 import mapshaper from "mapshaper";
 import booleanValid from "@turf/boolean-valid";
-import { Delaunay } from "d3-delaunay";
 import { pointInGeometry } from "./lib/ancient-area-checks.mjs";
 import { ancientGeoCache, fetchPinnedInputs, readJsonFile } from "./lib/ancient-geo-inputs.mjs";
 import { geometryAreaKm2, polygonsOf } from "./lib/geometry-cleanup.mjs";
+import { buildGroupVoronoi, bisectorLinesByLabel } from "./lib/local-equirect-voronoi.mjs";
+import { GROUP_A_LABELS, GROUP_B_LABELS } from "./lib/m5-20-region-groups.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const areasPath = path.join(repositoryRoot, "data", "geo", "ancient-areas.geojson");
@@ -382,6 +383,56 @@ function riverTrunkByName(riversMain, pattern) {
   return candidates.sort((left, right) => lineLengthSquared(right.line) - lineLengthSquared(left.line))[0].line;
 }
 
+function endpointDistanceSquared(lineA, lineB) {
+  const a = [lineA[0], lineA.at(-1)];
+  const b = [lineB[0], lineB.at(-1)];
+  let best = Infinity;
+  for (const pa of a) {
+    for (const pb of b) {
+      const d = (pa[0] - pb[0]) ** 2 + (pa[1] - pb[1]) ** 2;
+      if (d < best) best = d;
+    }
+  }
+  return best;
+}
+
+function nearestPointDistanceSquared(line, point) {
+  let best = Infinity;
+  for (const vertex of line) {
+    const d = (vertex[0] - point[0]) ** 2 + (vertex[1] - point[1]) ** 2;
+    if (d < best) best = d;
+  }
+  return best;
+}
+
+function orientLineFromNearPoint(line, point) {
+  const startDistance = (line[0][0] - point[0]) ** 2 + (line[0][1] - point[1]) ** 2;
+  const endDistance = (line.at(-1)[0] - point[0]) ** 2 + (line.at(-1)[1] - point[1]) ** 2;
+  return startDistance <= endDistance ? line : [...line].reverse();
+}
+
+function stitchNamedRiverChain(riversMain, pattern, startPoint) {
+  const candidates = riverCandidateLines(riversMain, (name) => pattern.test(name)).map((entry) => entry.line);
+  if (candidates.length === 0) throw new Error(`Could not find named river segments for ${pattern}.`);
+  const ordered = [...candidates].sort(
+    (left, right) => nearestPointDistanceSquared(left, startPoint) - nearestPointDistanceSquared(right, startPoint)
+  );
+  const used = new Set();
+  let chain = orientLineFromNearPoint(ordered[0], startPoint);
+  used.add(ordered[0]);
+  while (used.size < candidates.length) {
+    const next = candidates
+      .filter((candidate) => !used.has(candidate))
+      .map((candidate) => ({ candidate, d2: endpointDistanceSquared(chain, candidate) }))
+      .sort((left, right) => left.d2 - right.d2)[0];
+    if (!next || next.d2 > 0.2) break;
+    const stitched = connectLines(chain, next.candidate);
+    chain = stitched;
+    used.add(next.candidate);
+  }
+  return chain;
+}
+
 function featureFromLine(line, properties = {}) {
   return geometryFeature({ type: "LineString", coordinates: line }, properties);
 }
@@ -656,64 +707,41 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const mesopotamiaLand = selectLandComponentByAnchor(landMask, anchorPoint(anchorsById, "edessa"));
     const mediaLand = selectLandComponentByAnchor(landMask, anchorPoint(anchorsById, "ecbatana"));
 
-    async function buildVoronoiRegion({ regionId, insideAnchorIds, outsideAnchorIds, seedAnchorIds, landFeature, marginDegrees = 6 }) {
-      const insidePoints = insideAnchorIds.map((anchorId) => anchorPoint(anchorsById, anchorId));
-      const mask = await voronoiInsideMask({
-        workDirectory,
-        tag: `${regionId}-voronoi`,
-        anchorsById,
-        insideAnchorIds,
-        outsideAnchorIds,
-        marginDegrees
-      });
-      const seedPoints = seedAnchorIds.map((anchorId) => anchorPoint(anchorsById, anchorId));
-      const seed = bboxFeatureFromPoints(seedPoints, { marginLon: 3, marginLat: 3 });
-      const seeded = await booleanOpStrict({
-        workDirectory,
-        tag: `${regionId}-seeded`,
-        operation: "clip",
-        subjectFeatures: [mask],
-        maskFeatures: [seed],
-        expectNonEmpty: true
-      });
-      const onLand = await booleanOpStrict({
-        workDirectory,
-        tag: `${regionId}-land`,
-        operation: "clip",
-        subjectFeatures: seeded,
-        maskFeatures: [landFeature],
-        expectNonEmpty: true
-      });
-      const exploded = await explode({ workDirectory, tag: `${regionId}-explode`, features: onLand });
-      const retained = exploded.find((feature) => pointInGeometry(insidePoints[0], feature.geometry)) ?? exploded[0];
-      const dominant = largestPolygonOnly(retained);
-      return unionOne({ workDirectory, tag: `${regionId}-union`, features: [dominant] });
+    async function unionLabelCells({ groupVoronoi, label, tag }) {
+      const featuresForLabel = [...groupVoronoi.labelsByAnchorId.entries()]
+        .filter(([, candidateLabel]) => candidateLabel === label)
+        .map(([anchorId]) => groupVoronoi.cellByAnchorId.get(anchorId))
+        .filter(Boolean)
+        .map((geometry) => geometryFeature(geometry));
+      if (featuresForLabel.length === 0) throw new Error(`${tag}: no Voronoi cells for label '${label}'.`);
+      return unionOne({ workDirectory, tag, features: featuresForLabel });
     }
 
-    const pisidiaInside = ["termessus", "pednelissus", "selge", "sagalassus", "cremna", "adada", "anabura", "amblada", "sinda"];
-    const pisidiaOutside = [
-      "attalia",
-      "perge",
-      "sillyon",
-      "aspendus",
-      "side",
-      "apamea-cibotus",
-      "apollonia-phrygia",
-      "antioch-near-pisidia",
-      "philomelium",
-      "iconium-phrygia",
-      "isaura-vetus",
-      "isaura-nova",
-      "kibyra",
-      "milyas"
-    ];
-    const pisidia = await buildVoronoiRegion({
-      regionId: "pisidia",
-      insideAnchorIds: pisidiaInside,
-      outsideAnchorIds: pisidiaOutside,
-      seedAnchorIds: [...pisidiaInside, ...pisidiaOutside],
-      landFeature: asiaMainland
+    async function keepComponentWithAnchor({ feature, anchorId, tag }) {
+      const parts = await explode({ workDirectory, tag: `${tag}-explode`, features: [feature] });
+      const anchor = anchorPoint(anchorsById, anchorId);
+      const hit = parts.find((part) => pointInGeometry(anchor, part.geometry));
+      if (!hit) throw new Error(`${tag}: no component contains anchor '${anchorId}'.`);
+      return unionOne({ workDirectory, tag: `${tag}-union`, features: [hit] });
+    }
+
+    const groupA = buildGroupVoronoi({ anchorsById, labelsByAnchorId: GROUP_A_LABELS, marginDegrees: 6 });
+    allowedInputGeometries.push(...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_A_LABELS, marginDegrees: 6 }));
+
+    let pisidia = await unionLabelCells({ groupVoronoi: groupA, label: "pisidia", tag: "group-a-pisidia" });
+    pisidia = await unionOne({
+      workDirectory,
+      tag: "group-a-pisidia-land",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "group-a-pisidia-land",
+        operation: "clip",
+        subjectFeatures: [pisidia],
+        maskFeatures: [asiaMainland],
+        expectNonEmpty: true
+      })
     });
+    pisidia = await keepComponentWithAnchor({ feature: pisidia, anchorId: "selge", tag: "group-a-pisidia-main" });
     addFeature(features, {
       id: "pisidia",
       geometry: pisidia.geometry,
@@ -722,26 +750,20 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       note: "Pisidia as Strabo and ISBE place it between the Taurus front above Pamphylia and the Phrygian valleys (Strabo 12.7.1–2; ISBE, 'Pisidia'), bounded by Lycia/Milyas on the west and Isauria on the east. Antioch-near-Pisidia is kept outside by the project's M5-19 convention, while Pliny 5.24 places Antioch inside Pisidia; this outline follows the Strabo/ISBE reading and names Pliny's alternative."
     });
 
-    const lycaoniaInside = ["coropassus", "lystra-pleiades", "derbe-pleiades", "isaura-vetus", "isaura-nova"];
-    const lycaoniaOutside = [
-      "garsaura",
-      "tyana",
-      "iconium-phrygia",
-      "amblada",
-      "laranda",
-      "lake-tatta",
-      "pessinus",
-      "ancyra",
-      "attalia",
-      "perge"
-    ];
-    let lycaonia = await buildVoronoiRegion({
-      regionId: "lycaonia",
-      insideAnchorIds: lycaoniaInside,
-      outsideAnchorIds: lycaoniaOutside,
-      seedAnchorIds: [...lycaoniaInside, ...lycaoniaOutside],
-      landFeature: asiaMainland
+    let lycaonia = await unionLabelCells({ groupVoronoi: groupA, label: "lycaonia", tag: "group-a-lycaonia" });
+    lycaonia = await unionOne({
+      workDirectory,
+      tag: "group-a-lycaonia-land",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "group-a-lycaonia-land",
+        operation: "clip",
+        subjectFeatures: [lycaonia],
+        maskFeatures: [asiaMainland],
+        expectNonEmpty: true
+      })
     });
+    lycaonia = await keepComponentWithAnchor({ feature: lycaonia, anchorId: "lystra-pleiades", tag: "group-a-lycaonia-main" });
     const ciliciaTracheia = areaById(areas, "cilicia-tracheia");
     const cilicia = areaById(areas, "cilicia");
     lycaonia = await unionOne({
@@ -764,15 +786,20 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       note: "Lycaonia as Strabo's upland plain east of Iconium and bounded by Cappadocia, Pisidia/Phrygia and Cilicia Tracheia (Strabo 12.6.1–3; ISBE, 'Lycaonia'), with the south clipped to exclude this project's drawn Cilicia areas (PO-3/R52). Iconium is kept outside per M5-19 ruling P5, though Strabo 12.6.1 and Pliny 5.25 place it in Lycaonia; both readings are disputed. Lake Tatta is left in neither Lycaonia nor Phrygia (PO-3)."
     });
 
-    const mysiaInside = ["cyzicus", "miletopolis", "apollonia-rhyndacum", "pergamum", "teuthrania", "elaea", "adramyttium-anchor", "assos-anchor", "pitane"];
-    const mysiaOutside = ["prusa", "apamea-myrlea", "nicomedia", "dorylaeum", "cotiaeum", "midaeum", "nacolia", "aizani", "cyme", "magnesia-ad-sipylum"];
-    const mysia = await buildVoronoiRegion({
-      regionId: "mysia",
-      insideAnchorIds: mysiaInside,
-      outsideAnchorIds: mysiaOutside,
-      seedAnchorIds: [...mysiaInside, ...mysiaOutside],
-      landFeature: asiaMainland
+    let mysia = await unionLabelCells({ groupVoronoi: groupA, label: "mysia", tag: "group-a-mysia" });
+    mysia = await unionOne({
+      workDirectory,
+      tag: "group-a-mysia-land",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "group-a-mysia-land",
+        operation: "clip",
+        subjectFeatures: [mysia],
+        maskFeatures: [asiaMainland],
+        expectNonEmpty: true
+      })
     });
+    mysia = await keepComponentWithAnchor({ feature: mysia, anchorId: "pergamum", tag: "group-a-mysia-main" });
     addFeature(features, {
       id: "mysia",
       geometry: mysia.geometry,
@@ -781,40 +808,32 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       note: "Mysia as the mainland region from Olympene to the Caicus/Pergamene country (Strabo 12.8.1, 12.8.12), clipped to the Asian mainland (PO-6/R53): no Thrace and no Lesbos. Elaea is kept inside following Strabo's Caicus reading, while Pliny 5.32 treats it in Aeolis; this is disputed and noted. Cadi is treated on Phrygia's side where a single-point shared boundary is not explicit (PO-5)."
     });
 
-    const phrygiaInside = [
-      "dorylaeum",
-      "cotiaeum",
-      "midaeum",
-      "nacolia",
-      "aizani",
-      "synnada",
-      "amorium",
-      "philomelium",
-      "iconium-phrygia",
-      "antioch-near-pisidia",
-      "laodicea-phrygia",
-      "colossae-pleiades",
-      "apamea-cibotus",
-      "cadi"
-    ];
-    const phrygiaOutside = [
-      "prusa",
-      "pessinus",
-      "ancyra",
-      "lystra-pleiades",
-      "sagalassus",
-      "cremna",
-      "antioch-maeander",
-      "philadelphia-lydia",
-      "teuthrania",
-      "elaea"
-    ];
-    const phrygia = await buildVoronoiRegion({
-      regionId: "phrygia",
-      insideAnchorIds: phrygiaInside,
-      outsideAnchorIds: phrygiaOutside,
-      seedAnchorIds: [...phrygiaInside, ...phrygiaOutside],
-      landFeature: asiaMainland
+    let phrygia = await unionLabelCells({ groupVoronoi: groupA, label: "phrygia", tag: "group-a-phrygia" });
+    phrygia = await unionOne({
+      workDirectory,
+      tag: "group-a-phrygia-land",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "group-a-phrygia-land",
+        operation: "clip",
+        subjectFeatures: [phrygia],
+        maskFeatures: [asiaMainland],
+        expectNonEmpty: true
+      })
+    });
+    phrygia = await keepComponentWithAnchor({ feature: phrygia, anchorId: "synnada", tag: "group-a-phrygia-main" });
+    const lakeTattaCut = bboxFeatureFromPoints([anchorPoint(anchorsById, "lake-tatta")], { marginLon: 0.35, marginLat: 0.25 });
+    phrygia = await unionOne({
+      workDirectory,
+      tag: "group-a-phrygia-minus-tatta",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "group-a-phrygia-minus-tatta",
+        operation: "erase",
+        subjectFeatures: [phrygia],
+        maskFeatures: [lakeTattaCut],
+        expectNonEmpty: true
+      })
     });
     addFeature(features, {
       id: "phrygia",
@@ -824,20 +843,27 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       note: "Phrygia as the trans-provincial region Strabo and ISBE describe across Asian and Galatian Phrygia (Strabo 12.8.13–17; ISBE, 'Phrygia'), with Iconium inside per M5-19 ruling P5 and the Carian side constrained by Carura. Strabo and Pliny disagree on several compass placements and on Cadi's side; this outline follows the project's PO rulings and keeps confidence low."
     });
 
+    const groupB = buildGroupVoronoi({ anchorsById, labelsByAnchorId: GROUP_B_LABELS, marginDegrees: 8 });
+    allowedInputGeometries.push(...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_B_LABELS, marginDegrees: 8 }));
+
     const arasKura = findArasKuraChain(naturalEarthRiversMain);
     const arasKuraFeature = featureFromLine(arasKura.chain);
     allowedInputGeometries.push(arasKuraFeature.geometry);
 
-    const mediaInside = ["gazaca", "ecbatana", "rhagae"];
-    const mediaOutside = ["artaxata", "hecatompylos", "hyrcania", "persepolis", "pasargadae", "susa", "arbela"];
-    let media = await buildVoronoiRegion({
-      regionId: "media",
-      insideAnchorIds: mediaInside,
-      outsideAnchorIds: mediaOutside,
-      seedAnchorIds: [...mediaInside, ...mediaOutside],
-      landFeature: mediaLand,
-      marginDegrees: 8
+    let media = await unionLabelCells({ groupVoronoi: groupB, label: "media", tag: "group-b-media" });
+    media = await unionOne({
+      workDirectory,
+      tag: "group-b-media-land",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "group-b-media-land",
+        operation: "clip",
+        subjectFeatures: [media],
+        maskFeatures: [mediaLand],
+        expectNonEmpty: true
+      })
     });
+    media = await keepComponentWithAnchor({ feature: media, anchorId: "ecbatana", tag: "group-b-media-main" });
     addFeature(features, {
       id: "media",
       geometry: media.geometry,
@@ -846,28 +872,28 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       note: "Media including Atropatene as Strabo 11.13 and ISBE describe it, with Rhagae kept inside (PO-2). The north and north-east follow the Caspian side and the Araxes/Kura frontier against Armenia (PO-7), while the east and south are equidistant constructions from sourced anchors against Parthia/Persis/Susiana. Gazaca's site and Rhagae's side are disputed in the sources and are named here."
     });
 
-    const euphrates = riverTrunkByName(naturalEarthRiversMain, /(euphrates|firat|alfurat)/u);
-    const tigris = riverTrunkByName(naturalEarthRiversMain, /(tigris|dicle)/u);
-    const northMask = await voronoiInsideMask({
+    let mesopotamia = await unionLabelCells({ groupVoronoi: groupB, label: "mesopotamia", tag: "group-b-mesopotamia" });
+    mesopotamia = await unionOne({
       workDirectory,
-      tag: "mesopotamia-north",
-      anchorsById,
-      insideAnchorIds: ["edessa", "carrhae", "nisibis"],
-      outsideAnchorIds: ["arsamosata"],
-      marginDegrees: 6
+      tag: "group-b-mesopotamia-land",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "group-b-mesopotamia-land",
+        operation: "clip",
+        subjectFeatures: [mesopotamia],
+        maskFeatures: [mesopotamiaLand],
+        expectNonEmpty: true
+      })
     });
-    const euphratesCrossIndex = nearestLinePointIndex(euphrates, [39.0, 37.9]);
-    const tigrisCrossIndex = nearestLinePointIndex(tigris, [40.3, 37.8]);
+    const euphrates = stitchNamedRiverChain(naturalEarthRiversMain, /(euphrates|firat|alfurat)/u, [39.0, 37.9]);
+    const tigris = stitchNamedRiverChain(naturalEarthRiversMain, /(tigris|dicle)/u, [40.3, 37.8]);
+    const euphratesCrossIndex = nearestLinePointIndex(euphrates, [39.04, 37.93]);
+    const tigrisCrossIndex = nearestLinePointIndex(tigris, [40.34, 37.83]);
     const babylonIndex = nearestLinePointIndex(euphrates, anchorPoint(anchorsById, "babylon"));
     const seleuciaIndex = nearestLinePointIndex(tigris, anchorPoint(anchorsById, "seleucia-tigris"));
     const euphratesEdge = sliceLineByIndices(euphrates, euphratesCrossIndex, babylonIndex);
     const tigrisEdge = sliceLineByIndices(tigris, tigrisCrossIndex, seleuciaIndex);
-    const northBridge = [
-      euphrates[euphratesCrossIndex],
-      anchorPoint(anchorsById, "edessa"),
-      anchorPoint(anchorsById, "nisibis"),
-      tigris[tigrisCrossIndex]
-    ];
+    const northBridge = [euphrates[euphratesCrossIndex], tigris[tigrisCrossIndex]];
     const southBridge = [anchorPoint(anchorsById, "babylon"), anchorPoint(anchorsById, "seleucia-tigris")];
     allowedInputGeometries.push(
       featureFromLine(euphratesEdge).geometry,
@@ -878,20 +904,20 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const mesopotamiaRing = normalizeRing([
       ...northBridge,
       ...tigrisEdge.slice(1),
-      anchorPoint(anchorsById, "seleucia-tigris"),
-      anchorPoint(anchorsById, "babylon"),
+      ...southBridge.slice().reverse(),
       ...euphratesEdge.slice().reverse().slice(1)
     ]);
-    let mesopotamia = geometryFeature({ type: "Polygon", coordinates: [mesopotamiaRing] });
+    const mesopotamiaRivers = geometryFeature({ type: "Polygon", coordinates: [mesopotamiaRing] });
     const mesopotamiaPieces = await booleanOpStrict({
       workDirectory,
-      tag: "mesopotamia-land-and-north",
+      tag: "mesopotamia-river-clip",
       operation: "clip",
-      subjectFeatures: [mesopotamia],
-      maskFeatures: [mesopotamiaLand, northMask],
+      subjectFeatures: [mesopotamiaRivers],
+      maskFeatures: [mesopotamia, mesopotamiaLand],
       expectNonEmpty: true
     });
     mesopotamia = await unionOne({ workDirectory, tag: "mesopotamia-union", features: mesopotamiaPieces });
+    mesopotamia = await keepComponentWithAnchor({ feature: mesopotamia, anchorId: "edessa", tag: "group-b-mesopotamia-main" });
     addFeature(features, {
       id: "mesopotamia",
       geometry: mesopotamia.geometry,
