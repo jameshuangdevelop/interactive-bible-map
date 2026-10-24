@@ -1763,26 +1763,15 @@
       "bibleText": "Matthew 3:13-4:13, Mark 1:9-14, Luke 4:1-31 and John 1:28-4:46 together describe these early movements before Jesus' Galilean ministry is fully under way.",
       "notes": [
         "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
-        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
-        "About AD 26-29. Robertson's Chief Divisions places his Part VI in \"probably A.D. 26 and 27.\" ISBE dates the baptism to AD 26 and the first Passover to AD 27, and also reports a reckoning from Augustus's death that gives AD 28-29 for the start of the ministry, with an early tradition of AD 29 for the death. World History Encyclopedia places Jesus' ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range keeps AD 29 as its upper bound to cover ISBE's later-start view.",
-        "Bethany beyond the Jordan and Cana both have multiple proposed sites in this project's data, so the stages that begin or end at those places are listed without a line.",
-        "Where a passage names only a region—such as Judea, Samaria, or Galilee—rather than a town, the stage names the region; where a stage begins or ends at a region, its path isn't known, and its line runs straight between its ends."
+        "These segments are well attested individually: each is shown only where a Gospel names both ends of the movement, in the passage or its context. Within this part they are listed where each arrives, in each Gospel's own order and, where accounts from different Gospels meet, in the order of two public-domain harmonies of the Gospels (A. T. Robertson, 1922; Stevens and Burton, 1904), which agree on every position. This isn't a full harmonized itinerary: no stage or line is added, and the parts aren't joined into one journey.",
+        "About AD 26-29. Robertson dates his Part VI probably to AD 26 and 27. ISBE dates the baptism to AD 26 and the first Passover to AD 27, and also reports a reckoning from Augustus's death that gives AD 28-29 for the start of the ministry, with an early tradition of AD 29 for the death. World History Encyclopedia places Jesus' ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range keeps AD 29 as its upper bound to cover ISBE's later-start view.",
+        "Bethany beyond the Jordan and Cana both have more than one proposed site, and this map favors none of them, so the stages that begin or end at those places are listed without a line.",
+        "Where a passage names only a region—such as Judea, Samaria, or Galilee—rather than a town, the stage names the region; where a stage begins or ends at a region, or passes through one between two towns, its path isn't known, and its line runs straight between its ends."
       ],
       "sources": [
         "scripture:Matthew 3:13",
-        "scripture:Luke 24:50",
-        "scripture:Luke 24:34",
         "bib:isbe-chronology-nt",
         "bib:worldhistory-jesus-christ",
-        "bib:isbe-gadara",
-        "bib:isbe-gerasa",
-        "bib:isbe-bethphage",
-        "bib:niv-2011-biblegateway",
-        "bib:esv-2025-biblegateway",
-        "bib:nlt-2015-biblegateway",
-        "bib:kjv-1987-biblegateway",
-        "bib:nkjv-1982-biblegateway",
-        "bib:csb-2017-biblegateway",
         "bib:robertson-harmony-of-the-gospels",
         "bib:stevens-burton-harmony-of-the-gospels"
       ],
@@ -2257,31 +2246,28 @@
       "toYear": 32,
       "structure": "standalone-segments",
       "summary": "Jesus goes up to Jerusalem for an unnamed feast, then teaches and heals around Capernaum, Nain and the Sea of Galilee, including a crossing to the country of the Gadarenes and back.",
-      "bibleText": "John 5:1, Luke 7:1-8:40, Matthew 8:18-9:1 and Mark 4:35-5:21 describe these movements in and around Galilee.",
+      "bibleText": "John 5:1, Luke 7:1-8:40, Matthew 8:18-9:1 and Mark 4:35-5:21 describe these movements, from Galilee up to Jerusalem and around the Sea of Galilee.",
       "notes": [
         "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
-        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
-        "About AD 27-32. Robertson places this block within his Part VII (\"probably A.D. 27 to 29\"). ISBE ties this period's timing to the year before the last Passover and reports both an AD 28-29 start reckoning and an early AD 29 death tradition; World History Encyclopedia places the death between AD 30 and AD 33 within Pilate's AD 26-36 governorship. This part's range follows the widening approved for the six-part split.",
-        "The country of the Gadarenes (Gerasenes/Gergesenes) has multiple proposed sites in this project's data, so the crossing stages there and back are listed without a line.",
-        "Matthew, Mark and Luke's own manuscripts differ on the region name—\"Gergesenes,\" \"Gadarenes\" or \"Gerasenes\"—so this route keeps all three names rather than choosing one."
+        "These segments are well attested individually: each is shown only where a Gospel names both ends of the movement, in the passage or its context. Within this part they are listed where each arrives, in each Gospel's own order and, where accounts from different Gospels meet, in the order of two public-domain harmonies of the Gospels (A. T. Robertson, 1922; Stevens and Burton, 1904), which agree on every position. This isn't a full harmonized itinerary: no stage or line is added, and the parts aren't joined into one journey.",
+        "About AD 27-32. Robertson places this part in his Part VII, which he dates probably to AD 27-29. The International Standard Bible Encyclopedia dates the first Passover to AD 27 and the death to AD 30, and calls the indications of time from the Passover of John 6:4 to the last Passover \"definite and clear,\" so this part, which comes before John 6:4, ends no later than the year before the last Passover; it also reports a reckoning that gives AD 28-29 for the start of the ministry, and an early tradition of AD 29 for the death. World History Encyclopedia places the ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range runs to AD 32.",
+        "The country of the Gadarenes (Gerasenes/Gergesenes) has more than one proposed site, and this map favors none of them, so the crossing stages there and back are listed without a line.",
+        "Matthew, Mark and Luke's own manuscripts differ on the region name—\"Gergesenes,\" \"Gadarenes\" or \"Gerasenes\"—so this route keeps all three names rather than choosing one.",
+        "Where a passage names only a region—such as Galilee—rather than a town, the stage names the region; where a stage begins or ends at a region, its path isn't known, and its line runs straight between its ends."
       ],
       "sources": [
-        "scripture:Matthew 3:13",
-        "scripture:Luke 24:50",
-        "scripture:Luke 24:34",
         "bib:isbe-chronology-nt",
         "bib:worldhistory-jesus-christ",
+        "bib:robertson-harmony-of-the-gospels",
+        "bib:stevens-burton-harmony-of-the-gospels",
         "bib:isbe-gadara",
         "bib:isbe-gerasa",
-        "bib:isbe-bethphage",
         "bib:niv-2011-biblegateway",
         "bib:esv-2025-biblegateway",
         "bib:nlt-2015-biblegateway",
         "bib:kjv-1987-biblegateway",
         "bib:nkjv-1982-biblegateway",
-        "bib:csb-2017-biblegateway",
-        "bib:robertson-harmony-of-the-gospels",
-        "bib:stevens-burton-harmony-of-the-gospels"
+        "bib:csb-2017-biblegateway"
       ],
       "stages": [
         {
@@ -2483,32 +2469,26 @@
       "toYear": 32,
       "structure": "standalone-segments",
       "summary": "Jesus travels to the borders of Tyre and Sidon, through the region of the Decapolis, and to Bethsaida and the villages of Caesarea Philippi, then returns to Capernaum and goes up to Jerusalem for the Feast of Booths.",
-      "bibleText": "Matthew 15:21-17:24, Mark 7:24-9:33 and John 7:1-14 describe these movements beyond Galilee and back to Jerusalem for the Feast of Booths.",
+      "bibleText": "Matthew 15:21-17:24, Mark 7:24-9:33 and John 7:1-14 describe these movements beyond Galilee and up to Jerusalem for the Feast of Booths.",
       "notes": [
         "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
-        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
-        "About AD 28-32. Robertson places this in his Part VIII (from the Passover of John 6 to Tabernacles) and the start of Part IX; ISBE says the timing markers from John 6:4 to 11:55 are \"definite and clear\" (7:2; 10:22), which places this part in the year before the last Passover. ISBE also reports an AD 28-29 start reckoning and an early AD 29 death tradition, while World History Encyclopedia gives AD 30-33 for the commonly agreed death range within Pilate's AD 26-36 term.",
-        "Bethsaida has two proposed sites in this project's data, so stages that begin or end there are listed without a line.",
-        "Where a passage names only a region—such as the Decapolis or \"the borders of Tyre and Sidon\"—rather than a town, the stage names the region; where a stage begins or ends at a region, its path isn't known, and its line runs straight between its ends.",
+        "These segments are well attested individually: each is shown only where a Gospel names both ends of the movement, in the passage or its context. Within this part they are listed where each arrives, in each Gospel's own order and, where accounts from different Gospels meet, in the order of two public-domain harmonies of the Gospels (A. T. Robertson, 1922; Stevens and Burton, 1904), which agree on every position. This isn't a full harmonized itinerary: no stage or line is added, and the parts aren't joined into one journey.",
+        "About AD 28-32. Robertson places this part in his Part VIII and the start of Part IX, from the Passover of John 6:4 to the Feast of Tabernacles, which he dates probably to AD 29. The International Standard Bible Encyclopedia dates the death to AD 30 and calls the indications of time from John 6:4 to the last Passover \"definite and clear\" (7:2; 10:22), which places this part in the year before the last Passover; it also reports a reckoning that gives AD 28-29 for the start of the ministry, and an early tradition of AD 29 for the death. World History Encyclopedia places the ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range runs from AD 28 to AD 32.",
+        "Bethsaida has two proposed sites, and this map favors neither, so stages that begin or end there are listed without a line.",
+        "Where a passage names only a region—such as the Decapolis or \"the borders of Tyre and Sidon\"—rather than a town, the stage names the region; where a stage begins or ends at a region, or passes through one between two towns, its path isn't known, and its line runs straight between its ends.",
         "At Mark 7:31 the WEB, like the KJV and NKJV, says Jesus left \"the borders of Tyre and Sidon\"; the NIV, ESV, NLT and CSB say he went by way of Sidon. This route follows the WEB, so Sidon is named on the map but not shown as a place he passed."
       ],
       "sources": [
-        "scripture:Matthew 3:13",
-        "scripture:Luke 24:50",
-        "scripture:Luke 24:34",
         "bib:isbe-chronology-nt",
         "bib:worldhistory-jesus-christ",
-        "bib:isbe-gadara",
-        "bib:isbe-gerasa",
-        "bib:isbe-bethphage",
+        "bib:robertson-harmony-of-the-gospels",
+        "bib:stevens-burton-harmony-of-the-gospels",
         "bib:niv-2011-biblegateway",
         "bib:esv-2025-biblegateway",
         "bib:nlt-2015-biblegateway",
         "bib:kjv-1987-biblegateway",
         "bib:nkjv-1982-biblegateway",
-        "bib:csb-2017-biblegateway",
-        "bib:robertson-harmony-of-the-gospels",
-        "bib:stevens-burton-harmony-of-the-gospels"
+        "bib:csb-2017-biblegateway"
       ],
       "stages": [
         {
@@ -2905,29 +2885,24 @@
       "bibleText": "Matthew 19:1-21:10, Mark 10:1-11:11, Luke 18:35-19:45 and John 10:22-12:12 provide these final-journey movements before the last week.",
       "notes": [
         "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
-        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
-        "About AD 28-33. Robertson places these movements across his Parts IX-X, and ISBE places John 10:22 (Dedication) in the year before the last Passover while also reporting an AD 28-29 reckoning for the ministry's start and an early AD 29 death tradition. World History Encyclopedia places the commonly agreed death range at AD 30-33 within Pilate's AD 26-36 term, so this part's range runs through AD 33.",
-        "Bethany beyond the Jordan has multiple proposed sites in this project's data, so stages that begin or end there are listed without a line.",
-        "Where a passage names only a region—such as Galilee—rather than a town, the stage names the region; where a stage begins or ends at a region, its path isn't known, and its line runs straight between its ends.",
+        "These segments are well attested individually: each is shown only where a Gospel names both ends of the movement, in the passage or its context. Within this part they are listed where each arrives, in each Gospel's own order and, where accounts from different Gospels meet, in the order of two public-domain harmonies of the Gospels (A. T. Robertson, 1922; Stevens and Burton, 1904), which agree on every position. This isn't a full harmonized itinerary: no stage or line is added, and the parts aren't joined into one journey.",
+        "About AD 28-33. Robertson places these movements in his Parts IX to XI, from the Feast of Dedication, which he dates probably to AD 29, to the entry into Jerusalem in AD 30 or 29. The International Standard Bible Encyclopedia dates the death to AD 30 and places the Feast of Dedication (John 10:22) in the year before the last Passover; it also reports a reckoning that gives AD 28-29 for the start of the ministry, and an early tradition of AD 29 for the death. World History Encyclopedia places the ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range runs from AD 28 to AD 33.",
+        "Some places in this part have more than one proposed site; where sources point to one with the strongest support the route draws a line to it, and otherwise, as for Bethany beyond the Jordan, the stage is listed without a line.",
+        "Where a passage names only a region—such as Galilee—rather than a town, the stage names the region; where a stage begins or ends at a region, or passes through one between two towns, its path isn't known, and its line runs straight between its ends.",
         "At Matthew 21:1, Mark 11:1 and Luke 19:29 the WEB text reads \"Bethsphage\"; this route follows the spelling (\"Bethphage\") that the other compared English versions agree on."
       ],
       "sources": [
-        "scripture:Matthew 3:13",
-        "scripture:Luke 24:50",
-        "scripture:Luke 24:34",
         "bib:isbe-chronology-nt",
         "bib:worldhistory-jesus-christ",
-        "bib:isbe-gadara",
-        "bib:isbe-gerasa",
+        "bib:robertson-harmony-of-the-gospels",
+        "bib:stevens-burton-harmony-of-the-gospels",
         "bib:isbe-bethphage",
         "bib:niv-2011-biblegateway",
         "bib:esv-2025-biblegateway",
         "bib:nlt-2015-biblegateway",
         "bib:kjv-1987-biblegateway",
         "bib:nkjv-1982-biblegateway",
-        "bib:csb-2017-biblegateway",
-        "bib:robertson-harmony-of-the-gospels",
-        "bib:stevens-burton-harmony-of-the-gospels"
+        "bib:csb-2017-biblegateway"
       ],
       "stages": [
         {
@@ -3321,24 +3296,12 @@
       "bibleText": "Matthew 21:17-26:36, Mark 11:11-14:32, Luke 21:37-22:39 and John 18:1 narrate these movements in Jerusalem during the last week.",
       "notes": [
         "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
-        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
-        "About AD 29-33. Robertson labels these sections \"A.D. 30 or 29.\" ISBE also reports an early AD 29 death tradition and an AD 28-29 start reckoning depending on how Luke 3:1 is counted; World History Encyclopedia gives AD 30-33 as the commonly agreed death range within Pilate's AD 26-36 term. This part keeps AD 29-33 to cover all cited views."
+        "These segments are well attested individually: each is shown only where a Gospel names both ends of the movement, in the passage or its context. Within this part they are listed where each arrives, in each Gospel's own order and, where accounts from different Gospels meet, in the order of two public-domain harmonies of the Gospels (A. T. Robertson, 1922; Stevens and Burton, 1904), which agree on every position. This isn't a full harmonized itinerary: no stage or line is added, and the parts aren't joined into one journey.",
+        "About AD 29-33. Robertson dates the last week \"A.D. 30 or 29.\" The International Standard Bible Encyclopedia dates the death to AD 30, and also reports an early tradition of AD 29 for the death and a reckoning that gives AD 28-29 for the start of the ministry. World History Encyclopedia places the ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range runs from AD 29 to AD 33."
       ],
       "sources": [
-        "scripture:Matthew 3:13",
-        "scripture:Luke 24:50",
-        "scripture:Luke 24:34",
         "bib:isbe-chronology-nt",
         "bib:worldhistory-jesus-christ",
-        "bib:isbe-gadara",
-        "bib:isbe-gerasa",
-        "bib:isbe-bethphage",
-        "bib:niv-2011-biblegateway",
-        "bib:esv-2025-biblegateway",
-        "bib:nlt-2015-biblegateway",
-        "bib:kjv-1987-biblegateway",
-        "bib:nkjv-1982-biblegateway",
-        "bib:csb-2017-biblegateway",
         "bib:robertson-harmony-of-the-gospels",
         "bib:stevens-burton-harmony-of-the-gospels"
       ],
@@ -3494,25 +3457,15 @@
       "bibleText": "Luke 24:13-51 describes the Emmaus road and the movement to Bethany before the ascension.",
       "notes": [
         "The lines show the order and likely mode of each movement, not the exact path Jesus and his disciples walked or sailed.",
-        "Within this part, stages are ordered where they arrive, following the two cited public-domain harmonies (A. T. Robertson, 1922; Stevens and Burton, 1904). This is a listing order, not a full harmonized itinerary, and no stage or line is added.",
-        "About AD 29-33. Robertson places these scenes in his Part XIV (\"forty days ... A.D. 30 or 29\"). ISBE reports both an AD 28-29 start reckoning and an early AD 29 death tradition, and World History Encyclopedia gives AD 30-33 as the commonly agreed death range within Pilate's AD 26-36 term. This part keeps AD 29-33 to cover all cited views.",
-        "Emmaus has multiple proposed sites in this project's data, so the Emmaus stage is listed without a line."
+        "These segments are well attested individually: each is shown only where a Gospel names both ends of the movement, in the passage or its context. Within this part they are listed where each arrives, in each Gospel's own order and, where accounts from different Gospels meet, in the order of two public-domain harmonies of the Gospels (A. T. Robertson, 1922; Stevens and Burton, 1904), which agree on every position. This isn't a full harmonized itinerary: no stage or line is added, and the parts aren't joined into one journey.",
+        "About AD 29-33. Robertson dates his Part XIV, \"Forty days from Sunday of Passion Week,\" to \"A.D. 30 or 29.\" The International Standard Bible Encyclopedia dates the death to AD 30, and also reports an early tradition of AD 29 for the death and a reckoning that gives AD 28-29 for the start of the ministry. World History Encyclopedia places the ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range runs from AD 29 to AD 33.",
+        "Emmaus has four proposed sites, and this map favors none of them, so the Emmaus stage is listed without a line."
       ],
       "sources": [
-        "scripture:Matthew 3:13",
-        "scripture:Luke 24:50",
         "scripture:Luke 24:34",
+        "scripture:Luke 24:50",
         "bib:isbe-chronology-nt",
         "bib:worldhistory-jesus-christ",
-        "bib:isbe-gadara",
-        "bib:isbe-gerasa",
-        "bib:isbe-bethphage",
-        "bib:niv-2011-biblegateway",
-        "bib:esv-2025-biblegateway",
-        "bib:nlt-2015-biblegateway",
-        "bib:kjv-1987-biblegateway",
-        "bib:nkjv-1982-biblegateway",
-        "bib:csb-2017-biblegateway",
         "bib:robertson-harmony-of-the-gospels",
         "bib:stevens-burton-harmony-of-the-gospels"
       ],
