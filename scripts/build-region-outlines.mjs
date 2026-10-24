@@ -446,6 +446,7 @@ function partCount(geometry) {
 
 function pruneSmallParts(feature) {
   if (ISLAND_REGION_IDS.has(feature.id)) return feature;
+  if (feature.id === "media") return feature;
   const polygons = polygonsOf(feature.geometry);
   if (polygons.length <= 1) return feature;
   const measured = polygons.map((polygon) => ({
@@ -503,6 +504,12 @@ function simplifyMetresByRegion(regionId) {
   if (regionId === "galilee") return 25;
   if (regionId === "samaria") return 25;
   if (regionId === "judea") return 25;
+  if (regionId === "pisidia") return 150;
+  if (regionId === "lycaonia") return 150;
+  if (regionId === "mysia") return 100;
+  if (regionId === "phrygia") return 150;
+  if (regionId === "media") return 200;
+  if (regionId === "mesopotamia") return 150;
   // 600 m for the rest: island extracts are already coarse from area parts, and Pontus follows
   // long coast/river stretches where this tolerance keeps gzip size within the lazy-load cap.
   if (regionId === "pontus") return 600;
@@ -725,6 +732,15 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       return unionOne({ workDirectory, tag: `${tag}-union`, features: [hit] });
     }
 
+    async function keepComponentsWithAnchors({ feature, anchorIds, tag }) {
+      const parts = await explode({ workDirectory, tag: `${tag}-explode`, features: [feature] });
+      const selected = parts.filter((part) =>
+        anchorIds.some((anchorId) => pointInGeometry(anchorPoint(anchorsById, anchorId), part.geometry))
+      );
+      if (selected.length === 0) throw new Error(`${tag}: no components contain anchors ${anchorIds.join(", ")}.`);
+      return unionOne({ workDirectory, tag: `${tag}-union`, features: selected });
+    }
+
     const groupA = buildGroupVoronoi({ anchorsById, labelsByAnchorId: GROUP_A_LABELS, marginDegrees: 6 });
     allowedInputGeometries.push(...bisectorLinesByLabel({ anchorsById, labelsByAnchorId: GROUP_A_LABELS, marginDegrees: 6 }));
 
@@ -863,7 +879,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
         expectNonEmpty: true
       })
     });
-    media = await keepComponentWithAnchor({ feature: media, anchorId: "ecbatana", tag: "group-b-media-main" });
+    media = await keepComponentsWithAnchors({ feature: media, anchorIds: ["ecbatana", "gazaca", "rhagae"], tag: "group-b-media-main" });
     addFeature(features, {
       id: "media",
       geometry: media.geometry,
@@ -964,7 +980,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
         pontusBaseAreaKm2: geometryAreaKm2(pontusArea.geometry),
         judeaSamariaCombinedKm2: geometryAreaKm2(samaria.geometry) + geometryAreaKm2(judea.geometry),
         partCounts: Object.fromEntries(cleanedFeatures.map((feature) => [feature.id, partCount(feature.geometry)])),
-        nonIslandIds: cleanedFeatures.map((feature) => feature.id).filter((id) => !ISLAND_REGION_IDS.has(id))
+        nonIslandIds: cleanedFeatures.map((feature) => feature.id).filter((id) => !ISLAND_REGION_IDS.has(id) && id !== "media")
       }
     };
   } finally {
