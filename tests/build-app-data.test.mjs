@@ -624,6 +624,12 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     const outlinesPayload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "ancient.region-outlines.json"), "utf8")
     );
+    // Provenance stays in data/geo/; the app's outlines carry only each region's id and shape.
+    assert.ok(outlinesPayload.features.length > 0);
+    for (const feature of outlinesPayload.features) {
+      assert.deepEqual(Object.keys(feature).sort(), ["geometry", "id", "properties", "type"]);
+      assert.deepEqual(feature.properties, {});
+    }
     const outlineIds = outlinesPayload.features
       .map((feature) => feature.id)
       .filter((id) => typeof id === "string")
