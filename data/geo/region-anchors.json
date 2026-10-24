@@ -9,6 +9,14 @@
       ]
     },
     {
+      "id": "adramyttium-anchor",
+      "sourceId": "pleiades:550403",
+      "coordinates": [
+        26.9360975594,
+        39.4986400291
+      ]
+    },
+    {
       "id": "aizani",
       "sourceId": "pleiades:609292",
       "coordinates": [
@@ -150,6 +158,14 @@
       "coordinates": [
         31.169703019,
         36.9403723356
+      ]
+    },
+    {
+      "id": "assos-anchor",
+      "sourceId": "pleiades:550463",
+      "coordinates": [
+        26.3363517018,
+        39.4901354609
       ]
     },
     {
@@ -505,6 +521,14 @@
       ]
     },
     {
+      "id": "pergamum",
+      "sourceId": "wikidata:Q18986",
+      "coordinates": [
+        27.18412,
+        39.12947
+      ]
+    },
+    {
       "id": "perge",
       "sourceId": "wikidata:Q719815",
       "coordinates": [
@@ -646,6 +670,14 @@
       "coordinates": [
         30.9876208736,
         36.991633082
+      ]
+    },
+    {
+      "id": "sinda",
+      "sourceId": "pleiades:639111",
+      "coordinates": [
+        29.6045,
+        37.120499
       ]
     },
     {

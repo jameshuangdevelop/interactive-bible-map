@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import mapshaper from "mapshaper";
 import booleanValid from "@turf/boolean-valid";
+import { Delaunay } from "d3-delaunay";
 import { pointInGeometry } from "./lib/ancient-area-checks.mjs";
 import { ancientGeoCache, fetchPinnedInputs, readJsonFile } from "./lib/ancient-geo-inputs.mjs";
 import { geometryAreaKm2, polygonsOf } from "./lib/geometry-cleanup.mjs";
@@ -19,8 +20,10 @@ const OUTPUT_PRECISION = 0.00001;
 const MIN_NON_ISLAND_PART_KM2 = 1;
 const ISLAND_REGION_IDS = new Set(["crete", "chios", "cos", "malta", "rhodes", "samos"]);
 const ALLOWED_DROPPED_ISLAND_PARTS = Object.freeze({
-  pontus: [{ name: "pontus-lower-halys-coastal-islet", maxAreaKm2: 10 }]
+  pontus: [{ name: "pontus-lower-halys-coastal-islet", maxAreaKm2: 10 }],
+  lycaonia: [{ name: "lycaonia-detached-voronoi-fragments", maxAreaKm2: 50 }]
 });
+const VORONOI_EPSILON = 1e-9;
 
 function featureCollection(features) {
   return { type: "FeatureCollection", features };
@@ -191,6 +194,93 @@ function lowerHalysFromTripoint(riverCoordinates, tripoint) {
   return [tripoint, ...mouthSide.slice(1)];
 }
 
+function meanLatitude(points) {
+  if (!Array.isArray(points) || points.length === 0) return 0;
+  return points.reduce((sum, point) => sum + point[1], 0) / points.length;
+}
+
+function bboxFromPoints(points, { marginLon = 5, marginLat = 5 } = {}) {
+  const lons = points.map((point) => point[0]);
+  const lats = points.map((point) => point[1]);
+  return {
+    minLon: Math.min(...lons) - marginLon,
+    maxLon: Math.max(...lons) + marginLon,
+    minLat: Math.min(...lats) - marginLat,
+    maxLat: Math.max(...lats) + marginLat
+  };
+}
+
+function toLocalPlane(point, phi0Radians) {
+  return [point[0] * Math.cos(phi0Radians), point[1]];
+}
+
+function toLonLat(point, phi0Radians) {
+  const cosPhi0 = Math.cos(phi0Radians);
+  if (Math.abs(cosPhi0) < VORONOI_EPSILON) return [point[0], point[1]];
+  return [point[0] / cosPhi0, point[1]];
+}
+
+function normalizeRing(ring) {
+  if (!Array.isArray(ring) || ring.length < 4) return ring ?? [];
+  const first = ring[0];
+  const last = ring[ring.length - 1];
+  if (Math.abs(first[0] - last[0]) > VORONOI_EPSILON || Math.abs(first[1] - last[1]) > VORONOI_EPSILON) {
+    return [...ring, first];
+  }
+  return ring;
+}
+
+// G0.1: equidistant lines are computed in a local equirectangular plane (x = lon*cos(phi0), y = lat).
+function voronoiInsideCellFeatures({ insidePoints, outsidePoints, marginDegrees = 6 }) {
+  if (!insidePoints.length || !outsidePoints.length) {
+    throw new Error("Voronoi build needs at least one inside and one outside anchor.");
+  }
+  const allPoints = [...insidePoints, ...outsidePoints];
+  const phi0Radians = (meanLatitude(allPoints) * Math.PI) / 180;
+  const projected = allPoints.map((point) => toLocalPlane(point, phi0Radians));
+  const bboxLonLat = bboxFromPoints(allPoints, { marginLon: marginDegrees, marginLat: marginDegrees });
+  const lowerLeft = toLocalPlane([bboxLonLat.minLon, bboxLonLat.minLat], phi0Radians);
+  const upperRight = toLocalPlane([bboxLonLat.maxLon, bboxLonLat.maxLat], phi0Radians);
+  const delaunay = Delaunay.from(projected);
+  const voronoi = delaunay.voronoi([lowerLeft[0], lowerLeft[1], upperRight[0], upperRight[1]]);
+  const features = [];
+  for (let index = 0; index < insidePoints.length; index += 1) {
+    const polygon = voronoi.cellPolygon(index);
+    if (!polygon || polygon.length < 4) continue;
+    const ring = normalizeRing(polygon.map((point) => toLonLat(point, phi0Radians)));
+    features.push(geometryFeature({ type: "Polygon", coordinates: [ring] }));
+  }
+  return features;
+}
+
+async function voronoiInsideMask({ workDirectory, tag, anchorsById, insideAnchorIds, outsideAnchorIds, marginDegrees = 6 }) {
+  const insidePoints = insideAnchorIds.map((anchorId) => anchorPoint(anchorsById, anchorId));
+  const outsidePoints = outsideAnchorIds.map((anchorId) => anchorPoint(anchorsById, anchorId));
+  const cells = voronoiInsideCellFeatures({ insidePoints, outsidePoints, marginDegrees });
+  if (cells.length === 0) throw new Error(`${tag}: Voronoi produced no inside cells.`);
+  return unionOne({ workDirectory, tag: `${tag}-inside-mask`, features: cells });
+}
+
+function selectLandComponentByAnchor(landFeatures, anchorCoordinates) {
+  const hit = landFeatures.find((feature) => pointInGeometry(anchorCoordinates, feature.geometry));
+  if (!hit) throw new Error(`No Natural Earth land component contains anchor ${JSON.stringify(anchorCoordinates)}.`);
+  return hit;
+}
+
+function bboxFeatureFromPoints(points, { marginLon = 3, marginLat = 3 } = {}) {
+  const box = bboxFromPoints(points, { marginLon, marginLat });
+  return geometryFeature({
+    type: "Polygon",
+    coordinates: [[
+      [box.minLon, box.minLat],
+      [box.maxLon, box.minLat],
+      [box.maxLon, box.maxLat],
+      [box.minLon, box.maxLat],
+      [box.minLon, box.minLat]
+    ]]
+  });
+}
+
 function normalizedText(value) {
   return String(value ?? "")
     .toLowerCase()
@@ -213,8 +303,87 @@ function findKizilirmakFeature(...collections) {
   return scored.sort((left, right) => right.score - left.score)[0].feature;
 }
 
+function lineLengthSquared(line) {
+  let total = 0;
+  for (let index = 1; index < line.length; index += 1) {
+    const dx = line[index][0] - line[index - 1][0];
+    const dy = line[index][1] - line[index - 1][1];
+    total += dx * dx + dy * dy;
+  }
+  return total;
+}
+
+function linesFromFeature(feature) {
+  if (!feature?.geometry) return [];
+  if (feature.geometry.type === "LineString") return [feature.geometry.coordinates];
+  if (feature.geometry.type === "MultiLineString") return feature.geometry.coordinates;
+  return [];
+}
+
+function riverCandidateLines(collection, matcher) {
+  return (collection.features ?? [])
+    .filter((feature) => matcher(normalizedText(feature?.properties?.name)))
+    .flatMap((feature) => linesFromFeature(feature).map((line) => ({ line, feature })));
+}
+
+function nearestEndpointPair(lineA, lineB) {
+  const endpointsA = [lineA[0], lineA.at(-1)];
+  const endpointsB = [lineB[0], lineB.at(-1)];
+  let best = null;
+  for (const endpointA of endpointsA) {
+    for (const endpointB of endpointsB) {
+      const distance = (endpointA[0] - endpointB[0]) ** 2 + (endpointA[1] - endpointB[1]) ** 2;
+      if (!best || distance < best.distance) best = { endpointA, endpointB, distance };
+    }
+  }
+  return best;
+}
+
+function connectLines(lineA, lineB) {
+  const pair = nearestEndpointPair(lineA, lineB);
+  const orientedA = pair.endpointA === lineA.at(-1) ? lineA : [...lineA].reverse();
+  const orientedB = pair.endpointB === lineB[0] ? lineB : [...lineB].reverse();
+  return [...orientedA, ...orientedB.slice(1)];
+}
+
+function findArasKuraChain(riversMain) {
+  const arasCandidates = riverCandidateLines(riversMain, (name) => /(aras|arax)/u.test(name));
+  const kuraCandidates = riverCandidateLines(riversMain, (name) => /(kura|cyrus)/u.test(name));
+  if (arasCandidates.length === 0) throw new Error("Could not find Aras/Araxes in Natural Earth rivers.");
+  if (kuraCandidates.length === 0) throw new Error("Could not find Kura/Cyrus in Natural Earth rivers.");
+  const aras = arasCandidates.sort((left, right) => lineLengthSquared(right.line) - lineLengthSquared(left.line))[0].line;
+  const kura = kuraCandidates.sort((left, right) => lineLengthSquared(right.line) - lineLengthSquared(left.line))[0].line;
+  const chain = connectLines(aras, kura);
+  const eastEnd = chain.reduce((best, point, index) => (point[0] > chain[best][0] ? index : best), 0);
+  const oriented = eastEnd === chain.length - 1 ? chain : [...chain].reverse();
+  return {
+    chain: oriented,
+    arasLine: aras,
+    kuraLine: kura
+  };
+}
+
 function pointAtMaxLatitude(line) {
   return [...line].sort((left, right) => right[1] - left[1])[0];
+}
+
+function nearestLinePointIndex(line, point) {
+  return nearestVertexIndex(line, point);
+}
+
+function sliceLineByIndices(line, startIndex, endIndex) {
+  if (startIndex <= endIndex) return line.slice(startIndex, endIndex + 1);
+  return [...line.slice(endIndex, startIndex + 1)].reverse();
+}
+
+function riverTrunkByName(riversMain, pattern) {
+  const candidates = riverCandidateLines(riversMain, (name) => pattern.test(name));
+  if (candidates.length === 0) throw new Error(`Could not find river trunk for pattern ${pattern}.`);
+  return candidates.sort((left, right) => lineLengthSquared(right.line) - lineLengthSquared(left.line))[0].line;
+}
+
+function featureFromLine(line, properties = {}) {
+  return geometryFeature({ type: "LineString", coordinates: line }, properties);
 }
 
 function partCount(geometry) {
@@ -268,6 +437,15 @@ function pruneSmallParts(feature) {
   return { ...feature, geometry };
 }
 
+function largestPolygonOnly(feature) {
+  const polygons = polygonsOf(feature.geometry);
+  if (polygons.length <= 1) return feature;
+  const largest = polygons
+    .map((polygon) => ({ polygon, areaKm2: geometryAreaKm2({ type: "Polygon", coordinates: polygon }) }))
+    .sort((left, right) => right.areaKm2 - left.areaKm2)[0];
+  return { ...feature, geometry: { type: "Polygon", coordinates: largest.polygon } };
+}
+
 function simplifyMetresByRegion(regionId) {
   // 25 m for Levant neighbours that share one synthetic split line; this keeps that seam
   // visually stable while preserving precise coastline/river turns near each anchor.
@@ -314,6 +492,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const inputFiles = await fetchPinnedInputs(cache.inputs);
     const naturalEarthLand = await readJsonFile(inputFiles.naturalEarthLand);
     const naturalEarthRiversMain = await readJsonFile(inputFiles.naturalEarthRiversMain);
+    const naturalEarthRiversEurope = await readJsonFile(inputFiles.naturalEarthRiversEurope);
     const gazaFaceSource = await readJsonFile(gazaFacePath);
     const landMask = (naturalEarthLand.features ?? []).filter((feature) => feature.geometry);
 
@@ -471,6 +650,254 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       sources: ["bib:strabo-geography", "bib:isbe-pontus", "bib:isbe-galatia", "pleiades:857024", "pleiades:857350", "naturalearth:ne-10m-rivers-lake-centerlines"],
       confidence: "medium",
       note: "The kingdom of Pontus, including Pontus Galaticus and Lesser Armenia as this project's Pontus area draws them, since no source draws a line between these lands, plus the coast east of the lower Halys with Amisus and Themiscyra (Strabo 12.3.9; ISBE, 'Pontus'). The west cut follows Natural Earth's Kızılırmak line from the 35.621°E, 41.287°N tripoint downstream; one short straight segment ties the tripoint to the first river vertex, and a second runs north to the sea where the river line ends."
+    });
+
+    const asiaMainland = selectLandComponentByAnchor(landMask, anchorPoint(anchorsById, "pergamum"));
+    const mesopotamiaLand = selectLandComponentByAnchor(landMask, anchorPoint(anchorsById, "edessa"));
+    const mediaLand = selectLandComponentByAnchor(landMask, anchorPoint(anchorsById, "ecbatana"));
+
+    async function buildVoronoiRegion({ regionId, insideAnchorIds, outsideAnchorIds, seedAnchorIds, landFeature, marginDegrees = 6 }) {
+      const insidePoints = insideAnchorIds.map((anchorId) => anchorPoint(anchorsById, anchorId));
+      const mask = await voronoiInsideMask({
+        workDirectory,
+        tag: `${regionId}-voronoi`,
+        anchorsById,
+        insideAnchorIds,
+        outsideAnchorIds,
+        marginDegrees
+      });
+      const seedPoints = seedAnchorIds.map((anchorId) => anchorPoint(anchorsById, anchorId));
+      const seed = bboxFeatureFromPoints(seedPoints, { marginLon: 3, marginLat: 3 });
+      const seeded = await booleanOpStrict({
+        workDirectory,
+        tag: `${regionId}-seeded`,
+        operation: "clip",
+        subjectFeatures: [mask],
+        maskFeatures: [seed],
+        expectNonEmpty: true
+      });
+      const onLand = await booleanOpStrict({
+        workDirectory,
+        tag: `${regionId}-land`,
+        operation: "clip",
+        subjectFeatures: seeded,
+        maskFeatures: [landFeature],
+        expectNonEmpty: true
+      });
+      const exploded = await explode({ workDirectory, tag: `${regionId}-explode`, features: onLand });
+      const retained = exploded.find((feature) => pointInGeometry(insidePoints[0], feature.geometry)) ?? exploded[0];
+      const dominant = largestPolygonOnly(retained);
+      return unionOne({ workDirectory, tag: `${regionId}-union`, features: [dominant] });
+    }
+
+    const pisidiaInside = ["termessus", "pednelissus", "selge", "sagalassus", "cremna", "adada", "anabura", "amblada", "sinda"];
+    const pisidiaOutside = [
+      "attalia",
+      "perge",
+      "sillyon",
+      "aspendus",
+      "side",
+      "apamea-cibotus",
+      "apollonia-phrygia",
+      "antioch-near-pisidia",
+      "philomelium",
+      "iconium-phrygia",
+      "isaura-vetus",
+      "isaura-nova",
+      "kibyra",
+      "milyas"
+    ];
+    const pisidia = await buildVoronoiRegion({
+      regionId: "pisidia",
+      insideAnchorIds: pisidiaInside,
+      outsideAnchorIds: pisidiaOutside,
+      seedAnchorIds: [...pisidiaInside, ...pisidiaOutside],
+      landFeature: asiaMainland
+    });
+    addFeature(features, {
+      id: "pisidia",
+      geometry: pisidia.geometry,
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-pisidia", "bib:isbe-phrygia", "pleiades:639139", "pleiades:639100", "pleiades:638741", "pleiades:638804"],
+      confidence: "low",
+      note: "Pisidia as Strabo and ISBE place it between the Taurus front above Pamphylia and the Phrygian valleys (Strabo 12.7.1–2; ISBE, 'Pisidia'), bounded by Lycia/Milyas on the west and Isauria on the east. Antioch-near-Pisidia is kept outside by the project's M5-19 convention, while Pliny 5.24 places Antioch inside Pisidia; this outline follows the Strabo/ISBE reading and names Pliny's alternative."
+    });
+
+    const lycaoniaInside = ["coropassus", "lystra-pleiades", "derbe-pleiades", "isaura-vetus", "isaura-nova"];
+    const lycaoniaOutside = [
+      "garsaura",
+      "tyana",
+      "iconium-phrygia",
+      "amblada",
+      "laranda",
+      "lake-tatta",
+      "pessinus",
+      "ancyra",
+      "attalia",
+      "perge"
+    ];
+    let lycaonia = await buildVoronoiRegion({
+      regionId: "lycaonia",
+      insideAnchorIds: lycaoniaInside,
+      outsideAnchorIds: lycaoniaOutside,
+      seedAnchorIds: [...lycaoniaInside, ...lycaoniaOutside],
+      landFeature: asiaMainland
+    });
+    const ciliciaTracheia = areaById(areas, "cilicia-tracheia");
+    const cilicia = areaById(areas, "cilicia");
+    lycaonia = await unionOne({
+      workDirectory,
+      tag: "lycaonia-minus-cilicia-union",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "lycaonia-minus-cilicia",
+        operation: "erase",
+        subjectFeatures: [lycaonia],
+        maskFeatures: [ciliciaTracheia, cilicia],
+        expectNonEmpty: true
+      })
+    });
+    addFeature(features, {
+      id: "lycaonia",
+      geometry: lycaonia.geometry,
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-lycaonia", "scripture:Acts 14:6", "pleiades:619194", "pleiades:619164", "pleiades:648652"],
+      confidence: "low",
+      note: "Lycaonia as Strabo's upland plain east of Iconium and bounded by Cappadocia, Pisidia/Phrygia and Cilicia Tracheia (Strabo 12.6.1–3; ISBE, 'Lycaonia'), with the south clipped to exclude this project's drawn Cilicia areas (PO-3/R52). Iconium is kept outside per M5-19 ruling P5, though Strabo 12.6.1 and Pliny 5.25 place it in Lycaonia; both readings are disputed. Lake Tatta is left in neither Lycaonia nor Phrygia (PO-3)."
+    });
+
+    const mysiaInside = ["cyzicus", "miletopolis", "apollonia-rhyndacum", "pergamum", "teuthrania", "elaea", "adramyttium-anchor", "assos-anchor", "pitane"];
+    const mysiaOutside = ["prusa", "apamea-myrlea", "nicomedia", "dorylaeum", "cotiaeum", "midaeum", "nacolia", "aizani", "cyme", "magnesia-ad-sipylum"];
+    const mysia = await buildVoronoiRegion({
+      regionId: "mysia",
+      insideAnchorIds: mysiaInside,
+      outsideAnchorIds: mysiaOutside,
+      seedAnchorIds: [...mysiaInside, ...mysiaOutside],
+      landFeature: asiaMainland
+    });
+    addFeature(features, {
+      id: "mysia",
+      geometry: mysia.geometry,
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-mysia", "scripture:Acts 16:7", "scripture:Acts 16:8", "pleiades:550523", "pleiades:609420"],
+      confidence: "low",
+      note: "Mysia as the mainland region from Olympene to the Caicus/Pergamene country (Strabo 12.8.1, 12.8.12), clipped to the Asian mainland (PO-6/R53): no Thrace and no Lesbos. Elaea is kept inside following Strabo's Caicus reading, while Pliny 5.32 treats it in Aeolis; this is disputed and noted. Cadi is treated on Phrygia's side where a single-point shared boundary is not explicit (PO-5)."
+    });
+
+    const phrygiaInside = [
+      "dorylaeum",
+      "cotiaeum",
+      "midaeum",
+      "nacolia",
+      "aizani",
+      "synnada",
+      "amorium",
+      "philomelium",
+      "iconium-phrygia",
+      "antioch-near-pisidia",
+      "laodicea-phrygia",
+      "colossae-pleiades",
+      "apamea-cibotus",
+      "cadi"
+    ];
+    const phrygiaOutside = [
+      "prusa",
+      "pessinus",
+      "ancyra",
+      "lystra-pleiades",
+      "sagalassus",
+      "cremna",
+      "antioch-maeander",
+      "philadelphia-lydia",
+      "teuthrania",
+      "elaea"
+    ];
+    const phrygia = await buildVoronoiRegion({
+      regionId: "phrygia",
+      insideAnchorIds: phrygiaInside,
+      outsideAnchorIds: phrygiaOutside,
+      seedAnchorIds: [...phrygiaInside, ...phrygiaOutside],
+      landFeature: asiaMainland
+    });
+    addFeature(features, {
+      id: "phrygia",
+      geometry: phrygia.geometry,
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-phrygia", "bib:isbe-lycaonia", "pleiades:609420", "pleiades:638901"],
+      confidence: "low",
+      note: "Phrygia as the trans-provincial region Strabo and ISBE describe across Asian and Galatian Phrygia (Strabo 12.8.13–17; ISBE, 'Phrygia'), with Iconium inside per M5-19 ruling P5 and the Carian side constrained by Carura. Strabo and Pliny disagree on several compass placements and on Cadi's side; this outline follows the project's PO rulings and keeps confidence low."
+    });
+
+    const arasKura = findArasKuraChain(naturalEarthRiversMain);
+    const arasKuraFeature = featureFromLine(arasKura.chain);
+    allowedInputGeometries.push(arasKuraFeature.geometry);
+
+    const mediaInside = ["gazaca", "ecbatana", "rhagae"];
+    const mediaOutside = ["artaxata", "hecatompylos", "hyrcania", "persepolis", "pasargadae", "susa", "arbela"];
+    let media = await buildVoronoiRegion({
+      regionId: "media",
+      insideAnchorIds: mediaInside,
+      outsideAnchorIds: mediaOutside,
+      seedAnchorIds: [...mediaInside, ...mediaOutside],
+      landFeature: mediaLand,
+      marginDegrees: 8
+    });
+    addFeature(features, {
+      id: "media",
+      geometry: media.geometry,
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-media", "naturalearth:ne-10m-rivers-lake-centerlines", "pleiades:874361", "pleiades:884148", "pleiades:903104"],
+      confidence: "medium",
+      note: "Media including Atropatene as Strabo 11.13 and ISBE describe it, with Rhagae kept inside (PO-2). The north and north-east follow the Caspian side and the Araxes/Kura frontier against Armenia (PO-7), while the east and south are equidistant constructions from sourced anchors against Parthia/Persis/Susiana. Gazaca's site and Rhagae's side are disputed in the sources and are named here."
+    });
+
+    const euphrates = riverTrunkByName(naturalEarthRiversMain, /(euphrates|firat|alfurat)/u);
+    const tigris = riverTrunkByName(naturalEarthRiversMain, /(tigris|dicle)/u);
+    const northMask = await voronoiInsideMask({
+      workDirectory,
+      tag: "mesopotamia-north",
+      anchorsById,
+      insideAnchorIds: ["edessa", "carrhae", "nisibis"],
+      outsideAnchorIds: ["arsamosata"],
+      marginDegrees: 6
+    });
+    const euphratesCrossIndex = nearestLinePointIndex(euphrates, [39.0, 37.9]);
+    const tigrisCrossIndex = nearestLinePointIndex(tigris, [40.3, 37.8]);
+    const babylonIndex = nearestLinePointIndex(euphrates, anchorPoint(anchorsById, "babylon"));
+    const seleuciaIndex = nearestLinePointIndex(tigris, anchorPoint(anchorsById, "seleucia-tigris"));
+    const euphratesEdge = sliceLineByIndices(euphrates, euphratesCrossIndex, babylonIndex);
+    const tigrisEdge = sliceLineByIndices(tigris, tigrisCrossIndex, seleuciaIndex);
+    const northBridge = [
+      euphrates[euphratesCrossIndex],
+      anchorPoint(anchorsById, "edessa"),
+      anchorPoint(anchorsById, "nisibis"),
+      tigris[tigrisCrossIndex]
+    ];
+    const southBridge = [anchorPoint(anchorsById, "babylon"), anchorPoint(anchorsById, "seleucia-tigris")];
+    allowedInputGeometries.push(
+      featureFromLine(euphratesEdge).geometry,
+      featureFromLine(tigrisEdge).geometry,
+      featureFromLine(northBridge).geometry,
+      featureFromLine(southBridge).geometry
+    );
+    const mesopotamiaRing = normalizeRing([
+      ...northBridge,
+      ...tigrisEdge.slice(1),
+      anchorPoint(anchorsById, "seleucia-tigris"),
+      anchorPoint(anchorsById, "babylon"),
+      ...euphratesEdge.slice().reverse().slice(1)
+    ]);
+    let mesopotamia = geometryFeature({ type: "Polygon", coordinates: [mesopotamiaRing] });
+    const mesopotamiaPieces = await booleanOpStrict({
+      workDirectory,
+      tag: "mesopotamia-land-and-north",
+      operation: "clip",
+      subjectFeatures: [mesopotamia],
+      maskFeatures: [mesopotamiaLand, northMask],
+      expectNonEmpty: true
+    });
+    mesopotamia = await unionOne({ workDirectory, tag: "mesopotamia-union", features: mesopotamiaPieces });
+    addFeature(features, {
+      id: "mesopotamia",
+      geometry: mesopotamia.geometry,
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:livius-mesopotamia", "naturalearth:ne-10m-rivers-lake-centerlines", "pleiades:874354", "pleiades:893951", "pleiades:894084"],
+      confidence: "medium",
+      note: "Mesopotamia between the Euphrates and Tigris (Strabo 16.1.21–23, 28), closed in the south from Babylon to Seleucia (PO-8). The north line is an equidistant construction from Edessa/Carrhae/Nisibis against Arsamosata (R54–R57), so that edge is low confidence and is shown with Strabo's Zeugma-based reading noted as the alternative."
     });
 
     // Clip every region to land.

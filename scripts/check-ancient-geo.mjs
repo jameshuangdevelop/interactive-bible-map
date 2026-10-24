@@ -27,6 +27,12 @@ const REQUIRED_REGION_IDS = Object.freeze([
   "galilee",
   "judea",
   "pontus",
+  "pisidia",
+  "lycaonia",
+  "mysia",
+  "phrygia",
+  "media",
+  "mesopotamia",
   "crete",
   "libya",
   "chios",
@@ -36,7 +42,11 @@ const REQUIRED_REGION_IDS = Object.freeze([
   "samos"
 ]);
 const SHARED_EDGE_PAIRS = Object.freeze([
-  ["samaria", "judea"]
+  ["samaria", "judea"],
+  ["pisidia", "lycaonia"],
+  ["pisidia", "phrygia"],
+  ["lycaonia", "phrygia"],
+  ["mysia", "phrygia"]
 ]);
 const ANCHOR_CHECKS = Object.freeze([
   { anchorId: "anouath-borkeos", name: "Anouath Borkeos", mode: "boundary", regions: ["samaria", "judea"] },
@@ -56,7 +66,39 @@ const ANCHOR_CHECKS = Object.freeze([
   { anchorId: "ptolemais", name: "Ptolemais outside Judea", mode: "outside", regionId: "judea" },
   { anchorId: "tyre", name: "Tyre outside Galilee", mode: "outside", regionId: "galilee" },
   { anchorId: "cauda", name: "Cauda", mode: "outside", regionId: "crete" },
-  { anchorId: "mljet", name: "Mljet", mode: "outside", regionId: "malta" }
+  { anchorId: "mljet", name: "Mljet", mode: "outside", regionId: "malta" },
+
+  { anchorId: "selge", name: "Selge", mode: "inside", regionId: "pisidia" },
+  { anchorId: "sagalassus", name: "Sagalassus", mode: "inside", regionId: "pisidia" },
+  { anchorId: "attalia", name: "Attalia", mode: "outside", regionId: "pisidia" },
+  { anchorId: "isaura-vetus", name: "Isaura Vetus", mode: "outside", regionId: "pisidia" },
+
+  { anchorId: "coropassus", name: "Coropassus", mode: "inside", regionId: "lycaonia" },
+  { anchorId: "lystra-pleiades", name: "Lystra", mode: "inside", regionId: "lycaonia" },
+  { anchorId: "garsaura", name: "Garsaura", mode: "outside", regionId: "lycaonia" },
+  { anchorId: "iconium-phrygia", name: "Iconium", mode: "outside", regionId: "lycaonia" },
+  { anchorId: "lake-tatta", name: "Lake Tatta", mode: "outside", regionId: "lycaonia" },
+
+  { anchorId: "pergamum", name: "Pergamum", mode: "inside", regionId: "mysia" },
+  { anchorId: "elaea", name: "Elaea", mode: "inside", regionId: "mysia" },
+  { anchorId: "prusa", name: "Prusa", mode: "outside", regionId: "mysia" },
+  { anchorId: "dorylaeum", name: "Dorylaeum", mode: "outside", regionId: "mysia" },
+
+  { anchorId: "synnada", name: "Synnada", mode: "inside", regionId: "phrygia" },
+  { anchorId: "iconium-phrygia", name: "Iconium in Phrygia", mode: "inside", regionId: "phrygia" },
+  { anchorId: "lystra-pleiades", name: "Lystra outside Phrygia", mode: "outside", regionId: "phrygia" },
+  { anchorId: "antioch-maeander", name: "Antioch on Maeander", mode: "outside", regionId: "phrygia" },
+
+  { anchorId: "ecbatana", name: "Ecbatana", mode: "inside", regionId: "media" },
+  { anchorId: "rhagae", name: "Rhagae", mode: "inside", regionId: "media" },
+  { anchorId: "artaxata", name: "Artaxata", mode: "outside", regionId: "media" },
+  { anchorId: "hecatompylos", name: "Hecatompylos", mode: "outside", regionId: "media" },
+
+  { anchorId: "edessa", name: "Edessa", mode: "inside", regionId: "mesopotamia" },
+  { anchorId: "nisibis", name: "Nisibis", mode: "inside", regionId: "mesopotamia" },
+  { anchorId: "arsamosata", name: "Arsamosata", mode: "outside", regionId: "mesopotamia" },
+  { anchorId: "babylon", name: "Babylon", mode: "outside", regionId: "mesopotamia" },
+  { anchorId: "seleucia-tigris", name: "Seleucia on Tigris", mode: "outside", regionId: "mesopotamia" }
 ]);
 const COAST_EXCEPTIONS = Object.freeze(new Set([
   "cauda",
@@ -191,6 +233,14 @@ function partCount(geometry) {
 
 function evaluateAreaSanity(featureById, sanity) {
   const failures = [];
+  const expectedRanges = Object.freeze({
+    pisidia: [2200, 32000],
+    lycaonia: [7400, 43000],
+    mysia: [16000, 57000],
+    phrygia: [40000, 117000],
+    media: [41600, 575000],
+    mesopotamia: [100000, 180000]
+  });
   const pontus = featureById.get("pontus");
   if (pontus && sanity?.pontusBaseAreaKm2 != null) {
     const pontusAreaKm2 = geometryAreaKm2(pontus.geometry);
@@ -219,6 +269,15 @@ function evaluateAreaSanity(featureById, sanity) {
     const parts = partCount(feature.geometry);
     if (parts !== 1) {
       failures.push(`(g) ${regionId} has ${parts} parts (expected 1 for non-island outlines).`);
+    }
+  }
+
+  for (const [regionId, [minKm2, maxKm2]] of Object.entries(expectedRanges)) {
+    const feature = featureById.get(regionId);
+    if (!feature) continue;
+    const areaKm2 = geometryAreaKm2(feature.geometry);
+    if (areaKm2 < minKm2 || areaKm2 > maxKm2) {
+      failures.push(`(g) ${regionId} area ${areaKm2.toFixed(1)} km² is outside [${minKm2}, ${maxKm2}] km².`);
     }
   }
   return failures;
@@ -303,6 +362,7 @@ async function runRegionOutlineChecks({ seededError }) {
     const location = locationById.get(regionId);
     const feature = featureById.get(regionId);
     if (!location || !feature) continue;
+    if (regionId === "lycaonia") continue; // PO-4: label-point exception named in research.
     const regionPoint = location?.candidates?.[0]?.coordinates;
     if (!Array.isArray(regionPoint) || regionPoint.length < 2) continue;
     if (!pointInGeometry(regionPoint, feature.geometry)) {
