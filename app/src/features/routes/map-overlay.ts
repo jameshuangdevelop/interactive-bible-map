@@ -33,6 +33,7 @@ export interface RouteMapPointFeatureProperties {
   isSelectedPlace: boolean;
   isRouteStart?: boolean;
   stagePillVariant?: "standard" | "lineless-floating";
+  stagePillOffsetSlot?: number;
 }
 
 export interface RouteMapOverlayData {

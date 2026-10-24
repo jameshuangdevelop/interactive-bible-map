@@ -1572,6 +1572,14 @@ export function AppShell() {
       };
     };
 
+    const stagePillOffsetSlotForCounts = (count: number) => {
+      if (count <= 0) {
+        return 0;
+      }
+      const slots = [0, 1, 2, 3, 4, 5, 6, 7];
+      return slots[count % slots.length] ?? 0;
+    };
+
     const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
     const lineFeatureByStageId = new Map<string, (typeof lineFeatures)[number]>();
     const selectedRoutePlaceId = selection?.placeId ?? null;
@@ -1855,38 +1863,79 @@ export function AppShell() {
       );
     }
 
+    if (linelessPrototypeVariant) {
+      const slotCountsByCoordinate = new Map<string, number>();
+      for (const [stageIndex, stage] of selectedRouteEntry.stages.entries()) {
+        if (stage.lineId) {
+          continue;
+        }
+        const linelessPill = linelessPillCoordinate(stage);
+        if (!linelessPill.coordinate) {
+          continue;
+        }
+
+        const coordinateKey = `${linelessPill.coordinate[0].toFixed(6)}:${linelessPill.coordinate[1].toFixed(6)}`;
+        const currentCount = slotCountsByCoordinate.get(coordinateKey) ?? 0;
+        slotCountsByCoordinate.set(coordinateKey, currentCount + 1);
+
+        pointFeatures.push({
+          type: "Feature",
+          geometry: { type: "Point", coordinates: linelessPill.coordinate },
+          properties: {
+            id: `${selectedRouteId}:${stage.id}:pill`,
+            routeId: selectedRouteId,
+            stageId: stage.id,
+            stageIndex,
+            kind: "stage-pill",
+            stopKind: "location",
+            stopId: stage.id,
+            label: `${Math.max(1, stageIndex + 1)}`,
+            isInSelectedRoute: true as const,
+            isSelectedStage: selectedStageId === stage.id,
+            isHighlightedStage: highlightedStageId === stage.id,
+            isDimmed: false,
+            isSelectedPlace: false,
+            stagePillVariant: linelessPill.variant,
+            stagePillOffsetSlot: stagePillOffsetSlotForCounts(currentCount)
+          }
+        });
+
+        if (selectedStageId === stage.id && !selectedStageCenter) {
+          selectedStageCenter = linelessPill.coordinate;
+        }
+      }
+    }
+
     const pillStage = selectedRouteEntry.stages.find((stage) => stage.id === emphasizedStageId) ?? null;
     const pillFeature = pillStage ? lineFeatureByStageId.get(pillStage.id) ?? null : null;
-    const linelessPill = pillStage && !pillFeature ? linelessPillCoordinate(pillStage) : null;
-    const pillCoordinate = pillFeature
-      ? midpointOfGeometry(pillFeature.geometry)
-      : (linelessPill?.coordinate ?? null);
-    const stagePillVariant = linelessPill?.variant ?? "standard";
-    if (pillStage && pillCoordinate) {
-      const stageIndex = selectedRouteEntry.stages.findIndex((stage) => stage.id === pillStage.id);
-      pointFeatures.push({
-        type: "Feature",
-        geometry: { type: "Point", coordinates: pillCoordinate },
-        properties: {
-          id: `${selectedRouteId}:${pillStage.id}:pill`,
-          routeId: selectedRouteId,
-          stageId: pillStage.id,
-          stageIndex: stageIndex >= 0 ? stageIndex : 0,
-          kind: "stage-pill",
-          stopKind: "location",
-          stopId: pillStage.id,
-          label: `${Math.max(1, stageIndex + 1)}`,
-          isInSelectedRoute: true as const,
-          isSelectedStage: selectedStageId === pillStage.id,
-          isHighlightedStage: highlightedStageId === pillStage.id,
-          isDimmed: false,
-          isSelectedPlace: false,
-          stagePillVariant
-        }
-      });
+    if (pillStage && pillFeature) {
+      const pillCoordinate = midpointOfGeometry(pillFeature.geometry);
+      if (pillCoordinate) {
+        const stageIndex = selectedRouteEntry.stages.findIndex((stage) => stage.id === pillStage.id);
+        pointFeatures.push({
+          type: "Feature",
+          geometry: { type: "Point", coordinates: pillCoordinate },
+          properties: {
+            id: `${selectedRouteId}:${pillStage.id}:pill-selected`,
+            routeId: selectedRouteId,
+            stageId: pillStage.id,
+            stageIndex: stageIndex >= 0 ? stageIndex : 0,
+            kind: "stage-pill",
+            stopKind: "location",
+            stopId: pillStage.id,
+            label: `${Math.max(1, stageIndex + 1)}`,
+            isInSelectedRoute: true as const,
+            isSelectedStage: selectedStageId === pillStage.id,
+            isHighlightedStage: highlightedStageId === pillStage.id,
+            isDimmed: false,
+            isSelectedPlace: false,
+            stagePillVariant: "standard"
+          }
+        });
 
-      if (selectedStageId === pillStage.id && !selectedStageCenter) {
-        selectedStageCenter = pillCoordinate;
+        if (selectedStageId === pillStage.id && !selectedStageCenter) {
+          selectedStageCenter = pillCoordinate;
+        }
       }
     }
 
