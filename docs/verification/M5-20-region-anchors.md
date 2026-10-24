@@ -1090,3 +1090,16 @@ P4-F1, P4-F2 and P4-F4 change group A's mean latitude, so all four Asia Minor ou
   - Livius, "Mesopotamia" (cite-only);
   - Natural Earth's terms of use;
   - the WEB snapshot for Acts 14:6 and 16:7–8.
+
+### The PO's decisions (phase 4)
+- **P4-F1 to P4-F8:** accepted as written. The PO has added the two research rows (§3 West, Balbura; §6 North-east, Bithynium) and the `docs/LICENSES.md` wording, verbatim.
+- **P4-S1:** accepted. Lake Tatta's whole lake, Natural Earth's "Lake Tuz", is erased from Lycaonia and from Phrygia, so it lies in neither outline (PO-3).
+- **Q1 / P4-S2:** accepted. `lycaonia.json`'s label point is now Pleiades' "Lykaonia" (`pleiades:1001911`, 32.5°E 37.5°N), and its `support` says the point is approximate. Check (b) no longer needs the PO-4 exception. The PO will check in the browser that the name doesn't hide Lystra's. If it does, the change is reverted, and a display-only label point goes to the backlog.
+- **Q2:** accepted. The P4-F7 test is added: Pitane inside Mysia, or within 1 km of it.
+- **Q3 and Q5:** accepted.
+- **Q4:** fixed by P4-F1.
+- **Q6:** accepted. Mysia's note adds the optional sentence: "Thyatira, which 'by some is called the farthermost city of the Mysians' (Strabo 13.4.4), is outside."
+- **PO-A:** P4-F2 as written. Modra is outside, and Phrygia's note says so.
+- **PO-B:** accepted. Cadi is on Phrygia's side and the Catacecaumenê is in neither outline; both notes name them.
+- **PO-C:** to the backlog, as a separate card that sweeps the records whose `coordinateSource` is a Pleiades OSM location.
+- **P4-F6 and P4-F7, recommended items:** accepted. All the recommended sources and test points are added.
