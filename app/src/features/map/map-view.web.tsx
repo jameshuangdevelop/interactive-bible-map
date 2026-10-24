@@ -168,6 +168,7 @@ const layerRoutesStagePillIconId = "ibm-routes-stage-pill-icon";
 const layerRoutesStagePillLabelId = "ibm-routes-stage-pill-label";
 
 const routeStagePillImageId = "ibm-route-stage-pill-image";
+const routeStagePillLinelessImageId = "ibm-route-stage-pill-lineless-image";
 const routeDirectionArrowImageId = "ibm-route-direction-arrow-image";
 const selectedPlacePinImageId = "ibm-selected-place-pin-icon";
 const townDotMajorImageId = "ibm-town-dot-major";
@@ -991,7 +992,7 @@ function createCandidateIconImage({
   });
 }
 
-function createRouteStagePillImage() {
+function createRouteStagePillImage(variant: "standard" | "lineless-floating" = "standard") {
   return createCanvasImage(30, 30, (context, canvasWidth, canvasHeight) => {
     const canvasSize = Math.min(canvasWidth, canvasHeight);
     const width = canvasSize - 2;
@@ -1000,9 +1001,12 @@ function createRouteStagePillImage() {
     const y = (canvasSize - height) / 2;
     const radius = height / 2;
 
-    context.fillStyle = "#FFFFFF";
-    context.strokeStyle = "#1A73E8";
+    context.fillStyle = variant === "standard" ? "#FFFFFF" : "rgba(26, 115, 232, 0.07)";
+    context.strokeStyle = variant === "standard" ? "#1A73E8" : "#8AA9E6";
     context.lineWidth = 1.5;
+    if (variant === "lineless-floating") {
+      context.setLineDash([3, 2]);
+    }
     context.beginPath();
     context.moveTo(x + radius, y);
     context.lineTo(x + width - radius, y);
@@ -1016,6 +1020,9 @@ function createRouteStagePillImage() {
     context.closePath();
     context.fill();
     context.stroke();
+    if (variant === "lineless-floating") {
+      context.setLineDash([]);
+    }
   });
 }
 
@@ -1106,16 +1113,18 @@ function ensureTownDotImages(map: MapLibreMap) {
 }
 
 function ensureRouteStagePillImage(map: MapLibreMap) {
-  if (map.hasImage(routeStagePillImageId)) {
-    return;
+  if (!map.hasImage(routeStagePillImageId)) {
+    const image = createRouteStagePillImage("standard");
+    if (image) {
+      map.addImage(routeStagePillImageId, image.image, { pixelRatio: image.pixelRatio });
+    }
   }
-
-  const image = createRouteStagePillImage();
-  if (!image) {
-    return;
+  if (!map.hasImage(routeStagePillLinelessImageId)) {
+    const image = createRouteStagePillImage("lineless-floating");
+    if (image) {
+      map.addImage(routeStagePillLinelessImageId, image.image, { pixelRatio: image.pixelRatio });
+    }
   }
-
-  map.addImage(routeStagePillImageId, image.image, { pixelRatio: image.pixelRatio });
 }
 
 function ensureRouteDirectionArrowImage(map: MapLibreMap) {
@@ -1841,7 +1850,12 @@ function ensureMapLayers(map: MapLibreMap) {
       type: "symbol",
       filter: toLayerFilter(["==", ["get", "kind"], "stage-pill"]),
       layout: {
-        "icon-image": routeStagePillImageId,
+        "icon-image": [
+          "case",
+          ["==", ["get", "stagePillVariant"], "lineless-floating"],
+          routeStagePillLinelessImageId,
+          routeStagePillImageId
+        ],
         "icon-anchor": "center",
         "icon-size": 1,
         "icon-allow-overlap": true,
@@ -1868,7 +1882,12 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-ignore-placement": true
       },
       paint: {
-        "text-color": "#1A73E8",
+        "text-color": [
+          "case",
+          ["==", ["get", "stagePillVariant"], "lineless-floating"],
+          "#6F8FCC",
+          "#1A73E8"
+        ],
         "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.6, 1]
       }
     });

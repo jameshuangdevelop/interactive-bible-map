@@ -241,6 +241,23 @@ function timelineTickPosition(fraction: number) {
   return `calc(${clamped * 100}% + ${thumbInsetOffset}px)`;
 }
 
+type LinelessPrototypeVariant = "a" | "b";
+type RouteListPrototypeVariant = "plain" | "grouped";
+
+function parseLinelessPrototypeVariantFromSearch(search: string): LinelessPrototypeVariant | null {
+  const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  const value = params.get("lineless")?.trim().toLowerCase();
+  if (value === "a" || value === "b") {
+    return value;
+  }
+  return null;
+}
+
+function parseRouteListPrototypeVariantFromSearch(search: string): RouteListPrototypeVariant {
+  const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  return params.get("routeList")?.trim().toLowerCase() === "grouped" ? "grouped" : "plain";
+}
+
 function MapLoadingPlaceholder() {
   return (
     <div
@@ -470,6 +487,14 @@ export function AppShell() {
     () => hydratedRoutes.find((entry) => entry.route.id === selectedRouteId) ?? null,
     [hydratedRoutes, selectedRouteId]
   );
+  const linelessPrototypeVariant =
+    typeof window === "undefined"
+      ? null
+      : parseLinelessPrototypeVariantFromSearch(window.location.search);
+  const routeListPrototypeVariant =
+    typeof window === "undefined"
+      ? "plain"
+      : parseRouteListPrototypeVariantFromSearch(window.location.search);
   const selectedRouteTimelineStop = useMemo(() => {
     if (!selectedRoute || !ancientTimeline || ancientTimeline.stops.length === 0) {
       return null;
@@ -1478,6 +1503,75 @@ export function AppShell() {
       return midpointOfCoordinates(merged);
     };
 
+    const routeStopHasMultipleCandidates = (resolved: RouteStopResolved) => {
+      if (resolved.kind === "route-stop") {
+        return (resolved.stop?.candidates.length ?? 0) > 1;
+      }
+
+      return (resolved.place?.candidates.length ?? 0) > 1;
+    };
+
+    const routeStopNeutralCoordinate = (resolved: RouteStopResolved): [number, number] | null => {
+      const candidates =
+        resolved.kind === "route-stop"
+          ? (resolved.stop?.candidates ?? [])
+          : (resolved.place?.candidates ?? []);
+      if (candidates.length <= 1) {
+        return (resolved.coordinates as [number, number] | null) ?? null;
+      }
+
+      const totals = candidates.reduce(
+        (accumulator, candidate) => {
+          accumulator.lon += candidate.coordinates[0];
+          accumulator.lat += candidate.coordinates[1];
+          return accumulator;
+        },
+        { lon: 0, lat: 0 }
+      );
+      return [totals.lon / candidates.length, totals.lat / candidates.length];
+    };
+
+    const linelessPillCoordinate = (stage: (typeof selectedRouteEntry.stages)[number]) => {
+      if (!linelessPrototypeVariant) {
+        return { coordinate: null as [number, number] | null, variant: "standard" as const };
+      }
+
+      const from = resolveRouteStop(stage.from, placesById, routeStopsById);
+      const to = resolveRouteStop(stage.to, placesById, routeStopsById);
+      const fromDisputed = routeStopHasMultipleCandidates(from);
+      const toDisputed = routeStopHasMultipleCandidates(to);
+
+      if (linelessPrototypeVariant === "a") {
+        const anchor =
+          fromDisputed && !toDisputed
+            ? to
+            : !fromDisputed && toDisputed
+              ? from
+              : to;
+        const fallback = anchor.id === from.id ? to : from;
+        return {
+          coordinate:
+            routeStopNeutralCoordinate(anchor) ??
+            routeStopNeutralCoordinate(fallback) ??
+            null,
+          variant: "standard" as const
+        };
+      }
+
+      const fromCoordinate = routeStopNeutralCoordinate(from);
+      const toCoordinate = routeStopNeutralCoordinate(to);
+      if (!fromCoordinate || !toCoordinate) {
+        return { coordinate: null as [number, number] | null, variant: "lineless-floating" as const };
+      }
+      return {
+        coordinate: [
+          (fromCoordinate[0] + toCoordinate[0]) / 2,
+          (fromCoordinate[1] + toCoordinate[1]) / 2
+        ] as [number, number],
+        variant: "lineless-floating" as const
+      };
+    };
+
     const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
     const lineFeatureByStageId = new Map<string, (typeof lineFeatures)[number]>();
     const selectedRoutePlaceId = selection?.placeId ?? null;
@@ -1763,8 +1857,12 @@ export function AppShell() {
 
     const pillStage = selectedRouteEntry.stages.find((stage) => stage.id === emphasizedStageId) ?? null;
     const pillFeature = pillStage ? lineFeatureByStageId.get(pillStage.id) ?? null : null;
-    const pillCoordinate = pillFeature ? midpointOfGeometry(pillFeature.geometry) : null;
-    if (pillStage && pillFeature && pillCoordinate) {
+    const linelessPill = pillStage && !pillFeature ? linelessPillCoordinate(pillStage) : null;
+    const pillCoordinate = pillFeature
+      ? midpointOfGeometry(pillFeature.geometry)
+      : (linelessPill?.coordinate ?? null);
+    const stagePillVariant = linelessPill?.variant ?? "standard";
+    if (pillStage && pillCoordinate) {
       const stageIndex = selectedRouteEntry.stages.findIndex((stage) => stage.id === pillStage.id);
       pointFeatures.push({
         type: "Feature",
@@ -1782,9 +1880,14 @@ export function AppShell() {
           isSelectedStage: selectedStageId === pillStage.id,
           isHighlightedStage: highlightedStageId === pillStage.id,
           isDimmed: false,
-          isSelectedPlace: false
+          isSelectedPlace: false,
+          stagePillVariant
         }
       });
+
+      if (selectedStageId === pillStage.id && !selectedStageCenter) {
+        selectedStageCenter = pillCoordinate;
+      }
     }
 
     let minLon = Number.POSITIVE_INFINITY;
@@ -1846,6 +1949,7 @@ export function AppShell() {
     };
   }, [
     highlightedStageIndex,
+    linelessPrototypeVariant,
     placesById,
     routeStopsById,
     routesData,
@@ -2758,6 +2862,7 @@ export function AppShell() {
               routeStopsById={routeStopsById}
               routesData={routesData}
               routesLoadState={routesLoadState}
+              routeListVariant={routeListPrototypeVariant}
               selectedRoute={selectedRoute}
               selectedRouteBorderYear={selectedRoute?.route.fromYear ?? null}
               selectedStageIndex={selectedStageIndex}

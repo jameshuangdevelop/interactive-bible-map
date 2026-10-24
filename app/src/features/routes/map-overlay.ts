@@ -32,6 +32,7 @@ export interface RouteMapPointFeatureProperties {
   isDimmed: boolean;
   isSelectedPlace: boolean;
   isRouteStart?: boolean;
+  stagePillVariant?: "standard" | "lineless-floating";
 }
 
 export interface RouteMapOverlayData {

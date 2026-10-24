@@ -120,7 +120,8 @@ export function RoutesPanel({
   onSelectStage,
   onBackToAllRoutes,
   onResolveStopSelection,
-  onHighlightStage
+  onHighlightStage,
+  routeListVariant = "plain"
 }: {
   routesLoadState: RoutesLoadState;
   routesData: LoadedRoutesData | null;
@@ -136,6 +137,7 @@ export function RoutesPanel({
   onBackToAllRoutes: () => void;
   onResolveStopSelection: (resolved: RouteStopResolved, stageIndex: number) => void;
   onHighlightStage: (stageIndex: number | null) => void;
+  routeListVariant?: "plain" | "grouped";
 }) {
   const stageItemRefs = useRef(new Map<number, HTMLLIElement | null>());
   const suppressScrollStageIndexRef = useRef<number | null>(null);
@@ -198,34 +200,78 @@ export function RoutesPanel({
   }
 
   if (!selectedRoute) {
+    const groupedRoutes =
+      routeListVariant === "grouped"
+        ? [
+            {
+              id: "paul",
+              heading: "Paul's journeys",
+              routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("paul-"))
+            },
+            {
+              id: "jesus",
+              heading: "Jesus' journeys",
+              routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("jesus-"))
+            },
+            {
+              id: "other",
+              heading: "Other routes",
+              routes: hydratedRoutes.filter(
+                (entry) =>
+                  !entry.route.id.startsWith("paul-") && !entry.route.id.startsWith("jesus-")
+              )
+            }
+          ].filter((group) => group.routes.length > 0)
+        : [];
+    const routesList = (entries: HydratedRoute[]) => (
+      <ul style={{ listStyle: "none", padding: 0, margin: `${tokens.spacing.sm}px 0 0` }}>
+        {entries.map((entry) => (
+          <li key={entry.route.id}>
+            <button
+              onClick={() => onSelectRoute(entry.route.id)}
+              style={{
+                width: "100%",
+                textAlign: "left",
+                borderRadius: "8px",
+                border: `1px solid ${tokens.color.divider}`,
+                background: "#FFFFFF",
+                padding: `${tokens.spacing.sm}px`,
+                marginBottom: `${tokens.spacing.sm}px`,
+                cursor: "pointer"
+              }}
+              type="button"
+            >
+              <div style={{ fontWeight: 600 }}>{entry.route.title}</div>
+              <div style={{ color: tokens.color.textSecondary, marginTop: `${tokens.spacing.xs}px` }}>
+                {formatApproximateYears(entry.route.fromYear, entry.route.toYear)} · {formatStageCount(entry.stages.length)}
+              </div>
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+
     return (
       <div>
         <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>Routes</h2>
-        <ul style={{ listStyle: "none", padding: 0, margin: `${tokens.spacing.sm}px 0 0` }}>
-          {hydratedRoutes.map((entry) => (
-            <li key={entry.route.id}>
-              <button
-                onClick={() => onSelectRoute(entry.route.id)}
-                style={{
-                  width: "100%",
-                  textAlign: "left",
-                  borderRadius: "8px",
-                  border: `1px solid ${tokens.color.divider}`,
-                  background: "#FFFFFF",
-                  padding: `${tokens.spacing.sm}px`,
-                  marginBottom: `${tokens.spacing.sm}px`,
-                  cursor: "pointer"
-                }}
-                type="button"
-              >
-                <div style={{ fontWeight: 600 }}>{entry.route.title}</div>
-                <div style={{ color: tokens.color.textSecondary, marginTop: `${tokens.spacing.xs}px` }}>
-                  {formatApproximateYears(entry.route.fromYear, entry.route.toYear)} · {formatStageCount(entry.stages.length)}
-                </div>
-              </button>
-            </li>
-          ))}
-        </ul>
+        {routeListVariant === "grouped"
+          ? groupedRoutes.map((group) => (
+              <section key={group.id} style={{ marginTop: `${tokens.spacing.sm}px` }}>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: `${tokens.typography.captionSize}px`,
+                    letterSpacing: "0.02em",
+                    textTransform: "uppercase",
+                    color: tokens.color.textSecondary
+                  }}
+                >
+                  {group.heading}
+                </h3>
+                {routesList(group.routes)}
+              </section>
+            ))
+          : routesList(hydratedRoutes)}
       </div>
     );
   }
