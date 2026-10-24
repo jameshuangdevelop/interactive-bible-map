@@ -196,6 +196,17 @@ The backlog's own example groups the material differently: "the early ministry i
 
 The choice between five parts and six is the PO's and the human's (§10); five stays the default.
 
+**Decided on 2026-10-24: six parts (§7(b)).** The human chose six; the PO set the ids and the titles, which follow Paul's ("Paul's first journey") because the Routes tab lists every route in one list:
+
+| Route id | Part | Title |
+|---|---|---|
+| `jesus-1` | 1 | Jesus' early ministry |
+| `jesus-2` | 2a | Jesus in Galilee |
+| `jesus-3` | 2b | Jesus beyond Galilee |
+| `jesus-4` | 3 | Jesus' final journey to Jerusalem |
+| `jesus-5` | 4 | Jesus' last week in Jerusalem |
+| `jesus-6` | 5 | Jesus after the resurrection |
+
 ### (a) Five parts (this note's default)
 
 As in §2.
