@@ -1103,3 +1103,75 @@ P4-F1, P4-F2 and P4-F4 change group A's mean latitude, so all four Asia Minor ou
 - **PO-B:** accepted. Cadi is on Phrygia's side and the Catacecaumenê is in neither outline; both notes name them.
 - **PO-C:** to the backlog, as a separate card that sweeps the records whose `coordinateSource` is a Pleiades OSM location.
 - **P4-F6 and P4-F7, recommended items:** accepted. All the recommended sources and test points are added.
+
+### Phase 4 re-check
+- **Checked:** `cb75908..23f017b` on `data/m5-20-region-anchors`:
+  - 7f0bb82 (the check hardening and the coastal-touch guard);
+  - 979d309 (PO: the research rows, the `LICENSES.md` wording, `lycaonia.json`);
+  - e2350ef (GIS: P4-F1 to P4-F8 and P4-S1);
+  - 23f017b (PO: the app's copy and the name-only browser test);
+  - the r4 screenshots in `/tmp/m5-20-shots-r4/`.
+- **Verifier:** fact-checker · **Date:** 2026-10-24 (UTC).
+
+**Result: Pisidia, Lycaonia, Mysia, Phrygia and Media are signed off. Mesopotamia needs one more change, and the data-licence sentence needs one.**
+- **Done and correct:** P4-F1, P4-F2, P4-F4 to P4-F6 and P4-F8; the fixed points and Pitane from P4-F7; P4-S1 and P4-S2. My re-derivation matches the rebuild.
+- **P4-F3 is half done.** The west edge follows the empire's edge from the north line only to about 37.01°N, where that edge first touches the river. South of there it is Natural Earth's Euphrates again. Mesopotamia still overlaps the drawn `syria` by 383.9 km² (35.85–37.01°N, up to 6.3 km deep), and leaves gaps of up to 4.4 km.
+- **The new overlap check can't see this.** mapshaper writes a `GeometryCollection` here, and the check's `geometriesAsFeatures` handles only a `FeatureCollection`, a `Feature` or a bare geometry. Run on this build, the check's own function counts 0.000 km² where the overlap is 383.9 km². Its gap figure measures the empire-edge slice against Mesopotamia itself, so it is 0 by construction. The PO's "0.000 km² and 0.000 km" came from this check.
+- **Licensing O1 holds only in part.** The outlines are drawn only on the ancient map, whose attribution control always shows A1, the AWMC/ODbL string. But O1 also requires the data-licence sentence to name the outlines, and it doesn't. `main` has the same sentence, so this was never met; 23f017b doesn't change it.
+
+| Item | Finding | Verdict |
+|---|---|---|
+| The re-derivation (G0.1) | Group A has 58 seeds: Adramyttium and Assos are out, Balbura and Bithynium in; φ0 38.3307°.<br>• Pisidia (20,534 km²) and Phrygia (72,341 km²) equal the outlines, with 0 mismatched cells.<br>• Lycaonia differs only by the drawn `cilicia-tracheia` (5,920 km²) and `cilicia` (2,802 km²), the Anamur shore (28 km²) and Lake Tuz's tip (12 km², erased).<br>• Mysia differs only by Thrace and the islands.<br>• Group B and Media are unchanged. | Verified |
+| P4-F1, Pisidia | The south-west corners are 29.495°E 37.045°N and 29.900°E 37.012°N, as predicted. Balbura (9.4 km), Boubon, Oenoanda, Araxa and Kibyra are out; Sinda is in. Pisidia's share of the drawn `lycia` falls from 3,653 to 2,648 km², the land round Sinda and Kibyra. | Verified |
+| P4-F2, Phrygia | The northern tip is 30.759°E 40.505°N, as predicted. The anchor `claudiopolis-bithynia` (61.4 km away), Pleiades' Bithynion, Gordioukome/Iuliopolis and Modra are out. Phrygia's share of the drawn `bithynia` falls from 9,355 to 4,159 km², Phrygia Epictetus north of Dorylaeum, which Strabo says "was formerly occupied by the Bithynians" (12.3.7). | Verified |
+| P4-F3, Mesopotamia | From the north line to 37.01°N the edge is the empire's edge, with no overlap or gap. Further south it is Natural Earth's river: 383.9 km² of `syria` lies inside Mesopotamia (an exact mapshaper clip), and gaps reach 4.4 km. The drawn `syria` boundary and the empire edge coincide from 35.79°N to 37.20°N (0.000 km, densified). The empire edge leaves the river after its vertex 39.2682°E 35.7982°N; the next vertex is 37.5 km away. The new north-west corner, 39.113°E 37.916°N, is on that edge, 145 km from the Zeugma. | **Fix needed** (RC-F1, RC-F2) |
+| P4-F4, the seeds | Both seeds are gone from the groups and from `region-anchors.json`. The child records stay inside Mysia: Adramyttium 0.43 km from the edge, Assos 0.80 km. | Verified |
+| P4-F5, the notes | All six are identical to my texts. Mysia's adds the Thyatira sentence, whose quotation (13.4.4) I checked; Thyatira is 11.2 km outside. None has a build word or an area, and confidence is unchanged. | Verified |
+| P4-F6, the sources | Pisidia adds `pleiades:638789` and `639111`. Lycaonia adds `naturalearth:ne-10m-lakes` and `pleiades:619268`. Mysia adds `pleiades:609427`. Phrygia adds `naturalearth:ne-10m-lakes`, `wikidata:Q65088749` and `pleiades:609393`, `619268` and `845022`. Mesopotamia adds `pleiades:658636`. Each resolves to the right place, and the ids pass the schema. | Verified (RC-S1) |
+| P4-F7, the checks | The fixed points are correct: Bithynion is outside Phrygia, and Oenoanda and Araxa are outside Pisidia. Pitane is 0.33 km from Mysia, within 1 km. The overlap and gap checks are defective (above). The coastal-touch guard (7f0bb82) is sound: only Mysia (642.7 km of shore) and Media (653.6 km) touch the sea. | Partly (RC-F2) |
+| P4-S1, Lake Tatta | Lake Tuz is erased from Lycaonia. 1 of 6,491 lake grid points (0.005°) remains inside it, within the 150 m simplification, and none lies inside Phrygia. The lake's point and the check's point are outside both. | Verified |
+| P4-S2, `lycaonia.json` | `pleiades:1001911` is titled "Lykaonia". Its only location, a "Barrington Atlas location" of rough precision, is the box 30–35°E, 35–40°N, and its representative point is [32.5, 37.5]. Each clause of the new `support` holds: it is "the centre of a rough area after the Barrington Atlas"; "about 17 km from Lystra's pin" (16.9 km); "inside this map's outline of Lycaonia" (21.1 km from the edge); Wikidata's 33°E 38°N is "about 70 km to the northeast" (70.9 km, bearing 38°); and it "falls on Phrygia's side" (inside Phrygia, nearer Iconium than Lystra). Check (b) passes without the PO-4 exception. | Verified |
+| The labels | At zoom 6 the LYCAONIA label hides Lystra's name. At zoom 7 Iconium, Lystra and Derbe all show. With Phrygia selected, the label sits outside Phrygia. The PO's recorded rule was to revert if the label hides Lystra's name, and at zoom 6 it does; that choice is the PO's, since the point is sourced and correct either way. | Noted |
+| The areas | Pisidia 20,547.0; Lycaonia 16,924.3; Mysia 30,073.0; Phrygia 72,401.0; Media 359,943.2; Mesopotamia 148,741.1 km². They equal the PO's figures, and all are within §10's ranges. | Verified |
+| 979d309, the text | The two research rows and the `LICENSES.md` wording are verbatim. | Verified |
+| 23f017b and licensing | The app's copy now holds only each region's `id` and geometry; the provenance stays in `data/geo/region-outlines.geojson`, which is ODbL and public with its build, as for the areas. That is fine under ODbL §4.4 and §4.6. But `DATA_LICENSE_TEXT` names "the ancient layer's borders, roads and coastline" and "the routes' lines", not the outlines, so that half of O1 fails. | Fix needed (RC-F3) |
+
+#### Changes required (phase 4 re-check)
+- **RC-F1 (GIS). Finish P4-F3.** Keep the empire's edge as Mesopotamia's west edge south of 37.01°N, down to its last vertex beside the river, 39.2682°E 35.7982°N; the next vertex is 37.5 km from the river. Then join Natural Earth's Euphrates by the shortest connector, about 3.7 km. The drawn `syria` boundary coincides with that edge from 35.79°N to 37.20°N, so the overlap and the gaps both go to zero. The notes need no change.
+- **RC-F2 (GIS). Fix the checks.**
+  - Count `GeometryCollection` output in `clippedAreaKm2`; the build's own `geometriesAsFeatures` already handles it.
+  - Test the overlap against every drawn area, not only `syria` and `commagene`.
+  - Measure the gap from Mesopotamia's own boundary, between 35.8°N and 38.2°N, to the drawn areas, instead of from the slice.
+  - Make `--proof-p4-on-cb75908` fail on the overlap itself; at `cb75908` it is about 1,006 km².
+- **RC-F3 (Frontend Engineer). Licensing O1.** Set `DATA_LICENSE_TEXT` to: "Data license: all non-reference data and content are CC BY-SA 4.0, except two sets of map geometry, which are ODbL 1.0: the ancient layer's borders, region outlines, roads and coastline, derived from AWMC Geodata and OpenStreetMap, and the routes' lines, derived from AWMC Geodata's roads." Update any test that pins the old wording.
+
+**Recommended:**
+- **RC-S1.** Add `awmc:roman-empire-ad-69-extent`, the empire edge's own upstream id, to Mesopotamia's `sources`. M5-19 did the same when Judea cited `awmc:ad69-face-raw-0001`.
+- **RC-S2.** In `docs/LICENSES.md`, after "Decided on 2026-10-20. The evidence is in [`docs/verification/M5-19-region-outlines.md`](verification/M5-19-region-outlines.md), "Phase 4"", add: " and, for M5-20, in [`docs/verification/M5-20-region-anchors.md`](verification/M5-20-region-anchors.md), "Phase 4" and "Phase 4 re-check"".
+
+#### Sign-off by region (phase 4 re-check)
+
+| Region | Verdict | Still required |
+|---|---|---|
+| Pisidia | Signed off | — |
+| Lycaonia | Signed off | — |
+| Mysia | Signed off | — |
+| Phrygia | Signed off | — |
+| Media | Signed off | — |
+| Mesopotamia | Not yet | RC-F1, RC-F2 |
+| `region-anchors.json` | Signed off | — |
+| `lycaonia.json` | Signed off | — |
+| Licensing | Signed off for the data | RC-F3 (the app's data-licence sentence) |
+
+RC-F1 touches only Mesopotamia's build, so the other five outlines don't move. If, after RC-F1 and RC-F2, the corrected check reports under 1 km² of overlap and a gap within Mesopotamia's tolerance, Mesopotamia is signed off without another full round; I'll confirm those two figures from the check's log. RC-F3 is a one-sentence app change and can go in its own PR.
+
+#### Checks run (phase 4 re-check)
+- `lockf -k -t 7200 /tmp/ibm-heavy.lock npm run check:ancient-geo`: passed in 82 s (wall clock). It rebuilt `data/geo/` byte for byte from an empty cache, and checks (a)–(g) passed. Its overlap figure is wrong (RC-F2).
+- `npm run validate:data` (under the lock): "Validation passed with 207 warning(s)", none for these files, in 8 s.
+- Scratch scripts in `/tmp/m520p4` (not committed):
+  - the nearest-seed grid for both groups;
+  - side tests, areas and overlaps with every drawn area;
+  - an exact mapshaper clip of Mesopotamia against each area, and the same clip run through the check's own function;
+  - the gap along the west edge by latitude band, and the empire edge against Natural Earth's river and `syria`'s boundary;
+  - Lake Tuz's grid;
+  - Pleiades `1001911` (JSON) and Wikidata `Q622598`.
