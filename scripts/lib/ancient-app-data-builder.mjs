@@ -1365,11 +1365,12 @@ export async function buildAncientAppData({
   const writtenFiles = [];
   const holderUnionGeometryIdByKey = new Map();
   const holderUnionGeometryById = new Map();
+  // Provenance (sources, confidence, note) stays in data/geo/; the app uses outlines only for the
+  // selection highlight (ADR-0050 item 1), so its copy carries each region's id and shape.
   const regionOutlineFeatures = (regionOutlinesData?.features ?? []).map((feature) => ({
-    ...feature,
-    properties: {
-      ...feature.properties
-    },
+    type: "Feature",
+    id: feature.id,
+    properties: {},
     geometry: roundGeometry(feature.geometry, SIMPLIFIED_COORDINATE_DECIMALS)
   }));
   const regionOutlineIds = [...new Set(
