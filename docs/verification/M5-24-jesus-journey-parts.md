@@ -390,3 +390,81 @@ I checked `git diff d238cbb..befa93c`, which changes only the research note, aga
 - P1–P4 in §12 still apply.
 
 **Verdict for phase 3: signed off once R1–R5 are applied as written, or with the same facts.** If they're pasted verbatim, no re-check is needed. R5 needs only the PO's agreement on the ranges; any ranges that cover those in "The years" above pass.
+
+## Phase 3: the data
+I checked the branch at `d6112ce`, with main merged in, on 2026-10-24. The comparison was against the research (§2, §2.1, §7(b) and the decision table), R1–R5, and `origin/main`.
+
+**Result: the data's structure passes. The routes' `notes`, `sources` and two `bibleText` phrases need six corrections (D1–D6). Nothing blocks the PR.**
+
+| Check | Result |
+|---|---|
+| ADR-0038's 2026-10-24 update, against my P1 | **Pass.** It quotes item 3 and item 6 of the 2026-10-13 update exactly, and records the approval on 2026-10-23 and the choice on 2026-10-24. It keeps brief §1.6, says both harmonies agree on every position, and covers old links and the look. |
+| Ids, titles, years, order | **Pass.** `jesus-1` to `jesus-6` match the decision table. Their years (26–29, 27–32, 28–32, 28–33, 29–33, 29–33) match R5. Each part's order matches §5 and §7(b). R1–R5 are applied in the research. |
+| `summary` | **Pass.** All six are word for word from the research. |
+| `bibleText` | **Needs change.** Two phrases are inaccurate (D6). The others are right. |
+| `notes` | **Needs change** (D1–D4; details below). |
+| `sources` | **Needs change** (D5). Every part carries the whole old list, so for example `jesus-2` (Galilee) cites Luke 24:50 and ISBE's "Bethphage" article. |
+| Stage objects | **Pass.** All 32 are identical to `origin/main`'s, and each appears once. Paul's four routes and `version` are unchanged. |
+| Lines | **Pass.** The 20 line features are reassigned to the new routes, 5, 2, 5, 5, 2 and 1 per part. Their geometry and all other properties are unchanged. |
+| Old links | **Pass.** `selection-url.ts` maps the old stage N to the same segment in its new part, for all six orders. |
+| Bibliography | **Pass.** Both entries match my corrected ones exactly: publisher, edition and URL. |
+| Credits | **Pass.** `docs/LICENSES.md`, `ATTRIBUTION.md` and `sources-credits-content.ts` use my P3 wording. |
+| `npm run validate:data` | **Pass**, with 207 warnings, none for routes or the bibliography. |
+| `npm test` | **Pass**, 315 of 315. |
+
+**The notes, part by part.**
+- **`notes[1]`.** It now says the order follows the two harmonies, by arrival, and isn't a full harmonized itinerary. Two problems:
+  - It drops the old note's rule that each segment is "shown only where a Gospel names both ends".
+  - It still calls the order "a listing order", the old wording that the ADR update amends.
+- **`notes[2]`, the years.**
+  - `jesus-1` gives every view of the dates.
+  - `jesus-2` to `jesus-6` leave out ISBE's own date for the death, AD 30.
+  - `jesus-3` and `jesus-4` leave out Robertson's years, and `jesus-4` also leaves out his Part XI.
+  - `jesus-2` says ISBE "ties this period's timing to the year before the last Passover". ISBE says that of John 6:4–11:55, which comes after this part. The note also ends with process wording ("the widening approved for the six-part split").
+  - Three quotations of Robertson aren't word for word: "probably" for "Probably" (`jesus-1`, `jesus-2`) and "forty" for "Forty" (`jesus-6`).
+- **`notes[3]`, the stages without a line.** Each says a place "has multiple proposed sites …, so" its stages have no line, but the reason is that this map favors none of the sites. In `jesus-4`, Jericho and Bethphage also have two sites each and are drawn with lines.
+- **`notes[4]`, the regions.** The old wording lost "or passes through one between two towns", which is what makes segments 10, 14, 18 and 26 "path not known". `jesus-2` has no region note at all, though its segment-20 is "path not known".
+- **How the old notes were split.** `[0]` goes to every part, `[3]` to each part with a stage without a line, `[4]` to `jesus-2`, `[5]` to `jesus-1`, `jesus-3` and `jesus-4`, `[6]` to `jesus-3` and `[7]` to `jesus-4`. That split is right; the problems are only those listed above.
+
+**Corrections to `data/routes/routes.json`.**
+1. **D1. `notes[1]`, in all six parts.** Replace it with:
+   > These segments are well attested individually: each is shown only where a Gospel names both ends of the movement, in the passage or its context. Within this part they are listed where each arrives, in each Gospel's own order and, where accounts from different Gospels meet, in the order of two public-domain harmonies of the Gospels (A. T. Robertson, 1922; Stevens and Burton, 1904), which agree on every position. This isn't a full harmonized itinerary: no stage or line is added, and the parts aren't joined into one journey.
+2. **D2. `notes[2]`.**
+   - **`jesus-1`:** replace 'Robertson's Chief Divisions places his Part VI in "probably A.D. 26 and 27."' with "Robertson dates his Part VI probably to AD 26 and 27."
+   - **`jesus-2`:** replace the note with:
+   > About AD 27-32. Robertson places this part in his Part VII, which he dates probably to AD 27-29. The International Standard Bible Encyclopedia dates the first Passover to AD 27 and the death to AD 30, and calls the indications of time from the Passover of John 6:4 to the last Passover "definite and clear," so this part, which comes before John 6:4, ends no later than the year before the last Passover; it also reports a reckoning that gives AD 28-29 for the start of the ministry, and an early tradition of AD 29 for the death. World History Encyclopedia places the ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range runs to AD 32.
+   - **`jesus-3`:** replace the note with:
+   > About AD 28-32. Robertson places this part in his Part VIII and the start of Part IX, from the Passover of John 6:4 to the Feast of Tabernacles, which he dates probably to AD 29. The International Standard Bible Encyclopedia dates the death to AD 30 and calls the indications of time from John 6:4 to the last Passover "definite and clear" (7:2; 10:22), which places this part in the year before the last Passover; it also reports a reckoning that gives AD 28-29 for the start of the ministry, and an early tradition of AD 29 for the death. World History Encyclopedia places the ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range runs from AD 28 to AD 32.
+   - **`jesus-4`:** replace the note with:
+   > About AD 28-33. Robertson places these movements in his Parts IX to XI, from the Feast of Dedication, which he dates probably to AD 29, to the entry into Jerusalem in AD 30 or 29. The International Standard Bible Encyclopedia dates the death to AD 30 and places the Feast of Dedication (John 10:22) in the year before the last Passover; it also reports a reckoning that gives AD 28-29 for the start of the ministry, and an early tradition of AD 29 for the death. World History Encyclopedia places the ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range runs from AD 28 to AD 33.
+   - **`jesus-5`:** replace the note with:
+   > About AD 29-33. Robertson dates the last week "A.D. 30 or 29." The International Standard Bible Encyclopedia dates the death to AD 30, and also reports an early tradition of AD 29 for the death and a reckoning that gives AD 28-29 for the start of the ministry. World History Encyclopedia places the ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range runs from AD 29 to AD 33.
+   - **`jesus-6`:** replace the note with:
+   > About AD 29-33. Robertson dates his Part XIV, "Forty days from Sunday of Passion Week," to "A.D. 30 or 29." The International Standard Bible Encyclopedia dates the death to AD 30, and also reports an early tradition of AD 29 for the death and a reckoning that gives AD 28-29 for the start of the ministry. World History Encyclopedia places the ministry and death within Pilate's term (AD 26-36) and says the commonly agreed date for the death falls between AD 30 and AD 33, so this part's range runs from AD 29 to AD 33.
+3. **D3. `notes[3]`.**
+   - **`jesus-1`:** replace "both have multiple proposed sites in this project's data, so" with "both have more than one proposed site, and this map favors none of them, so".
+   - **`jesus-2`:** replace "has multiple proposed sites in this project's data, so" with "has more than one proposed site, and this map favors none of them, so".
+   - **`jesus-3`:** replace "has two proposed sites in this project's data, so" with "has two proposed sites, and this map favors neither, so".
+   - **`jesus-6`:** replace "has multiple proposed sites in this project's data, so" with "has four proposed sites, and this map favors none of them, so".
+   - **`jesus-4`:** replace the note with "Some places in this part have more than one proposed site; where sources point to one with the strongest support the route draws a line to it, and otherwise, as for Bethany beyond the Jordan, the stage is listed without a line."
+4. **D4. The region notes.**
+   - In `jesus-1`, `jesus-3` and `jesus-4`, replace "where a stage begins or ends at a region, its path isn't known" with "where a stage begins or ends at a region, or passes through one between two towns, its path isn't known".
+   - In `jesus-2`, add the note "Where a passage names only a region—such as Galilee—rather than a town, the stage names the region; where a stage begins or ends at a region, its path isn't known, and its line runs straight between its ends."
+5. **D5. `sources`.** "The core four" are `bib:isbe-chronology-nt`, `bib:worldhistory-jesus-christ`, `bib:robertson-harmony-of-the-gospels` and `bib:stevens-burton-harmony-of-the-gospels`. "The six versions" are the six `bib:*-biblegateway` entries. Keep only:
+   - `jesus-1`: `scripture:Matthew 3:13` and the core four;
+   - `jesus-2`: the core four, `bib:isbe-gadara`, `bib:isbe-gerasa` and the six versions;
+   - `jesus-3`: the core four and the six versions;
+   - `jesus-4`: the core four, `bib:isbe-bethphage` and the six versions;
+   - `jesus-5`: the core four;
+   - `jesus-6`: `scripture:Luke 24:34`, `scripture:Luke 24:50` and the core four.
+
+   The schema asks only for at least one unique source per route, so this passes validation.
+6. **D6. `bibleText`.**
+   - In `jesus-2`, replace "describe these movements in and around Galilee." with "describe these movements, from Galilee up to Jerusalem and around the Sea of Galilee." John 5:1 goes to Jerusalem.
+   - In `jesus-3`, replace "and back to Jerusalem for the Feast of Booths." with "and up to Jerusalem for the Feast of Booths." No earlier stage in this part is in Jerusalem.
+
+**Optional.**
+- The six `bibleText`s are short pointers to scripture ranges. Paul's routes tell "what the Bible says" (ADR-0041 item 1).
+- My P3 wording credits Robertson as "transcribed by Project Gutenberg", while his entry links to the Internet Archive scan. Both are true; "(1922; Internet Archive scan, Project Gutenberg text)" would name both.
+
+**Verdict: phase 3 is signed off once D1–D6 are applied as written, or with the same facts.** They change only text in `routes.json`; no stage, line or test moves. If they're pasted verbatim and `npm run validate:data` and `npm test` still pass, no re-check is needed.
