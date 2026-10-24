@@ -314,6 +314,79 @@ async function waitForRenderedPillCount(page, expectedCount) {
   );
 }
 
+async function waitForSinglePillStage(page, stageId) {
+  await page.waitForFunction(
+    ({ testHookKey, expectedStageId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        return false;
+      }
+      const pills = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stage-pill-icon"] });
+      if (pills.length !== 1) {
+        return false;
+      }
+      return String(pills[0]?.properties?.stageId ?? "") === expectedStageId;
+    },
+    { testHookKey: mapTestHookKey, expectedStageId: stageId },
+    { timeout: 5_000 }
+  );
+}
+
+async function routeStageLineMidpointScreenPoint(page, stageId) {
+  return page.evaluate(
+    ({ testHookKey, targetStageId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      const renderedLines = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] });
+      const lineFeature = renderedLines.find((feature) => String(feature?.properties?.stageId ?? "") === targetStageId);
+      if (!lineFeature || !lineFeature.geometry) {
+        return null;
+      }
+
+      const points =
+        lineFeature.geometry.type === "LineString"
+          ? lineFeature.geometry.coordinates
+          : lineFeature.geometry.coordinates.flat();
+      if (!Array.isArray(points) || points.length < 2) {
+        return null;
+      }
+
+      const segmentLengths = [];
+      let totalLength = 0;
+      for (let i = 1; i < points.length; i += 1) {
+        const [x1, y1] = points[i - 1];
+        const [x2, y2] = points[i];
+        const length = Math.hypot(x2 - x1, y2 - y1);
+        segmentLengths.push(length);
+        totalLength += length;
+      }
+      if (totalLength === 0) {
+        return null;
+      }
+      let traversed = 0;
+      const target = totalLength / 2;
+      let midpoint = points[0];
+      for (let i = 1; i < points.length; i += 1) {
+        const segmentLength = segmentLengths[i - 1];
+        if (traversed + segmentLength >= target) {
+          const ratio = (target - traversed) / segmentLength;
+          midpoint = [
+            points[i - 1][0] + (points[i][0] - points[i - 1][0]) * ratio,
+            points[i - 1][1] + (points[i][1] - points[i - 1][1]) * ratio
+          ];
+          break;
+        }
+        traversed += segmentLength;
+      }
+      const projected = map.project(midpoint);
+      return { x: projected.x, y: projected.y };
+    },
+    { testHookKey: mapTestHookKey, targetStageId: stageId }
+  );
+}
+
 function clipAroundPoint(page, x, y, width = 180, height = 72) {
   const viewport = page.viewportSize();
   const viewportWidth = viewport?.width ?? 1280;
@@ -3355,40 +3428,44 @@ test("hovering lineless stages shows a pill, and unhovering hides it @routes", {
   }
 });
 
-test("selected + hovered lineless stages sharing one stop render two non-overlapping pills @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+test("selected lineless stage yields to hovered line stage pill, then restores on unhover @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=routes&route=jesus-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
   await waitForMapIdle(page);
 
   await clickRouteStageCard(page, 3);
   await waitForMapIdle(page);
-  await page.locator("[data-route-stage-index='4']").hover();
-  await waitForMapIdle(page);
+  let pills = await renderedStagePills(page);
+  let selectedLinelessPill = pills.find((pill) => pill.routeId === "jesus-2" && pill.stageId === "segment-11");
+  expect(pills).toHaveLength(1);
+  expect(selectedLinelessPill).toBeTruthy();
+  const capernaumPoint = await routeStopScreenPoint(page, "capernaum");
+  expect(capernaumPoint).toBeTruthy();
+  expect(Math.abs((selectedLinelessPill?.x ?? 0) - capernaumPoint.x)).toBeLessThanOrEqual(4);
+  expect(Math.abs((selectedLinelessPill?.y ?? 0) - capernaumPoint.y)).toBeLessThanOrEqual(4);
 
-  const visiblePills = await renderedStagePills(page);
-  const targetPills = visiblePills.filter((pill) => pill.routeId === "jesus-2" && (pill.stageId === "segment-11" || pill.stageId === "segment-12"));
-  expect(targetPills).toHaveLength(2);
+  const stage2Item = page.locator("[data-route-stage-index='2']");
+  await stage2Item.hover();
+  await waitForSinglePillStage(page, "segment-19");
+  pills = await renderedStagePills(page);
+  expect(pills).toHaveLength(1);
+  const hoveredLinePill = pills[0];
+  expect(hoveredLinePill?.stageId).toBe("segment-19");
+  const segment19Midpoint = await routeStageLineMidpointScreenPoint(page, "segment-19");
+  expect(segment19Midpoint).toBeTruthy();
+  expect(Math.abs((hoveredLinePill?.x ?? 0) - segment19Midpoint.x)).toBeLessThanOrEqual(4);
+  expect(Math.abs((hoveredLinePill?.y ?? 0) - segment19Midpoint.y)).toBeLessThanOrEqual(4);
 
-  const anchorPoint = await routeStopScreenPoint(page, "capernaum");
-  expect(anchorPoint).toBeTruthy();
-  const iconSizePx = 30;
-  const pillWidthPx = 30;
-  const pillHeightPx = 18;
-  const stageBoxes = targetPills.map((pill) => {
-    const centerX = anchorPoint.x + ((pill.stageId === "segment-11" ? -1.2 : 1.2) * iconSizePx);
-    const centerY = anchorPoint.y + 1.4 * iconSizePx;
-    return {
-      stageId: pill.stageId,
-      left: centerX - pillWidthPx / 2,
-      right: centerX + pillWidthPx / 2,
-      top: centerY - pillHeightPx / 2,
-      bottom: centerY + pillHeightPx / 2
-    };
+  await stage2Item.evaluate((element) => {
+    element.dispatchEvent(new MouseEvent("mouseout", { bubbles: true, relatedTarget: document.body }));
   });
-  const [a, b] = stageBoxes;
-  const overlapsHorizontally = a.left < b.right && b.left < a.right;
-  const overlapsVertically = a.top < b.bottom && b.top < a.bottom;
-  expect(overlapsHorizontally && overlapsVertically, "expected paired pills to use non-overlapping screen boxes").toBe(false);
+  await waitForSinglePillStage(page, "segment-11");
+  pills = await renderedStagePills(page);
+  selectedLinelessPill = pills.find((pill) => pill.routeId === "jesus-2" && pill.stageId === "segment-11");
+  expect(pills).toHaveLength(1);
+  expect(selectedLinelessPill).toBeTruthy();
+  expect(Math.abs((selectedLinelessPill?.x ?? 0) - capernaumPoint.x)).toBeLessThanOrEqual(4);
+  expect(Math.abs((selectedLinelessPill?.y ?? 0) - capernaumPoint.y)).toBeLessThanOrEqual(4);
 });
 
 test("with no hovered or selected stage, routes show no stage pills @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
@@ -3420,6 +3497,8 @@ test("line stages still show pills on selection (Paul unchanged) @routes", { tag
 test("routes list groups Paul then Jesus headings with expected route counts @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await expect(page.getByRole("heading", { level: 3, name: "Paul's journeys" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 3, name: "Jesus' journeys" })).toBeVisible();
 
   const groups = await page.evaluate(() => {
     return [...document.querySelectorAll("[data-routes-panel='true'] section")].map((section) => ({

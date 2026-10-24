@@ -1784,104 +1784,40 @@ export function AppShell() {
       );
     }
 
-    const selectedStage = selectedStageId
-      ? selectedRouteEntry.stages.find((stage) => stage.id === selectedStageId) ?? null
+    const emphasizedStage = emphasizedStageId
+      ? selectedRouteEntry.stages.find((stage) => stage.id === emphasizedStageId) ?? null
       : null;
-    const highlightedStage = highlightedStageId
-      ? selectedRouteEntry.stages.find((stage) => stage.id === highlightedStageId) ?? null
-      : null;
-    const selectedLinelessAnchor = selectedStage && !selectedStage.lineId
-      ? linelessPillCoordinate(selectedStage)
-      : null;
-    const highlightedLinelessAnchor = highlightedStage && !highlightedStage.lineId
-      ? linelessPillCoordinate(highlightedStage)
-      : null;
-    const showBothLinelessPills =
-      Boolean(
-        selectedStage &&
-          highlightedStage &&
-          selectedStage.id !== highlightedStage.id &&
-          !selectedStage.lineId &&
-          !highlightedStage.lineId &&
-          selectedLinelessAnchor &&
-          highlightedLinelessAnchor &&
-          selectedLinelessAnchor[0] === highlightedLinelessAnchor[0] &&
-          selectedLinelessAnchor[1] === highlightedLinelessAnchor[1]
-      );
+    if (emphasizedStage) {
+      const lineFeature = lineFeatureByStageId.get(emphasizedStage.id) ?? null;
+      const stageIndex = selectedRouteEntry.stages.findIndex((candidate) => candidate.id === emphasizedStage.id);
+      const pillCoordinate =
+        lineFeature ? midpointOfGeometry(lineFeature.geometry) : linelessPillCoordinate(emphasizedStage);
+      if (stageIndex >= 0 && pillCoordinate) {
+        pointFeatures.push({
+          type: "Feature",
+          geometry: { type: "Point", coordinates: pillCoordinate },
+          properties: {
+            id: `${selectedRouteId}:${emphasizedStage.id}:pill`,
+            routeId: selectedRouteId,
+            stageId: emphasizedStage.id,
+            stageIndex,
+            kind: "stage-pill",
+            stopKind: "location",
+            stopId: emphasizedStage.id,
+            label: `${Math.max(1, stageIndex + 1)}`,
+            isInSelectedRoute: true as const,
+            isSelectedStage: selectedStageId === emphasizedStage.id,
+            isHighlightedStage: highlightedStageId === emphasizedStage.id,
+            isDimmed: false,
+            isSelectedPlace: false
+          }
+        });
 
-    const stagesWithPills = selectedRouteEntry.stages.filter((stage) => {
-      if (selectedStageId === stage.id) {
-        return true;
-      }
-      if (highlightedStageId !== stage.id) {
-        return false;
-      }
-      return showBothLinelessPills || !selectedStageId;
-    });
-
-    const stagePillFeatures: RouteMapOverlayData["points"]["features"] = [];
-    const linelessPillsByAnchorKey = new Map<string, number[]>();
-    for (const stage of stagesWithPills) {
-      const lineFeature = lineFeatureByStageId.get(stage.id) ?? null;
-      const stageIndex = selectedRouteEntry.stages.findIndex((candidate) => candidate.id === stage.id);
-      if (stageIndex < 0) {
-        continue;
-      }
-      const pillCoordinate = lineFeature ? midpointOfGeometry(lineFeature.geometry) : linelessPillCoordinate(stage);
-      if (!pillCoordinate) {
-        continue;
-      }
-
-      const pillFeatureIndex = stagePillFeatures.length;
-      stagePillFeatures.push({
-        type: "Feature",
-        geometry: { type: "Point", coordinates: pillCoordinate },
-        properties: {
-          id: `${selectedRouteId}:${stage.id}:pill`,
-          routeId: selectedRouteId,
-          stageId: stage.id,
-          stageIndex,
-          kind: "stage-pill",
-          stopKind: "location",
-          stopId: stage.id,
-          label: `${Math.max(1, stageIndex + 1)}`,
-          isInSelectedRoute: true as const,
-          isSelectedStage: selectedStageId === stage.id,
-          isHighlightedStage: highlightedStageId === stage.id,
-          isDimmed: false,
-          isSelectedPlace: false,
-          stagePillRowIndex: 0,
-          stagePillRowSize: stage.lineId ? 0 : 1
+        if (selectedStageId === emphasizedStage.id) {
+          selectedStageCenter = pillCoordinate;
         }
-      });
-
-      if (!stage.lineId) {
-        const anchorKey = `${pillCoordinate[0].toFixed(6)}:${pillCoordinate[1].toFixed(6)}`;
-        const anchorIndices = linelessPillsByAnchorKey.get(anchorKey) ?? [];
-        anchorIndices.push(pillFeatureIndex);
-        linelessPillsByAnchorKey.set(anchorKey, anchorIndices);
-      }
-
-      if (selectedStageId === stage.id) {
-        selectedStageCenter = pillCoordinate;
       }
     }
-
-    for (const anchorIndices of linelessPillsByAnchorKey.values()) {
-      if (anchorIndices.length <= 1) {
-        continue;
-      }
-      for (const [rowIndex, pillFeatureIndex] of anchorIndices.entries()) {
-        const stagePillFeature = stagePillFeatures[pillFeatureIndex];
-        if (!stagePillFeature) {
-          continue;
-        }
-        stagePillFeature.properties.stagePillRowIndex = rowIndex;
-        stagePillFeature.properties.stagePillRowSize = anchorIndices.length;
-      }
-    }
-
-    pointFeatures.push(...stagePillFeatures);
 
     let minLon = Number.POSITIVE_INFINITY;
     let minLat = Number.POSITIVE_INFINITY;

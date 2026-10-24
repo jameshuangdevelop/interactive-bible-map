@@ -32,8 +32,6 @@ export interface RouteMapPointFeatureProperties {
   isDimmed: boolean;
   isSelectedPlace: boolean;
   isRouteStart?: boolean;
-  stagePillRowIndex?: number;
-  stagePillRowSize?: number;
 }
 
 export interface RouteMapOverlayData {

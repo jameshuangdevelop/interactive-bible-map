@@ -1840,18 +1840,7 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         "icon-image": routeStagePillImageId,
         "icon-anchor": "center",
-        "icon-offset": [
-          "case",
-          [">", ["coalesce", ["get", "stagePillRowSize"], 0], 1],
-          [
-            "match",
-            ["coalesce", ["get", "stagePillRowIndex"], 0],
-            0,
-            ["literal", [-1.2, 1.4]],
-            ["literal", [1.2, 1.4]]
-          ],
-          ["literal", [0, 0]]
-        ],
+        "icon-offset": ["literal", [0, 0]],
         "icon-size": 1,
         "icon-allow-overlap": true,
         "icon-ignore-placement": true
@@ -1873,18 +1862,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-font": ["Noto Sans Bold"],
         "text-size": 10,
         "text-anchor": "center",
-        "text-offset": [
-          "case",
-          [">", ["coalesce", ["get", "stagePillRowSize"], 0], 1],
-          [
-            "match",
-            ["coalesce", ["get", "stagePillRowIndex"], 0],
-            0,
-            ["literal", [-1.2, 1.4]],
-            ["literal", [1.2, 1.4]]
-          ],
-          ["literal", [0, 0]]
-        ],
+        "text-offset": ["literal", [0, 0]],
         "text-allow-overlap": true,
         "text-ignore-placement": true
       },

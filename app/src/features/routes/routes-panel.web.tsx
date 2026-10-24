@@ -364,13 +364,19 @@ export function RoutesPanel({
                 }
               }}
               onMouseEnter={() => onHighlightStage(stageIndex)}
-              onMouseLeave={() => onHighlightStage(null)}
+              onMouseMove={() => onHighlightStage(stageIndex)}
+              onMouseOver={() => onHighlightStage(stageIndex)}
               onMouseOut={(event) => {
                 if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
                   return;
                 }
+                const nextElement = event.relatedTarget as Element | null;
+                if (nextElement?.closest("li[data-route-stage-index]")) {
+                  return;
+                }
                 onHighlightStage(null);
               }}
+              onPointerEnter={() => onHighlightStage(stageIndex)}
               ref={(element) => {
                 stageItemRefs.current.set(stageIndex, element);
               }}
