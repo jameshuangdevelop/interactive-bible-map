@@ -7697,96 +7697,100 @@
         "coordinates": [
           [
             [
-              29.78909,
-              37.56715
+              29.78896,
+              37.56718
             ],
             [
-              29.22331,
-              36.56331
+              29.49461,
+              37.04461
             ],
             [
-              30.04864,
-              37.10966
+              29.90044,
+              37.01159
             ],
             [
-              30.39569,
-              36.64692
+              30.04867,
+              37.10978
+            ],
+            [
+              30.3957,
+              36.64677
             ],
             [
               30.66803,
-              37.07217
+              37.07226
             ],
             [
-              30.6737,
-              37.13059
+              30.67369,
+              37.13062
             ],
             [
-              30.87722,
-              37.09036
+              30.87725,
+              37.09035
             ],
             [
               31.04129,
-              37.11424
+              37.11425
             ],
             [
-              31.13146,
+              31.13143,
               37.08134
             ],
             [
-              31.62294,
-              37.12735
+              31.62281,
+              37.12737
             ],
             [
-              31.72239,
-              37.09888
+              31.7225,
+              37.09882
             ],
             [
-              32.06569,
-              37.42438
+              32.06568,
+              37.42441
             ],
             [
-              31.98236,
-              37.86985
+              31.98238,
+              37.86993
             ],
             [
-              31.89673,
-              37.982
+              31.89675,
+              37.98215
             ],
             [
-              31.90603,
-              38.04034
+              31.90601,
+              38.04026
             ],
             [
-              31.36523,
-              38.17187
+              31.36519,
+              38.17188
             ],
             [
-              30.88267,
-              38.08203
+              30.88266,
+              38.08198
             ],
             [
-              30.85374,
-              37.90998
+              30.85377,
+              37.91004
             ],
             [
-              30.84021,
-              37.90128
+              30.84015,
+              37.9013
             ],
             [
-              30.32437,
-              37.86166
+              30.32436,
+              37.86165
             ],
             [
-              29.871,
-              37.62121
+              29.87098,
+              37.62105
             ],
             [
-              29.86666,
-              37.59182
+              29.86668,
+              37.59191
             ],
             [
-              29.78909,
-              37.56715
+              29.78896,
+              37.56718
             ]
           ]
         ]
@@ -7797,13 +7801,15 @@
           "bib:pliny-natural-history",
           "bib:isbe-pisidia",
           "bib:isbe-phrygia",
+          "pleiades:638789",
+          "pleiades:639111",
           "pleiades:639139",
           "pleiades:639100",
           "pleiades:638741",
           "pleiades:638804"
         ],
         "confidence": "low",
-        "note": "Pisidia as Strabo and ISBE place it between the Taurus front above Pamphylia and the Phrygian valleys (Strabo 12.7.1–2; ISBE, 'Pisidia'), bounded by Lycia/Milyas on the west and Isauria on the east. Antioch-near-Pisidia is kept outside by the project's M5-19 convention, while Pliny 5.24 places Antioch inside Pisidia; this outline follows the Strabo/ISBE reading and names Pliny's alternative."
+        "note": "Pisidia, the mountain country above the Pamphylian plain. Strabo says most Pisidians 'occupy the summits of the Taurus, but some, situated above Sidê and Aspendus, Pamphylian cities, occupy hilly places' (Geography 12.7.1). The International Standard Bible Encyclopedia (ISBE) says Pisidia 'was bounded by Lycia on the West, by the Phrygian country on the North, and by Isauria on the East', and that toward Isauria 'the frontier was never strictly drawn' ('Pisidia'). No source this project cites gives a line, so each edge is drawn halfway between towns the sources place on either side, and is approximate. Sinda, in the south-west, is inside: Artemidorus counts it among 'the cities of the Pisidians' (Strabo 12.7.2), but Strabo also groups 'Greater Cibyra and Sinda and Cabalis' (13.4.15). Cibyra is outside, and so is Balbura, which, Strabo says, Murena 'included ... within the territory of the Lycians' (13.4.17). Antioch and Apollonia, to the north, are drawn in Phrygia: ISBE places Antioch 'in Galatian Phrygia, near the northern border of Pisidia' ('Pisidia') and names Antioch, Iconium and Apollonia among Galatian Phrygia's important cities ('Phrygia'). Pliny instead puts 'the colony of Cæsarea, also called Antiochia' in the Pisidians' country (Natural History 5.24)."
       },
       "id": "pisidia"
     },
@@ -7814,32 +7820,32 @@
         "coordinates": [
           [
             [
-              33.02757,
-              38.30051
+              33.0277,
+              38.30041
             ],
             [
-              33.23292,
-              37.92341
+              33.23281,
+              37.9235
             ],
             [
-              32.89486,
-              37.57795
+              32.8948,
+              37.57787
             ],
             [
-              31.98236,
-              37.86985
+              31.98238,
+              37.86993
             ],
             [
-              32.06569,
-              37.42438
+              32.06568,
+              37.42441
             ],
             [
-              31.72239,
-              37.09888
+              31.7225,
+              37.09882
             ],
             [
-              32.01871,
-              36.73039
+              32.01861,
+              36.73036
             ],
             [
               32.13006,
@@ -7862,11 +7868,11 @@
               37.39547
             ],
             [
-              32.86317,
-              37.49502
+              32.86321,
+              37.49514
             ],
             [
-              33.34595,
+              33.34592,
               37.23508
             ],
             [
@@ -7878,24 +7884,44 @@
               37.35219
             ],
             [
-              34.10081,
-              37.37601
+              34.10074,
+              37.376
             ],
             [
-              33.86304,
-              37.74947
+              33.86315,
+              37.74939
             ],
             [
-              34.07478,
-              37.95913
+              34.07473,
+              37.95902
             ],
             [
-              33.7858,
-              38.62338
+              33.78585,
+              38.62345
             ],
             [
-              33.02757,
-              38.30051
+              33.56737,
+              38.53035
+            ],
+            [
+              33.54147,
+              38.4844
+            ],
+            [
+              33.53058,
+              38.48763
+            ],
+            [
+              33.51704,
+              38.49823
+            ],
+            [
+              33.51224,
+              38.50687
+            ],
+            [
+              33.0277,
+              38.30041
             ]
           ]
         ]
@@ -7906,12 +7932,14 @@
           "bib:pliny-natural-history",
           "bib:isbe-lycaonia",
           "scripture:Acts 14:6",
+          "naturalearth:ne-10m-lakes",
           "pleiades:619194",
           "pleiades:619164",
+          "pleiades:619268",
           "pleiades:648652"
         ],
         "confidence": "low",
-        "note": "Lycaonia as Strabo's upland plain east of Iconium and bounded by Cappadocia, Pisidia/Phrygia and Cilicia Tracheia (Strabo 12.6.1–3; ISBE, 'Lycaonia'), with the south clipped to exclude this project's drawn Cilicia areas (PO-3/R52). Iconium is kept outside per M5-19 ruling P5, though Strabo 12.6.1 and Pliny 5.25 place it in Lycaonia; both readings are disputed. Lake Tatta is left in neither Lycaonia nor Phrygia (PO-3)."
+        "note": "Lycaonia, the plain of south-central Asia Minor, drawn as its western, Roman part, where Lystra and Derbe lay (Acts 14:6). Strabo describes 'the plateaus of the Lycaonians' as 'cold, bare of trees, and grazed by wild asses' (Geography 12.6.1). He puts the boundary with Cappadocia 'between Coropassus, a village of the Lycaonians, and Garsaüra, a town of the Cappadocians' (12.6.1). The International Standard Bible Encyclopedia (ISBE) bounds Lycaonia 'on the South by Cilicia Tracheia', so the outline stops at this map's Cilicia and does not reach the sea. ISBE also says 'The boundary of Phrygia and Lycaonia passed between Iconium and Lystra' ('Lycaonia'), and this map follows it, drawing Iconium in Phrygia. But Strabo names Iconium with the Lycaonian plateau ('In this neighbourhood is also Iconium', 12.6.1), and Pliny places 'the famous city of Iconium' in 'a Tetrarchy of Lycaonia' (Natural History 5.25). Laranda is outside, with the eastern part of Lycaonia, which ISBE says 'included the important city of Laranda'. Lake Tatta is in neither this outline nor Phrygia's: Strabo calls it 'a part of Greater Phrygia' (12.5.4), but also says Greater Phrygia 'leaves on the left Pessinus and the region of Orcaorci and Lycaonia' (12.8.13). The other edges are drawn halfway between towns the sources place on either side, and are approximate."
       },
       "id": "lycaonia"
     },
@@ -7922,16 +7950,16 @@
         "coordinates": [
           [
             [
-              28.89346,
-              39.54059
+              28.89345,
+              39.54049
             ],
             [
               28.87095,
-              40.22009
+              40.22006
             ],
             [
-              28.63528,
-              40.36608
+              28.6355,
+              40.366
             ],
             [
               28.59278,
@@ -8930,36 +8958,36 @@
               38.85413
             ],
             [
-              27.2223,
-              38.76154
+              27.22226,
+              38.76151
             ],
             [
-              27.42673,
-              38.90601
+              27.42658,
+              38.90599
             ],
             [
-              28.23666,
-              39.14622
+              28.23655,
+              39.14636
             ],
             [
-              28.29571,
-              39.20833
+              28.29541,
+              39.20831
             ],
             [
-              28.31673,
-              39.20983
+              28.3171,
+              39.20985
             ],
             [
-              28.76118,
-              39.48742
+              28.76106,
+              39.48731
             ],
             [
-              28.8807,
-              39.53311
+              28.88098,
+              39.53318
             ],
             [
-              28.89346,
-              39.54059
+              28.89345,
+              39.54049
             ]
           ]
         ]
@@ -8972,10 +9000,11 @@
           "scripture:Acts 16:7",
           "scripture:Acts 16:8",
           "pleiades:550523",
-          "pleiades:609420"
+          "pleiades:609420",
+          "pleiades:609427"
         ],
         "confidence": "low",
-        "note": "Mysia as the mainland region from Olympene to the Caicus/Pergamene country (Strabo 12.8.1, 12.8.12), clipped to the Asian mainland (PO-6/R53): no Thrace and no Lesbos. Elaea is kept inside following Strabo's Caicus reading, while Pliny 5.32 treats it in Aeolis; this is disputed and noted. Cadi is treated on Phrygia's side where a single-point shared boundary is not explicit (PO-5)."
+        "note": "Mysia, in north-western Asia Minor. The International Standard Bible Encyclopedia (ISBE) says 'its boundaries were always vague', but that it reached 'on the North to the Sea of Marmora on the East to Bithynia and Phrygia, on the South to Lydia, and on the West to Hellespont', and that 'According to some authors it included the Troad' ('Mysia'). This outline includes the Troad, which is disputed: Strabo says 'Mysia and Olympus come after the Troad' (Geography 12.4.6). The coast is the Asian mainland's; the islands are left out. In the south, Strabo's Mysia takes in 'the country in the neighbourhood of the Caïcus River and Pergamenê, extending as far as Teuthrania and the outlets of the river' (12.8.1), so Elaea, at the river's mouth, is inside. Pliny instead lists 'the town of Elæa, the river Caïcus, which flows from Mysia, the town of Pitane' in 'Æolis ..., formerly known as Mysia' (Natural History 5.32). Cadi is drawn in Phrygia: Strabo lists it among the cities of Phrygia Epictetus, 'and also Cadi, which, according to some writers, belongs to Mysia' (12.8.12). Strabo says Mysia 'lies between Mt. Ida and Catacecaumenê', which is 'by some called Mysian and by others Maeonian' (12.8.12); the Catacecaumenê is outside this outline. The inland edges are drawn halfway between towns the sources place on either side, and are approximate. Thyatira, which 'by some is called the farthermost city of the Mysians' (Strabo 13.4.4), is outside."
       },
       "id": "mysia"
     },
@@ -8986,144 +9015,144 @@
         "coordinates": [
           [
             [
-              33.02757,
-              38.30051
+              33.0277,
+              38.30041
             ],
             [
-              32.39652,
-              38.70213
+              32.39645,
+              38.7024
             ],
             [
-              32.37569,
-              38.76063
+              32.37575,
+              38.76058
             ],
             [
-              32.13222,
-              38.78421
+              32.13178,
+              38.78422
             ],
             [
-              31.1346,
-              39.34926
+              31.13463,
+              39.34935
             ],
             [
-              31.17663,
-              39.5298
+              31.1766,
+              39.52975
             ],
             [
-              31.81946,
-              40.15459
+              31.69609,
+              40.03497
             ],
             [
-              31.71316,
-              41.07075
+              30.75911,
+              40.50535
             ],
             [
-              30.60303,
-              40.4127
+              30.60307,
+              40.4128
             ],
             [
-              29.86216,
-              40.1362
+              29.86206,
+              40.13609
             ],
             [
-              29.80322,
-              40.00713
+              29.8033,
+              40.00731
             ],
             [
-              29.4129,
-              39.71814
+              29.41307,
+              39.71822
             ],
             [
-              28.89346,
-              39.54059
+              28.89345,
+              39.54049
             ],
             [
-              28.8807,
-              39.53311
+              28.88098,
+              39.53318
             ],
             [
-              28.76118,
-              39.48742
+              28.76106,
+              39.48731
             ],
             [
-              28.31673,
-              39.20983
+              28.3171,
+              39.20985
             ],
             [
-              29.27499,
-              38.42339
+              29.27473,
+              38.42344
             ],
             [
-              29.28324,
-              38.42065
+              29.28306,
+              38.42068
             ],
             [
               28.80149,
-              37.61391
+              37.61374
             ],
             [
-              28.76836,
-              37.31177
+              28.76839,
+              37.31166
             ],
             [
-              28.95685,
-              37.37769
+              28.95698,
+              37.37766
             ],
             [
-              29.78909,
-              37.56715
+              29.78896,
+              37.56718
             ],
             [
-              29.86666,
-              37.59182
+              29.86668,
+              37.59191
             ],
             [
-              29.871,
-              37.62121
+              29.87098,
+              37.62105
             ],
             [
-              30.32437,
-              37.86166
+              30.32436,
+              37.86165
             ],
             [
-              30.84021,
-              37.90128
+              30.84015,
+              37.9013
             ],
             [
-              30.85374,
-              37.90998
+              30.85377,
+              37.91004
             ],
             [
-              30.88267,
-              38.08203
+              30.88266,
+              38.08198
             ],
             [
-              31.36523,
-              38.17187
+              31.36519,
+              38.17188
             ],
             [
-              31.90603,
-              38.04034
+              31.90601,
+              38.04026
             ],
             [
-              31.89673,
-              37.982
+              31.89675,
+              37.98215
             ],
             [
-              31.98236,
-              37.86985
+              31.98238,
+              37.86993
             ],
             [
-              32.89486,
-              37.57795
+              32.8948,
+              37.57787
             ],
             [
-              33.23292,
-              37.92341
+              33.23281,
+              37.9235
             ],
             [
-              33.02757,
-              38.30051
+              33.0277,
+              38.30041
             ]
           ]
         ]
@@ -9134,11 +9163,16 @@
           "bib:pliny-natural-history",
           "bib:isbe-phrygia",
           "bib:isbe-lycaonia",
+          "naturalearth:ne-10m-lakes",
+          "wikidata:Q65088749",
+          "pleiades:609393",
           "pleiades:609420",
-          "pleiades:638901"
+          "pleiades:638901",
+          "pleiades:619268",
+          "pleiades:845022"
         ],
         "confidence": "low",
-        "note": "Phrygia as the trans-provincial region Strabo and ISBE describe across Asian and Galatian Phrygia (Strabo 12.8.13–17; ISBE, 'Phrygia'), with Iconium inside per M5-19 ruling P5. Carura is treated as an outside anchor fallback where a through-point shared line is not explicit (Strabo 12.8.16; R23/A12). Strabo and Pliny disagree on several compass placements and on Cadi's side; this outline follows the project's PO rulings and keeps confidence low."
+        "note": "Phrygia, the uplands of west-central Asia Minor. Under Rome it was split between the provinces of Asia and Galatia, 'but the line between them was never sharply drawn', and its boundaries 'were always vague' (International Standard Bible Encyclopedia, ISBE, 'Phrygia'). Strabo says Greater Phrygia 'leaves on the left Pessinus and the region of Orcaorci and Lycaonia, and on the right the Maeonians and Lydians and Carians' (Geography 12.8.13). No source this project cites gives a line, so each edge is drawn halfway between towns the sources place on either side, and is approximate. Antioch, Iconium and Apollonia are inside: ISBE names them as Galatian Phrygia's 'important cities'. But Pliny puts Antioch in Pisidia (Natural History 5.24) and Iconium in 'a Tetrarchy of Lycaonia' (5.25), and Strabo names Iconium with the Lycaonian plateau (12.6.1). Cadi is inside: Strabo lists it among the cities of Phrygia Epictetus, 'and also Cadi, which, according to some writers, belongs to Mysia' (12.8.12). Carura is just outside: Strabo says it 'forms a boundary between Phrygia and Caria' (12.8.17), and also puts it 'in the neighbouring country' to Laodiceia (12.8.16). In the north, Bithynium, which Strabo places 'In the interior of Bithynia' (12.4.7), is outside. So is Modra, though Strabo puts it 'in Phrygia on the Hellespont' (12.3.7). Lake Tatta is in neither this outline nor Lycaonia's: Strabo calls it 'a part of Greater Phrygia' (12.5.4), but, as above, Greater Phrygia leaves Pessinus and Orcaorci on its left (12.8.13). Gordium, among 'the ancient habitations of the Phrygians' on the Sangarius, is outside, in the Galatians' land where Strabo describes it (12.5.3)."
       },
       "id": "phrygia"
     },
@@ -10310,7 +10344,7 @@
           "pleiades:903104"
         ],
         "confidence": "medium",
-        "note": "Media including Atropatene as Strabo 11.13 and ISBE describe it, with Rhagae kept inside (PO-2). The north-west follows the Aras→Kura chain to the Artaxata→Gazaca segment (PO-7/R50), then closes by the Artaxata/Gazaca equidistant construction against Armenia. The east and south remain equidistant constructions from sourced anchors against Parthia/Persis/Susiana. Gazaca's site and Rhagae's side are disputed in the sources and are named here."
+        "note": "Media, with Atropatene, west and south-west of the Caspian. Strabo says Media 'is divided into two parts', Greater Media, with its metropolis at Ecbatana, and 'Atropatian Media' (Geography 11.13.1). The International Standard Bible Encyclopedia (ISBE) says Media 'Lay to the West and Southwest of the Caspian' and 'included Atropatene', and adds that 'Lake Spauta is now known as Urmi' ('Media'). The north-west edge is the Araxes, 'which forms the boundary between Armenia and Atropatenê' (11.13.3), and the lower Cyrus to the sea. ISBE: 'On the North in later times it was bounded by the rivers Araxes and Cyrus, which separated it from Armenia'. Near Artaxata, a town of Greater Armenia (Pliny, Natural History 6.10), the edge leaves the river along the straight line from Artaxata to Gazaca for about 170 km. Rhagae is inside, as one of ISBE's 'chief cities of ancient Media', 'Ecbatana, Gazaea, and Ragae'. But Strabo counts 'the whole region that extends as far as the Caspian Gates and Rhagae and the Tapyri, which formerly belonged to Media' as Parthian in his day (11.9.1), so Rhagae and the east end of the coast are disputed. Gazaca, where the kings of Atropatene had their 'royal summer palace' (11.13.3), is inside, but its site is uncertain (Pleiades). The other edges are drawn halfway between towns the sources place on either side: Artaxata in Armenia, Arbela to the west, Susa, Persepolis and Pasargadae to the south, and Hecatompylos, 'the royal seat of the Parthians' (11.9.1), to the east. They are approximate."
       },
       "id": "media"
     },
@@ -10321,408 +10355,52 @@
         "coordinates": [
           [
             [
-              39.04837,
-              37.93682
+              39.1131,
+              37.91615
             ],
             [
-              39.04046,
-              37.92524
+              39.01072,
+              37.83499
             ],
             [
-              39.02727,
-              37.91804
+              38.95434,
+              37.73009
             ],
             [
-              38.97828,
-              37.90603
+              38.84734,
+              37.57163
             ],
             [
-              38.98268,
-              37.89936
+              38.64594,
+              37.56869
             ],
             [
-              38.98919,
-              37.87804
+              38.50423,
+              37.51015
             ],
             [
-              38.98268,
-              37.86551
+              38.23728,
+              37.42252
             ],
             [
-              38.9708,
-              37.85078
+              37.9489,
+              37.37656
             ],
             [
-              38.97617,
-              37.84589
+              37.88721,
+              37.25615
             ],
             [
-              38.9791,
-              37.83849
+              37.86214,
+              37.17623
             ],
             [
-              38.97796,
-              37.83027
+              37.87842,
+              37.10076
             ],
             [
-              38.9708,
-              37.82282
-            ],
-            [
-              38.9367,
-              37.82966
-            ],
-            [
-              38.9214,
-              37.82514
-            ],
-            [
-              38.90838,
-              37.81684
-            ],
-            [
-              38.89788,
-              37.80471
-            ],
-            [
-              38.88893,
-              37.78868
-            ],
-            [
-              38.90341,
-              37.79182
-            ],
-            [
-              38.93059,
-              37.80756
-            ],
-            [
-              38.94361,
-              37.80915
-            ],
-            [
-              38.95387,
-              37.80138
-            ],
-            [
-              38.95257,
-              37.77526
-            ],
-            [
-              38.96477,
-              37.76134
-            ],
-            [
-              38.94483,
-              37.75694
-            ],
-            [
-              38.92229,
-              37.75613
-            ],
-            [
-              38.90187,
-              37.75275
-            ],
-            [
-              38.88893,
-              37.74091
-            ],
-            [
-              38.89796,
-              37.73566
-            ],
-            [
-              38.92311,
-              37.71357
-            ],
-            [
-              38.90821,
-              37.70624
-            ],
-            [
-              38.89967,
-              37.70624
-            ],
-            [
-              38.88242,
-              37.71491
-            ],
-            [
-              38.87501,
-              37.71048
-            ],
-            [
-              38.86476,
-              37.69929
-            ],
-            [
-              38.84938,
-              37.69331
-            ],
-            [
-              38.84124,
-              37.69245
-            ],
-            [
-              38.83595,
-              37.69477
-            ],
-            [
-              38.82073,
-              37.70673
-            ],
-            [
-              38.80039,
-              37.69705
-            ],
-            [
-              38.81845,
-              37.68094
-            ],
-            [
-              38.86834,
-              37.65148
-            ],
-            [
-              38.6456,
-              37.62421
-            ],
-            [
-              38.59734,
-              37.58352
-            ],
-            [
-              38.5879,
-              37.57954
-            ],
-            [
-              38.57529,
-              37.56155
-            ],
-            [
-              38.51539,
-              37.51109
-            ],
-            [
-              38.49488,
-              37.50068
-            ],
-            [
-              38.37232,
-              37.48395
-            ],
-            [
-              38.34083,
-              37.49445
-            ],
-            [
-              38.28264,
-              37.477
-            ],
-            [
-              38.27198,
-              37.47643
-            ],
-            [
-              38.26572,
-              37.45445
-            ],
-            [
-              38.24993,
-              37.44855
-            ],
-            [
-              38.20672,
-              37.45356
-            ],
-            [
-              38.19801,
-              37.44803
-            ],
-            [
-              38.1972,
-              37.42365
-            ],
-            [
-              38.18564,
-              37.41291
-            ],
-            [
-              38.18019,
-              37.41193
-            ],
-            [
-              38.17669,
-              37.41376
-            ],
-            [
-              38.17506,
-              37.42263
-            ],
-            [
-              38.17018,
-              37.4256
-            ],
-            [
-              38.1255,
-              37.43378
-            ],
-            [
-              38.10841,
-              37.44095
-            ],
-            [
-              38.09449,
-              37.45356
-            ],
-            [
-              38.06552,
-              37.43688
-            ],
-            [
-              38.05413,
-              37.43647
-            ],
-            [
-              38.03997,
-              37.44607
-            ],
-            [
-              38.02296,
-              37.44347
-            ],
-            [
-              37.98968,
-              37.44477
-            ],
-            [
-              37.97438,
-              37.43549
-            ],
-            [
-              37.9301,
-              37.39082
-            ],
-            [
-              37.89641,
-              37.36384
-            ],
-            [
-              37.88551,
-              37.35065
-            ],
-            [
-              37.87892,
-              37.32514
-            ],
-            [
-              37.85768,
-              37.31293
-            ],
-            [
-              37.85214,
-              37.30382
-            ],
-            [
-              37.84059,
-              37.26789
-            ],
-            [
-              37.85491,
-              37.26004
-            ],
-            [
-              37.86679,
-              37.24938
-            ],
-            [
-              37.87412,
-              37.2344
-            ],
-            [
-              37.87477,
-              37.21332
-            ],
-            [
-              37.86793,
-              37.21332
-            ],
-            [
-              37.86175,
-              37.22464
-            ],
-            [
-              37.85255,
-              37.22651
-            ],
-            [
-              37.84425,
-              37.21931
-            ],
-            [
-              37.84059,
-              37.20307
-            ],
-            [
-              37.84352,
-              37.18663
-            ],
-            [
-              37.85068,
-              37.17341
-            ],
-            [
-              37.86793,
-              37.15188
-            ],
-            [
-              37.87623,
-              37.13089
-            ],
-            [
-              37.87477,
-              37.10688
-            ],
-            [
-              37.86818,
-              37.07766
-            ],
-            [
-              37.86939,
-              37.06521
-            ],
-            [
-              37.8816,
-              37.055
-            ],
-            [
-              37.89381,
-              37.06017
-            ],
-            [
-              37.92254,
-              37.04202
-            ],
-            [
-              37.95436,
-              37.0528
-            ],
-            [
-              37.96746,
-              37.055
-            ],
-            [
-              37.97877,
-              37.05012
-            ],
-            [
-              37.97657,
-              37.03844
-            ],
-            [
-              37.96412,
-              37.01411
+              37.96441,
+              37.01254
             ],
             [
               37.96388,
@@ -14437,12 +14115,12 @@
               37.63351
             ],
             [
-              39.74837,
-              37.71333
+              39.80837,
+              37.69417
             ],
             [
-              39.04837,
-              37.93682
+              39.1131,
+              37.91615
             ]
           ]
         ]
@@ -14453,12 +14131,13 @@
           "bib:pliny-natural-history",
           "bib:livius-mesopotamia",
           "naturalearth:ne-10m-rivers-lake-centerlines",
+          "pleiades:658636",
           "pleiades:874354",
           "pleiades:893951",
           "pleiades:894084"
         ],
         "confidence": "medium",
-        "note": "Mesopotamia between the Euphrates and Tigris (Strabo 16.1.21–23, 28), closed in the south from Babylon to Seleucia (PO-8). The north line is an equidistant construction from Edessa/Carrhae/Nisibis against Arsamosata (R54–R57), so that edge is low confidence and is shown with Strabo's Zeugma-based reading noted as the alternative."
+        "note": "Mesopotamia, which Strabo says 'lies between the Euphrates and the Tigris', with 'the Taurus, which separates Armenia from Mesopotamia' to the north (Geography 16.1.21). Its east edge is the Tigris. Its west edge is the Euphrates, the frontier with Rome: 'The Euphrates and the land beyond it constitute the boundary of the Parthian empire' (16.1.28). In the south it closes between Babylon and Seleucia, where Strabo puts 'the shortest distance between the two rivers' (16.1.21), with short straight links from each city to its river. The north edge is approximate. It is drawn halfway between Edessa, Carrhae and Nisibis and Arsamosata, which Pliny lists among the towns of Greater Armenia (Natural History 6.10). It meets the Euphrates about 140 km above the Zeugma, while Strabo measures Mesopotamia from 'the Zeugma at Commagenê, where Mesopotamia begins' (16.1.22). The name's reach varied: the historian Arrian used it only for the northern part, today's Jezira, while Pliny's Mesopotamia also takes in Babylonia, with 'Seleucia, Laodicea, Artemita' (6.30)."
       },
       "id": "mesopotamia"
     }

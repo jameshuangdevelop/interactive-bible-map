@@ -13,6 +13,7 @@ import { GROUP_A_LABELS, GROUP_B_LABELS } from "./lib/m5-20-region-groups.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const areasPath = path.join(repositoryRoot, "data", "geo", "ancient-areas.geojson");
+const empireEdgePath = path.join(repositoryRoot, "data", "geo", "ancient-empire-edge.geojson");
 const anchorsPath = path.join(repositoryRoot, "data", "geo", "region-anchors.json");
 const gazaFacePath = path.join(repositoryRoot, "data", "geo", "sources", "gaza-rhinocolura-face.geojson");
 const outputPath = path.join(repositoryRoot, "data", "geo", "region-outlines.geojson");
@@ -321,6 +322,32 @@ function linesFromFeature(feature) {
   return [];
 }
 
+function linesFromCollection(collection) {
+  return (collection.features ?? []).flatMap((feature) => linesFromFeature(feature));
+}
+
+function pointDistanceKm(a, b) {
+  const midLatRad = (((a[1] + b[1]) / 2) * Math.PI) / 180;
+  const dx = (b[0] - a[0]) * 111.32 * Math.cos(midLatRad);
+  const dy = (b[1] - a[1]) * 110.574;
+  return Math.hypot(dx, dy);
+}
+
+function findLakeFeatureByName(lakesCollection, matcher) {
+  const feature = (lakesCollection.features ?? []).find((candidate) =>
+    matcher.test(normalizedText(candidate?.properties?.name ?? candidate?.properties?.name_en))
+  );
+  if (!feature?.geometry) throw new Error("Could not find the named lake feature in Natural Earth lakes.");
+  return feature;
+}
+
+function boundaryLinesFromGeometry(geometry) {
+  if (!geometry) return [];
+  if (geometry.type === "Polygon") return geometry.coordinates.map((ring) => ring);
+  if (geometry.type === "MultiPolygon") return geometry.coordinates.flatMap((polygon) => polygon);
+  return [];
+}
+
 function riverCandidateLines(collection, matcher) {
   return (collection.features ?? [])
     .filter((feature) => matcher(normalizedText(feature?.properties?.name)))
@@ -454,6 +481,27 @@ function stitchNamedRiverChain(riversMain, pattern, anchorCoordinates) {
     if (!next || next.d2 > 0.2) break;
     const stitched = connectLines(chain, next.candidate);
     chain = stitched;
+    used.add(next.candidate);
+  }
+  return chain;
+}
+
+function stitchEmpireEdgeChain(empireEdgeCollection, anchorCoordinates) {
+  const lines = linesFromCollection(empireEdgeCollection);
+  if (lines.length === 0) throw new Error("Ancient empire edge has no lines.");
+  const ordered = [...lines].sort(
+    (left, right) => nearestPointDistanceSquared(left, anchorCoordinates) - nearestPointDistanceSquared(right, anchorCoordinates)
+  );
+  const used = new Set();
+  let chain = orientLineFromNearPoint(ordered[0], anchorCoordinates);
+  used.add(ordered[0]);
+  while (used.size < lines.length) {
+    const next = lines
+      .filter((candidate) => !used.has(candidate))
+      .map((candidate) => ({ candidate, d2: endpointDistanceSquared(chain, candidate) }))
+      .sort((left, right) => left.d2 - right.d2)[0];
+    if (!next || next.d2 > 0.2) break;
+    chain = connectLines(chain, next.candidate);
     used.add(next.candidate);
   }
   return chain;
@@ -877,6 +925,8 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const naturalEarthLand = await readJsonFile(inputFiles.naturalEarthLand);
     const naturalEarthRiversMain = await readJsonFile(inputFiles.naturalEarthRiversMain);
     const naturalEarthRiversEurope = await readJsonFile(inputFiles.naturalEarthRiversEurope);
+    const naturalEarthLakes = await readJsonFile(inputFiles.naturalEarthLakes);
+    const empireEdge = await readJsonFile(empireEdgePath);
     const gazaFaceSource = await readJsonFile(gazaFacePath);
     const landMask = (naturalEarthLand.features ?? []).filter((feature) => feature.geometry);
 
@@ -1043,6 +1093,10 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const asiaMainland = selectLandComponentByAnchor(landMask, anchorPoint(anchorsById, "pergamum"));
     const mesopotamiaLand = selectLandComponentByAnchor(landMask, anchorPoint(anchorsById, "edessa"));
     const mediaLand = selectLandComponentByAnchor(landMask, anchorPoint(anchorsById, "ecbatana"));
+    const lakeTuz = findLakeFeatureByName(naturalEarthLakes, /^(lake)?tuz$/u);
+    for (const ring of boundaryLinesFromGeometry(lakeTuz.geometry)) {
+      allowInput("ne-lake-slice", { type: "LineString", coordinates: ring }, { source: "lake-tuz" });
+    }
 
     async function unionLabelCells({ groupVoronoi, label, tag }) {
       const featuresForLabel = [...groupVoronoi.labelsByAnchorId.entries()]
@@ -1090,9 +1144,9 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     addFeature(features, {
       id: "pisidia",
       geometry: pisidia.geometry,
-      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-pisidia", "bib:isbe-phrygia", "pleiades:639139", "pleiades:639100", "pleiades:638741", "pleiades:638804"],
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-pisidia", "bib:isbe-phrygia", "pleiades:638789", "pleiades:639111", "pleiades:639139", "pleiades:639100", "pleiades:638741", "pleiades:638804"],
       confidence: "low",
-      note: "Pisidia as Strabo and ISBE place it between the Taurus front above Pamphylia and the Phrygian valleys (Strabo 12.7.1–2; ISBE, 'Pisidia'), bounded by Lycia/Milyas on the west and Isauria on the east. Antioch-near-Pisidia is kept outside by the project's M5-19 convention, while Pliny 5.24 places Antioch inside Pisidia; this outline follows the Strabo/ISBE reading and names Pliny's alternative."
+      note: "Pisidia, the mountain country above the Pamphylian plain. Strabo says most Pisidians 'occupy the summits of the Taurus, but some, situated above Sidê and Aspendus, Pamphylian cities, occupy hilly places' (Geography 12.7.1). The International Standard Bible Encyclopedia (ISBE) says Pisidia 'was bounded by Lycia on the West, by the Phrygian country on the North, and by Isauria on the East', and that toward Isauria 'the frontier was never strictly drawn' ('Pisidia'). No source this project cites gives a line, so each edge is drawn halfway between towns the sources place on either side, and is approximate. Sinda, in the south-west, is inside: Artemidorus counts it among 'the cities of the Pisidians' (Strabo 12.7.2), but Strabo also groups 'Greater Cibyra and Sinda and Cabalis' (13.4.15). Cibyra is outside, and so is Balbura, which, Strabo says, Murena 'included ... within the territory of the Lycians' (13.4.17). Antioch and Apollonia, to the north, are drawn in Phrygia: ISBE places Antioch 'in Galatian Phrygia, near the northern border of Pisidia' ('Pisidia') and names Antioch, Iconium and Apollonia among Galatian Phrygia's important cities ('Phrygia'). Pliny instead puts 'the colony of Cæsarea, also called Antiochia' in the Pisidians' country (Natural History 5.24)."
     });
 
     let lycaonia = await unionLabelCells({ groupVoronoi: groupA, label: "lycaonia", tag: "group-a-lycaonia" });
@@ -1123,12 +1177,24 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
         expectNonEmpty: true
       })
     });
+    lycaonia = await unionOne({
+      workDirectory,
+      tag: "lycaonia-minus-lake-tuz-union",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "lycaonia-minus-lake-tuz",
+        operation: "erase",
+        subjectFeatures: [lycaonia],
+        maskFeatures: [lakeTuz],
+        expectNonEmpty: true
+      })
+    });
     addFeature(features, {
       id: "lycaonia",
       geometry: lycaonia.geometry,
-      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-lycaonia", "scripture:Acts 14:6", "pleiades:619194", "pleiades:619164", "pleiades:648652"],
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-lycaonia", "scripture:Acts 14:6", "naturalearth:ne-10m-lakes", "pleiades:619194", "pleiades:619164", "pleiades:619268", "pleiades:648652"],
       confidence: "low",
-      note: "Lycaonia as Strabo's upland plain east of Iconium and bounded by Cappadocia, Pisidia/Phrygia and Cilicia Tracheia (Strabo 12.6.1–3; ISBE, 'Lycaonia'), with the south clipped to exclude this project's drawn Cilicia areas (PO-3/R52). Iconium is kept outside per M5-19 ruling P5, though Strabo 12.6.1 and Pliny 5.25 place it in Lycaonia; both readings are disputed. Lake Tatta is left in neither Lycaonia nor Phrygia (PO-3)."
+      note: "Lycaonia, the plain of south-central Asia Minor, drawn as its western, Roman part, where Lystra and Derbe lay (Acts 14:6). Strabo describes 'the plateaus of the Lycaonians' as 'cold, bare of trees, and grazed by wild asses' (Geography 12.6.1). He puts the boundary with Cappadocia 'between Coropassus, a village of the Lycaonians, and Garsaüra, a town of the Cappadocians' (12.6.1). The International Standard Bible Encyclopedia (ISBE) bounds Lycaonia 'on the South by Cilicia Tracheia', so the outline stops at this map's Cilicia and does not reach the sea. ISBE also says 'The boundary of Phrygia and Lycaonia passed between Iconium and Lystra' ('Lycaonia'), and this map follows it, drawing Iconium in Phrygia. But Strabo names Iconium with the Lycaonian plateau ('In this neighbourhood is also Iconium', 12.6.1), and Pliny places 'the famous city of Iconium' in 'a Tetrarchy of Lycaonia' (Natural History 5.25). Laranda is outside, with the eastern part of Lycaonia, which ISBE says 'included the important city of Laranda'. Lake Tatta is in neither this outline nor Phrygia's: Strabo calls it 'a part of Greater Phrygia' (12.5.4), but also says Greater Phrygia 'leaves on the left Pessinus and the region of Orcaorci and Lycaonia' (12.8.13). The other edges are drawn halfway between towns the sources place on either side, and are approximate."
     });
 
     let mysia = await unionLabelCells({ groupVoronoi: groupA, label: "mysia", tag: "group-a-mysia" });
@@ -1148,9 +1214,9 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     addFeature(features, {
       id: "mysia",
       geometry: mysia.geometry,
-      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-mysia", "scripture:Acts 16:7", "scripture:Acts 16:8", "pleiades:550523", "pleiades:609420"],
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-mysia", "scripture:Acts 16:7", "scripture:Acts 16:8", "pleiades:550523", "pleiades:609420", "pleiades:609427"],
       confidence: "low",
-      note: "Mysia as the mainland region from Olympene to the Caicus/Pergamene country (Strabo 12.8.1, 12.8.12), clipped to the Asian mainland (PO-6/R53): no Thrace and no Lesbos. Elaea is kept inside following Strabo's Caicus reading, while Pliny 5.32 treats it in Aeolis; this is disputed and noted. Cadi is treated on Phrygia's side where a single-point shared boundary is not explicit (PO-5)."
+      note: "Mysia, in north-western Asia Minor. The International Standard Bible Encyclopedia (ISBE) says 'its boundaries were always vague', but that it reached 'on the North to the Sea of Marmora on the East to Bithynia and Phrygia, on the South to Lydia, and on the West to Hellespont', and that 'According to some authors it included the Troad' ('Mysia'). This outline includes the Troad, which is disputed: Strabo says 'Mysia and Olympus come after the Troad' (Geography 12.4.6). The coast is the Asian mainland's; the islands are left out. In the south, Strabo's Mysia takes in 'the country in the neighbourhood of the Caïcus River and Pergamenê, extending as far as Teuthrania and the outlets of the river' (12.8.1), so Elaea, at the river's mouth, is inside. Pliny instead lists 'the town of Elæa, the river Caïcus, which flows from Mysia, the town of Pitane' in 'Æolis ..., formerly known as Mysia' (Natural History 5.32). Cadi is drawn in Phrygia: Strabo lists it among the cities of Phrygia Epictetus, 'and also Cadi, which, according to some writers, belongs to Mysia' (12.8.12). Strabo says Mysia 'lies between Mt. Ida and Catacecaumenê', which is 'by some called Mysian and by others Maeonian' (12.8.12); the Catacecaumenê is outside this outline. The inland edges are drawn halfway between towns the sources place on either side, and are approximate. Thyatira, which 'by some is called the farthermost city of the Mysians' (Strabo 13.4.4), is outside."
     });
 
     let phrygia = await unionLabelCells({ groupVoronoi: groupA, label: "phrygia", tag: "group-a-phrygia" });
@@ -1167,12 +1233,24 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       })
     });
     phrygia = await keepComponentWithAnchor({ feature: phrygia, anchorId: "synnada", tag: "group-a-phrygia-main" });
+    phrygia = await unionOne({
+      workDirectory,
+      tag: "phrygia-minus-lake-tuz-union",
+      features: await booleanOpStrict({
+        workDirectory,
+        tag: "phrygia-minus-lake-tuz",
+        operation: "erase",
+        subjectFeatures: [phrygia],
+        maskFeatures: [lakeTuz],
+        expectNonEmpty: true
+      })
+    });
     addFeature(features, {
       id: "phrygia",
       geometry: phrygia.geometry,
-      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-phrygia", "bib:isbe-lycaonia", "pleiades:609420", "pleiades:638901"],
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-phrygia", "bib:isbe-lycaonia", "naturalearth:ne-10m-lakes", "wikidata:Q65088749", "pleiades:609393", "pleiades:609420", "pleiades:638901", "pleiades:619268", "pleiades:845022"],
       confidence: "low",
-      note: "Phrygia as the trans-provincial region Strabo and ISBE describe across Asian and Galatian Phrygia (Strabo 12.8.13–17; ISBE, 'Phrygia'), with Iconium inside per M5-19 ruling P5. Carura is treated as an outside anchor fallback where a through-point shared line is not explicit (Strabo 12.8.16; R23/A12). Strabo and Pliny disagree on several compass placements and on Cadi's side; this outline follows the project's PO rulings and keeps confidence low."
+      note: "Phrygia, the uplands of west-central Asia Minor. Under Rome it was split between the provinces of Asia and Galatia, 'but the line between them was never sharply drawn', and its boundaries 'were always vague' (International Standard Bible Encyclopedia, ISBE, 'Phrygia'). Strabo says Greater Phrygia 'leaves on the left Pessinus and the region of Orcaorci and Lycaonia, and on the right the Maeonians and Lydians and Carians' (Geography 12.8.13). No source this project cites gives a line, so each edge is drawn halfway between towns the sources place on either side, and is approximate. Antioch, Iconium and Apollonia are inside: ISBE names them as Galatian Phrygia's 'important cities'. But Pliny puts Antioch in Pisidia (Natural History 5.24) and Iconium in 'a Tetrarchy of Lycaonia' (5.25), and Strabo names Iconium with the Lycaonian plateau (12.6.1). Cadi is inside: Strabo lists it among the cities of Phrygia Epictetus, 'and also Cadi, which, according to some writers, belongs to Mysia' (12.8.12). Carura is just outside: Strabo says it 'forms a boundary between Phrygia and Caria' (12.8.17), and also puts it 'in the neighbouring country' to Laodiceia (12.8.16). In the north, Bithynium, which Strabo places 'In the interior of Bithynia' (12.4.7), is outside. So is Modra, though Strabo puts it 'in Phrygia on the Hellespont' (12.3.7). Lake Tatta is in neither this outline nor Lycaonia's: Strabo calls it 'a part of Greater Phrygia' (12.5.4), but, as above, Greater Phrygia leaves Pessinus and Orcaorci on its left (12.8.13). Gordium, among 'the ancient habitations of the Phrygians' on the Sangarius, is outside, in the Galatians' land where Strabo describes it (12.5.3)."
     });
 
     const groupB = buildGroupVoronoi({ anchorsById, labelsByAnchorId: GROUP_B_LABELS, marginDegrees: 8 });
@@ -1282,7 +1360,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       geometry: media.geometry,
       sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-media", "naturalearth:ne-10m-rivers-lake-centerlines", "pleiades:874361", "pleiades:884148", "pleiades:903104"],
       confidence: "medium",
-      note: "Media including Atropatene as Strabo 11.13 and ISBE describe it, with Rhagae kept inside (PO-2). The north-west follows the Aras→Kura chain to the Artaxata→Gazaca segment (PO-7/R50), then closes by the Artaxata/Gazaca equidistant construction against Armenia. The east and south remain equidistant constructions from sourced anchors against Parthia/Persis/Susiana. Gazaca's site and Rhagae's side are disputed in the sources and are named here."
+      note: "Media, with Atropatene, west and south-west of the Caspian. Strabo says Media 'is divided into two parts', Greater Media, with its metropolis at Ecbatana, and 'Atropatian Media' (Geography 11.13.1). The International Standard Bible Encyclopedia (ISBE) says Media 'Lay to the West and Southwest of the Caspian' and 'included Atropatene', and adds that 'Lake Spauta is now known as Urmi' ('Media'). The north-west edge is the Araxes, 'which forms the boundary between Armenia and Atropatenê' (11.13.3), and the lower Cyrus to the sea. ISBE: 'On the North in later times it was bounded by the rivers Araxes and Cyrus, which separated it from Armenia'. Near Artaxata, a town of Greater Armenia (Pliny, Natural History 6.10), the edge leaves the river along the straight line from Artaxata to Gazaca for about 170 km. Rhagae is inside, as one of ISBE's 'chief cities of ancient Media', 'Ecbatana, Gazaea, and Ragae'. But Strabo counts 'the whole region that extends as far as the Caspian Gates and Rhagae and the Tapyri, which formerly belonged to Media' as Parthian in his day (11.9.1), so Rhagae and the east end of the coast are disputed. Gazaca, where the kings of Atropatene had their 'royal summer palace' (11.13.3), is inside, but its site is uncertain (Pleiades). The other edges are drawn halfway between towns the sources place on either side: Artaxata in Armenia, Arbela to the west, Susa, Persepolis and Pasargadae to the south, and Hecatompylos, 'the royal seat of the Parthians' (11.9.1), to the east. They are approximate."
     });
 
     let mesopotamia = await unionLabelCells({ groupVoronoi: groupB, label: "mesopotamia", tag: "group-b-mesopotamia" });
@@ -1331,7 +1409,10 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     if (northEdge.length < 2) {
       throw new Error("Could not solve Mesopotamia north equidistant line between Euphrates and Tigris.");
     }
-    northEdge[0] = euphratesCrossing;
+    const empireEdgeChain = stitchEmpireEdgeChain(empireEdge, anchorPoint(anchorsById, "arsamosata"));
+    const northEmpireHits = polylineIntersections(northEdge, empireEdgeChain).sort((left, right) => left.segmentA - right.segmentA);
+    const northWestPoint = northEmpireHits[0]?.point ?? nearestPointOnLine(empireEdgeChain, euphratesCrossing).point;
+    northEdge[0] = northWestPoint;
     northEdge[northEdge.length - 1] = tigrisCrossing;
     m520Diagnostics.mesopotamia = {
       euphratesCrossing,
@@ -1343,29 +1424,49 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const seleuciaAnchor = anchorPoint(anchorsById, "seleucia-tigris");
     const euphratesNearBabylon = nearestPointOnLine(euphrates, babylonAnchor).point;
     const tigrisNearSeleucia = nearestPointOnLine(tigris, seleuciaAnchor).point;
-    let euphratesEdge = sliceLineBetweenPoints(euphrates, euphratesCrossing, euphratesNearBabylon);
+    const empireFromNorthToSouth = sliceLineBetweenPoints(empireEdgeChain, northWestPoint, babylonAnchor);
+    let empireSouthJoin = null;
+    for (const candidate of empireFromNorthToSouth) {
+      const nearestOnEuphrates = nearestPointOnLine(euphrates, candidate).point;
+      const distanceKm = pointDistanceKm(candidate, nearestOnEuphrates);
+      if (distanceKm <= 0.2) {
+        empireSouthJoin = candidate;
+        continue;
+      }
+      if (empireSouthJoin) break;
+    }
+    if (!empireSouthJoin) {
+      throw new Error("Could not derive Mesopotamia empire-edge handoff from the Euphrates.");
+    }
+    const empireWestEdge = sliceLineBetweenPoints(empireEdgeChain, northWestPoint, empireSouthJoin);
+    let lowerEuphratesEdge = sliceLineBetweenPoints(euphrates, empireSouthJoin, euphratesNearBabylon);
     let tigrisEdge = sliceLineBetweenPoints(tigris, tigrisCrossing, tigrisNearSeleucia);
-    const babylonOnEuphrates = nearestPointOnLine(euphratesEdge, babylonAnchor);
+    const babylonOnEuphrates = nearestPointOnLine(lowerEuphratesEdge, babylonAnchor);
     const seleuciaOnTigris = nearestPointOnLine(tigrisEdge, seleuciaAnchor);
-    euphratesEdge = insertPointOnLine(euphratesEdge, babylonOnEuphrates);
+    lowerEuphratesEdge = insertPointOnLine(lowerEuphratesEdge, babylonOnEuphrates);
     tigrisEdge = insertPointOnLine(tigrisEdge, seleuciaOnTigris);
     const babylonRiverPoint = babylonOnEuphrates.point;
     const seleuciaRiverPoint = seleuciaOnTigris.point;
     const southBridge = [babylonAnchor, seleuciaAnchor];
     const babylonConnector = [babylonAnchor, babylonRiverPoint];
     const seleuciaConnector = [seleuciaAnchor, seleuciaRiverPoint];
-    allowInput("ne-river-slice", featureFromLine(euphratesEdge).geometry, { source: "euphrates" });
+    allowInput("ne-river-slice", featureFromLine(lowerEuphratesEdge).geometry, { source: "euphrates" });
     allowInput("ne-river-slice", featureFromLine(tigrisEdge).geometry, { source: "tigris" });
+    allowInput("empire-edge-slice", featureFromLine(empireWestEdge).geometry, { source: "ancient-empire-edge" });
     allowInput("anchor-segment", featureFromLine(southBridge).geometry, { anchors: ["babylon", "seleucia-tigris"] });
     allowInput("anchor-river-connector", featureFromLine(babylonConnector).geometry, { anchor: "babylon" });
     allowInput("anchor-river-connector", featureFromLine(seleuciaConnector).geometry, { anchor: "seleucia-tigris" });
+    const westEdgeFromBabylonToNorth = [
+      ...lowerEuphratesEdge.slice().reverse(),
+      ...empireWestEdge.slice().reverse().slice(1)
+    ];
     const mesopotamiaRing = normalizeRing([
       ...northEdge,
       ...tigrisEdge.slice(1),
       ...seleuciaConnector.slice().reverse().slice(1),
       ...southBridge.slice().reverse().slice(1),
       ...babylonConnector,
-      ...euphratesEdge.slice().reverse().slice(1)
+      ...westEdgeFromBabylonToNorth.slice(1)
     ]);
     const mesopotamiaRivers = geometryFeature({ type: "Polygon", coordinates: [mesopotamiaRing] });
     const mesopotamiaPieces = await booleanOpStrict({
@@ -1381,9 +1482,9 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     addFeature(features, {
       id: "mesopotamia",
       geometry: mesopotamia.geometry,
-      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:livius-mesopotamia", "naturalearth:ne-10m-rivers-lake-centerlines", "pleiades:874354", "pleiades:893951", "pleiades:894084"],
+      sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:livius-mesopotamia", "naturalearth:ne-10m-rivers-lake-centerlines", "pleiades:658636", "pleiades:874354", "pleiades:893951", "pleiades:894084"],
       confidence: "medium",
-      note: "Mesopotamia between the Euphrates and Tigris (Strabo 16.1.21–23, 28), closed in the south from Babylon to Seleucia (PO-8). The north line is an equidistant construction from Edessa/Carrhae/Nisibis against Arsamosata (R54–R57), so that edge is low confidence and is shown with Strabo's Zeugma-based reading noted as the alternative."
+      note: "Mesopotamia, which Strabo says 'lies between the Euphrates and the Tigris', with 'the Taurus, which separates Armenia from Mesopotamia' to the north (Geography 16.1.21). Its east edge is the Tigris. Its west edge is the Euphrates, the frontier with Rome: 'The Euphrates and the land beyond it constitute the boundary of the Parthian empire' (16.1.28). In the south it closes between Babylon and Seleucia, where Strabo puts 'the shortest distance between the two rivers' (16.1.21), with short straight links from each city to its river. The north edge is approximate. It is drawn halfway between Edessa, Carrhae and Nisibis and Arsamosata, which Pliny lists among the towns of Greater Armenia (Natural History 6.10). It meets the Euphrates about 140 km above the Zeugma, while Strabo measures Mesopotamia from 'the Zeugma at Commagenê, where Mesopotamia begins' (16.1.22). The name's reach varied: the historian Arrian used it only for the northern part, today's Jezira, while Pliny's Mesopotamia also takes in Babylonia, with 'Seleucia, Laodicea, Artemita' (6.30)."
     });
 
     // Clip every region to land.

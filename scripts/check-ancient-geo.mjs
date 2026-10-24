@@ -11,6 +11,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import mapshaper from "mapshaper";
 import booleanValid from "@turf/boolean-valid";
 import { distancePointToSegmentKm, distanceToGeometryKm, pointInGeometry } from "./lib/ancient-area-checks.mjs";
 import { buildRegionOutlinesData } from "./build-region-outlines.mjs";
@@ -23,6 +24,7 @@ import { GROUP_A_LABELS, GROUP_B_LABELS } from "./lib/m5-20-region-groups.mjs";
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const regionOutlinePath = path.join(repositoryRoot, "data", "geo", "region-outlines.geojson");
 const anchorsPath = path.join(repositoryRoot, "data", "geo", "region-anchors.json");
+const empireEdgePath = path.join(repositoryRoot, "data", "geo", "ancient-empire-edge.geojson");
 const gazaFacePath = path.join(repositoryRoot, "data", "geo", "sources", "gaza-rhinocolura-face.geojson");
 const locationsDirectory = path.join(repositoryRoot, "data", "locations");
 const REQUIRED_REGION_IDS = Object.freeze([
@@ -128,6 +130,11 @@ const M520_EXTRA_OUTSIDE_CHECKS = Object.freeze([
   { name: "Mesopotamia record point", point: [43.5, 33.7], regionId: "mesopotamia", expected: "inside" },
   { name: "Lake Tatta", point: [33.75, 38.85], regionIds: ["lycaonia", "phrygia"] }
 ]);
+const M520_FIXED_POINT_CHECKS = Object.freeze([
+  { name: "Bithynion", point: [31.5858565, 40.7561925], regionId: "phrygia", expected: "outside" },
+  { name: "Oenoanda", point: [29.55518, 36.81125], regionId: "pisidia", expected: "outside" },
+  { name: "Araxa", point: [29.3837, 36.75132], regionId: "pisidia", expected: "outside" }
+]);
 const SIMPLIFY_INTERVAL_METRES = Object.freeze({
   samaria: 25,
   galilee: 25,
@@ -174,6 +181,7 @@ function parseArguments(argv) {
   let proofEgOn20320e9 = false;
   let proofM520On8a8f467 = false;
   let proofInjectedRiverSlice = false;
+  let proofP4OnCb75908 = false;
   for (const argument of argv) {
     if (argument.startsWith("--seed-error=")) {
       seededError = argument.slice("--seed-error=".length).trim();
@@ -195,12 +203,16 @@ function parseArguments(argv) {
       proofInjectedRiverSlice = true;
       continue;
     }
+    if (argument === "--proof-p4-on-cb75908") {
+      proofP4OnCb75908 = true;
+      continue;
+    }
     throw new Error(`Unknown argument '${argument}'.`);
   }
   if (seededError && !["b", "d", "e", "coast"].includes(seededError)) {
     throw new Error("--seed-error supports only b, d, e or coast.");
   }
-  return { seededError, proofFOnFe27276, proofEgOn20320e9, proofM520On8a8f467, proofInjectedRiverSlice };
+  return { seededError, proofFOnFe27276, proofEgOn20320e9, proofM520On8a8f467, proofInjectedRiverSlice, proofP4OnCb75908 };
 }
 
 function ringsOf(geometry) {
@@ -283,6 +295,39 @@ function pointNearBbox(point, box, expandKm) {
   const latMargin = expandKm / 110.574;
   const lonMargin = expandKm / (111.32 * Math.cos((point[1] * Math.PI) / 180));
   return point[0] >= box[0] - lonMargin && point[0] <= box[2] + lonMargin && point[1] >= box[1] - latMargin && point[1] <= box[3] + latMargin;
+}
+
+async function writeJson(filePath, value) {
+  await fs.writeFile(filePath, `${JSON.stringify(value)}\n`, "utf8");
+}
+
+function geometryFeature(geometry, properties = {}) {
+  return { type: "Feature", properties, geometry };
+}
+
+function geometriesAsFeatures(document) {
+  if (!document) return [];
+  if (document.type === "FeatureCollection") return (document.features ?? []).filter((feature) => feature.geometry);
+  if (document.type === "Feature") return document.geometry ? [document] : [];
+  if (document.type && document.coordinates) return [geometryFeature(document)];
+  return [];
+}
+
+async function clippedAreaKm2(subjectFeature, maskFeature, tag) {
+  const workDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "ibm-check-clip-"));
+  try {
+    const subjectPath = path.join(workDirectory, `${tag}-subject.geojson`);
+    const maskPath = path.join(workDirectory, `${tag}-mask.geojson`);
+    const outputPath = path.join(workDirectory, `${tag}-out.geojson`);
+    await writeJson(subjectPath, { type: "FeatureCollection", features: [geometryFeature(subjectFeature.geometry)] });
+    await writeJson(maskPath, { type: "FeatureCollection", features: [geometryFeature(maskFeature.geometry)] });
+    await mapshaper.runCommands(`-i ${subjectPath} name=subject -i ${maskPath} name=mask -target subject -clip mask -o format=geojson ${outputPath}`);
+    const output = JSON.parse(await fs.readFile(outputPath, "utf8"));
+    const clipped = geometriesAsFeatures(output);
+    return clipped.reduce((sum, feature) => sum + geometryAreaKm2(feature.geometry), 0);
+  } finally {
+    await fs.rm(workDirectory, { recursive: true, force: true });
+  }
 }
 
 function segmentLengthKm(start, end) {
@@ -586,7 +631,8 @@ function validateAllowedInputKinds({
   naturalEarthRivers,
   naturalEarthLakes,
   naturalEarthLandGeometries,
-  areaGeometries
+  areaGeometries,
+  empireEdgeGeometries
 }) {
   const failures = [];
   const riverSliceGeometries = [];
@@ -597,6 +643,7 @@ function validateAllowedInputKinds({
     "ne-land",
     "ne-river-slice",
     "ne-lake-slice",
+    "empire-edge-slice",
     "anchor-segment",
     "anchor-river-connector",
     "m5-19-g11-line",
@@ -616,6 +663,13 @@ function validateAllowedInputKinds({
     ),
     sampleBounds: combineBboxes(naturalEarthLakes.map((geometry) => geometryBbox(geometry)).filter(Boolean)),
     expandDegrees: maxSliceDistanceKm / 110.574
+  });
+  const empireEdgeIndex = buildSegmentGridIndex({
+    segmentEntries: empireEdgeGeometries.flatMap((geometry) =>
+      segmentsFromGeometry(geometry).map(([start, end]) => ({ kind: "empire-edge", start, end }))
+    ),
+    sampleBounds: combineBboxes(empireEdgeGeometries.map((geometry) => geometryBbox(geometry)).filter(Boolean)),
+    expandDegrees: 0.001 / 110.574
   });
   for (const entry of allowedTagged) {
     if (!allowedKinds.has(entry.kind)) {
@@ -676,6 +730,22 @@ function validateAllowedInputKinds({
       const coordinates = entry.geometry?.coordinates;
       if (!Array.isArray(coordinates) || coordinates.length !== 2) {
         failures.push("(f) anchor-segment must contain exactly 2 coordinates.");
+        continue;
+      }
+      if (entry.kind === "empire-edge-slice") {
+        const coordinates = entry.geometry?.coordinates;
+        if (!Array.isArray(coordinates) || coordinates.length < 2) {
+          failures.push("(f) empire-edge-slice must be a LineString with at least 2 coordinates.");
+          continue;
+        }
+        const samples = densifiedLineSamples(coordinates, 0.1);
+        for (const sample of samples) {
+          const nearestKm = nearestDistanceFromSegmentIndexKm(sample, empireEdgeIndex);
+          if (nearestKm > 0.001) {
+            failures.push(`(f) empire-edge-slice sample ${JSON.stringify(sample)} is ${nearestKm.toFixed(4)} km from ancient-empire-edge.`);
+            break;
+          }
+        }
         continue;
       }
       const [start, end] = coordinates;
@@ -807,6 +877,25 @@ function evaluateCheckE({ featureById, anchorCoordinatesById, seededError = null
       failures.push(`(e) ${check.name} expected outside ${check.regionId}.`);
     }
   }
+  for (const check of M520_FIXED_POINT_CHECKS) {
+    const feature = featureById.get(check.regionId);
+    const inside = feature ? pointInGeometry(check.point, feature.geometry) : false;
+    if (check.expected === "outside" && inside) {
+      failures.push(`(e) ${check.name} expected outside ${check.regionId}.`);
+    }
+    if (check.expected === "inside" && !inside) {
+      failures.push(`(e) ${check.name} expected inside ${check.regionId}.`);
+    }
+  }
+  const pitaneCoordinates = anchorCoordinatesById.get("pitane");
+  const mysia = featureById.get("mysia");
+  if (pitaneCoordinates && mysia) {
+    const pitaneInside = pointInGeometry(pitaneCoordinates, mysia.geometry);
+    const pitaneDistanceKm = distanceToGeometryKm(pitaneCoordinates, mysia.geometry);
+    if (!pitaneInside && pitaneDistanceKm > 1) {
+      failures.push(`(e) Pitane must be inside Mysia or within 1 km (currently ${pitaneDistanceKm.toFixed(3)} km).`);
+    }
+  }
   const mediaFeature = featureById.get("media");
   if (mediaFeature) {
     for (const guard of M520_MEDIA_GUARDS.inside) {
@@ -832,7 +921,8 @@ function evaluateCheckF({
   naturalEarthLandGeometries,
   naturalEarthRivers,
   naturalEarthLakes,
-  areaGeometries
+  areaGeometries,
+  empireEdgeGeometries
 }) {
   const started = Date.now();
   const failures = [];
@@ -846,7 +936,8 @@ function evaluateCheckF({
     naturalEarthRivers,
     naturalEarthLakes,
     naturalEarthLandGeometries,
-    areaGeometries
+    areaGeometries,
+    empireEdgeGeometries
   });
   failures.push(...kindValidation.failures);
   const bisectors = [
@@ -944,10 +1035,53 @@ function evaluateM520CoastalTouch({ featureById, naturalEarthLandGeometries }) {
   return { failures, figures };
 }
 
+async function evaluateMesopotamiaDrawnAreaAdjacency({ featureById, areaById, allowedTagged }) {
+  const failures = [];
+  const mesopotamia = featureById.get("mesopotamia");
+  const syria = areaById.get("syria");
+  const commagene = areaById.get("commagene");
+  if (!mesopotamia || !syria || !commagene) {
+    return {
+      failures: ["(g) missing mesopotamia/syria/commagene feature for adjacency checks."],
+      overlapKm2: null,
+      maxGapKm: null
+    };
+  }
+
+  const overlapSyria = await clippedAreaKm2(mesopotamia, syria, "mesopotamia-overlap-syria");
+  const overlapCommagene = await clippedAreaKm2(mesopotamia, commagene, "mesopotamia-overlap-commagene");
+  const overlapKm2 = overlapSyria + overlapCommagene;
+  if (overlapKm2 >= 1) {
+    failures.push(`(g) mesopotamia overlaps drawn syria/commagene areas by ${overlapKm2.toFixed(3)} km² (must be < 1 km²).`);
+  }
+
+  const empireSlices = (allowedTagged ?? [])
+    .filter((entry) => entry.kind === "empire-edge-slice")
+    .map((entry) => entry.geometry)
+    .filter((geometry) => geometry?.type === "LineString");
+  if (empireSlices.length === 0) {
+    failures.push("(g) mesopotamia has no tagged empire-edge-slice input for west-edge validation.");
+  }
+  let maxGapKm = 0;
+  for (const line of empireSlices) {
+    for (const sample of densifiedLineSamples(line.coordinates ?? [], 0.2)) {
+      maxGapKm = Math.max(maxGapKm, distanceToGeometryKm(sample, mesopotamia.geometry));
+    }
+  }
+  const mesopotamiaToleranceKm = regionToleranceKm("mesopotamia");
+  if (maxGapKm > mesopotamiaToleranceKm) {
+    failures.push(
+      `(g) mesopotamia gap to syria/commagene is ${maxGapKm.toFixed(3)} km (must be <= ${mesopotamiaToleranceKm.toFixed(3)} km).`
+    );
+  }
+  return { failures, overlapKm2, maxGapKm };
+}
+
 async function runRegionOutlineChecks({ seededError, cacheRoot }) {
   const outlines = JSON.parse(await fs.readFile(regionOutlinePath, "utf8"));
   const anchors = JSON.parse(await fs.readFile(anchorsPath, "utf8"));
   const ancientAreas = JSON.parse(await fs.readFile(path.join(repositoryRoot, "data", "geo", "ancient-areas.geojson"), "utf8"));
+  const empireEdge = JSON.parse(await fs.readFile(empireEdgePath, "utf8"));
   const rebuilt = await buildRegionOutlinesData({ writeOutput: false });
   const pinnedInputFiles = await fetchPinnedInputs(ancientGeoCache(cacheRoot).inputs);
   const naturalEarthLand = await readJsonFile(pinnedInputFiles.naturalEarthLand);
@@ -965,6 +1099,7 @@ async function runRegionOutlineChecks({ seededError, cacheRoot }) {
   const locationById = new Map(locations.map((location) => [location.id, location]));
   const features = outlines.features ?? [];
   const featureById = new Map(features.map((feature) => [feature.id, feature]));
+  const areaById = new Map((ancientAreas.features ?? []).map((feature) => [feature?.properties?.areaId, feature]).filter(([id]) => typeof id === "string"));
   const anchorCoordinatesById = new Map(
     (anchors.anchors ?? [])
       .filter((anchor) => typeof anchor?.id === "string" && Array.isArray(anchor?.coordinates))
@@ -1011,7 +1146,6 @@ async function runRegionOutlineChecks({ seededError, cacheRoot }) {
     const location = locationById.get(regionId);
     const feature = featureById.get(regionId);
     if (!location || !feature) continue;
-    if (regionId === "lycaonia") continue; // PO-4: label-point exception named in research.
     const regionPoint = location?.candidates?.[0]?.coordinates;
     if (!Array.isArray(regionPoint) || regionPoint.length < 2) continue;
     if (!pointInGeometry(regionPoint, feature.geometry)) {
@@ -1065,7 +1199,8 @@ async function runRegionOutlineChecks({ seededError, cacheRoot }) {
       ...(naturalEarthRiversEurope.features ?? []).map((feature) => feature.geometry)
     ],
     naturalEarthLakes: (naturalEarthLakes.features ?? []).map((feature) => feature.geometry),
-    areaGeometries: (ancientAreas.features ?? []).map((feature) => feature.geometry)
+    areaGeometries: (ancientAreas.features ?? []).map((feature) => feature.geometry),
+    empireEdgeGeometries: (empireEdge.features ?? []).map((feature) => feature.geometry)
   });
   failures.push(...checkFResult.failures);
   for (const maximum of checkFResult.sliceMaximums) {
@@ -1086,6 +1221,18 @@ async function runRegionOutlineChecks({ seededError, cacheRoot }) {
   }
   failures.push(...coastalTouch.failures);
 
+  const mesopotamiaAdjacency = await evaluateMesopotamiaDrawnAreaAdjacency({
+    featureById,
+    areaById,
+    allowedTagged: rebuilt.allowedInputGeometriesTagged
+  });
+  if (mesopotamiaAdjacency.overlapKm2 != null && mesopotamiaAdjacency.maxGapKm != null) {
+    console.log(
+      `(g) mesopotamia drawn-area overlap ${mesopotamiaAdjacency.overlapKm2.toFixed(3)} km²; max gap to syria/commagene ${mesopotamiaAdjacency.maxGapKm.toFixed(3)} km`
+    );
+  }
+  failures.push(...mesopotamiaAdjacency.failures);
+
   // (g) Area sanity and part sanity.
   failures.push(...evaluateAreaSanity(featureById, rebuilt.sanity));
 
@@ -1104,7 +1251,10 @@ async function runRegionOutlineChecks({ seededError, cacheRoot }) {
       ...(naturalEarthRiversEurope.features ?? []).map((feature) => feature.geometry)
     ],
     naturalEarthLakes: (naturalEarthLakes.features ?? []).map((feature) => feature.geometry),
-    areaGeometries: (ancientAreas.features ?? []).map((feature) => feature.geometry)
+    areaGeometries: (ancientAreas.features ?? []).map((feature) => feature.geometry),
+    areaFeatures: ancientAreas.features ?? [],
+    empireEdgeGeometries: (empireEdge.features ?? []).map((feature) => feature.geometry),
+    mesopotamiaAdjacency
   };
 }
 
@@ -1184,7 +1334,8 @@ async function proofM520On8a8f467({ context }) {
     naturalEarthLandGeometries: context.naturalEarthLandGeometries,
     naturalEarthRivers: context.naturalEarthRivers,
     naturalEarthLakes: context.naturalEarthLakes,
-    areaGeometries: context.areaGeometries
+    areaGeometries: context.areaGeometries,
+    empireEdgeGeometries: context.empireEdgeGeometries
   });
   failures.push(...checkFResult.failures);
   if (failures.length === 0) throw new Error("Expected 8a8f467 to fail strengthened M5-20 checks, but it passed.");
@@ -1237,7 +1388,8 @@ async function proofInjectedRiverSlice({ context }) {
     naturalEarthLandGeometries: context.naturalEarthLandGeometries,
     naturalEarthRivers: context.naturalEarthRivers,
     naturalEarthLakes: context.naturalEarthLakes,
-    areaGeometries: context.areaGeometries
+    areaGeometries: context.areaGeometries,
+    empireEdgeGeometries: context.empireEdgeGeometries
   });
   const rejection = result.failures.find(
     (failure) => failure.includes("(f) ne-river-slice sample") && failure.includes("pinned rivers")
@@ -1247,6 +1399,44 @@ async function proofInjectedRiverSlice({ context }) {
   }
   console.log("Proof for injected ne-river-slice fault:");
   console.log(`- ${rejection}`);
+}
+
+async function proofP4OnCb75908({ context }) {
+  const previous = spawnSync("git", ["show", "cb75908:data/geo/region-outlines.geojson"], {
+    cwd: repositoryRoot,
+    encoding: "utf8"
+  });
+  if (previous.status !== 0) throw new Error(`git show failed: ${previous.stderr}`);
+  const oldCollection = JSON.parse(previous.stdout);
+  const oldById = new Map((oldCollection.features ?? []).map((feature) => [feature.id, feature]));
+  const failures = [];
+
+  const lycaoniaLocation = JSON.parse(await fs.readFile(path.join(locationsDirectory, "lycaonia.json"), "utf8"));
+  const lycaoniaPoint = lycaoniaLocation?.candidates?.[0]?.coordinates;
+  const lycaoniaFeature = oldById.get("lycaonia");
+  if (Array.isArray(lycaoniaPoint) && lycaoniaFeature && !pointInGeometry(lycaoniaPoint, lycaoniaFeature.geometry)) {
+    failures.push("(b) lycaonia: region point is outside its outline.");
+  }
+
+  failures.push(
+    ...evaluateCheckE({
+      featureById: oldById,
+      anchorCoordinatesById: context.anchorCoordinatesById
+    })
+  );
+  const mesopotamiaAdjacency = await evaluateMesopotamiaDrawnAreaAdjacency({
+    featureById: oldById,
+    areaById: new Map(
+      (context.areaFeatures ?? []).map((feature) => [feature?.properties?.areaId, feature]).filter(([id]) => typeof id === "string")
+    ),
+    allowedTagged: context.rebuilt.allowedInputGeometriesTagged
+  });
+  failures.push(...mesopotamiaAdjacency.failures);
+  if (failures.length === 0) {
+    throw new Error("Expected cb75908 to fail P4 checks, but it passed.");
+  }
+  console.log("Proof for P4 checks on cb75908:");
+  for (const failure of failures) console.log(`- ${failure}`);
 }
 
 async function verifyGazaFaceReproducibility(cacheRoot) {
@@ -1267,7 +1457,8 @@ async function main() {
     proofFOnFe27276: runProof,
     proofEgOn20320e9: runProofEg,
     proofM520On8a8f467: runProofM520,
-    proofInjectedRiverSlice: runProofInjectedRiverSlice
+    proofInjectedRiverSlice: runProofInjectedRiverSlice,
+    proofP4OnCb75908: runProofP4OnCb75908
   } = parseArguments(process.argv.slice(2));
   const before = changedGeoFiles();
   if (before.length > 0) throw new Error(`data/geo/ has uncommitted changes, so the rebuild can't be compared with it:\n${before.join("\n")}`);
@@ -1295,6 +1486,9 @@ async function main() {
     }
     if (runProofInjectedRiverSlice) {
       await proofInjectedRiverSlice({ context });
+    }
+    if (runProofP4OnCb75908) {
+      await proofP4OnCb75908({ context });
     }
     console.log(`Reproduced data/geo/ byte for byte from an empty cache in ${Math.round((Date.now() - started) / 1000)} s.`);
   } finally {

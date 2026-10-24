@@ -9,14 +9,6 @@
       ]
     },
     {
-      "id": "adramyttium-anchor",
-      "sourceId": "pleiades:550403",
-      "coordinates": [
-        26.9360975594,
-        39.4986400291
-      ]
-    },
-    {
       "id": "aizani",
       "sourceId": "pleiades:609292",
       "coordinates": [
@@ -161,19 +153,19 @@
       ]
     },
     {
-      "id": "assos-anchor",
-      "sourceId": "pleiades:550463",
-      "coordinates": [
-        26.3363517018,
-        39.4901354609
-      ]
-    },
-    {
       "id": "attalia",
       "sourceId": "pleiades:638778",
       "coordinates": [
         30.699968,
         36.8903095
+      ]
+    },
+    {
+      "id": "balbura",
+      "sourceId": "pleiades:638789",
+      "coordinates": [
+        29.58230975,
+        36.95264135
       ]
     },
     {
