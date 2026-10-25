@@ -332,6 +332,31 @@ async function waitForSinglePillStage(page, stageId) {
   );
 }
 
+// After a click, the map is still idle from before it, so waiting for idle alone can read the
+// pills before the new one is drawn. Poll for idle AND exactly the expected pill together.
+async function waitForSettledPill(page, { routeId, stageId = null, label = null }) {
+  await page.waitForFunction(
+    ({ testHookKey, expected }) => {
+      const map = window[testHookKey];
+      if (!map || !map.loaded() || map.isMoving() || !map.areTilesLoaded()) {
+        return false;
+      }
+      const pills = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stage-pill-icon"] });
+      if (pills.length !== 1) {
+        return false;
+      }
+      const properties = pills[0]?.properties ?? {};
+      return (
+        properties.routeId === expected.routeId &&
+        (expected.stageId === null || properties.stageId === expected.stageId) &&
+        (expected.label === null || properties.label === expected.label)
+      );
+    },
+    { testHookKey: mapTestHookKey, expected: { routeId, stageId, label } },
+    { timeout: 15_000 }
+  );
+}
+
 async function routeStageLineMidpointScreenPoint(page, stageId) {
   return page.evaluate(
     ({ testHookKey, targetStageId }) => {
@@ -3356,25 +3381,25 @@ test("each real route renders lines, stops, and panel content (replaces routesRe
   }
 });
 
-test("lineless stages show one anchored pill on select, and remove it when deselected @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
-  const scenarios = [
-    { routeId: "jesus-1", stageIndex: 1, stageId: "segment-01", label: "1", anchorStopId: "nazareth" },
-    { routeId: "jesus-1", stageIndex: 2, stageId: "segment-05", label: "2", anchorStopId: "cana" },
-    { routeId: "jesus-1", stageIndex: 3, stageId: "segment-06", label: "3", anchorStopId: "capernaum" },
-    { routeId: "jesus-1", stageIndex: 7, stageId: "segment-02", label: "7", anchorStopId: "galilee" },
-    { routeId: "jesus-1", stageIndex: 8, stageId: "segment-10", label: "8", anchorStopId: "sychar" },
-    { routeId: "jesus-2", stageIndex: 3, stageId: "segment-11", label: "3", anchorStopId: "capernaum" },
-    { routeId: "jesus-2", stageIndex: 4, stageId: "segment-12", label: "4", anchorStopId: "capernaum" },
-    { routeId: "jesus-6", stageIndex: 1, stageId: "segment-31", label: "1", anchorStopId: "jerusalem" }
-  ];
-
-  for (const scenario of scenarios) {
+// One test per stage, so each has its own time budget: eight in one test reloaded the map 16 times and
+// timed out on CI.
+for (const scenario of [
+  { routeId: "jesus-1", stageIndex: 1, stageId: "segment-01", label: "1", anchorStopId: "nazareth" },
+  { routeId: "jesus-1", stageIndex: 2, stageId: "segment-05", label: "2", anchorStopId: "cana" },
+  { routeId: "jesus-1", stageIndex: 3, stageId: "segment-06", label: "3", anchorStopId: "capernaum" },
+  { routeId: "jesus-1", stageIndex: 7, stageId: "segment-02", label: "7", anchorStopId: "galilee" },
+  { routeId: "jesus-1", stageIndex: 8, stageId: "segment-10", label: "8", anchorStopId: "sychar" },
+  { routeId: "jesus-2", stageIndex: 3, stageId: "segment-11", label: "3", anchorStopId: "capernaum" },
+  { routeId: "jesus-2", stageIndex: 4, stageId: "segment-12", label: "4", anchorStopId: "capernaum" },
+  { routeId: "jesus-6", stageIndex: 1, stageId: "segment-31", label: "1", anchorStopId: "jerusalem" }
+]) {
+  test(`lineless stage ${scenario.routeId} #${scenario.stageIndex} shows one pill on ${scenario.anchorStopId}, and none when deselected @routes`, { tag: ["@routes"] }, async ({ page, baseUrl }) => {
     await page.goto(`${baseUrl}/?tab=routes&route=${scenario.routeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
     await waitForMapIdle(page);
     await clickRouteStageCard(page, scenario.stageIndex);
-    await waitForMapIdle(page);
     await expect(page.locator(`[data-route-stage-index='${scenario.stageIndex}'][data-route-stage-selected='true']`)).toBeVisible();
+    await waitForSettledPill(page, { routeId: scenario.routeId, stageId: scenario.stageId, label: scenario.label });
     const visiblePills = await renderedStagePills(page);
     const matchingPills = visiblePills.filter(
       (pill) => pill.routeId === scenario.routeId && pill.stageId === scenario.stageId && pill.label === scenario.label
@@ -3395,8 +3420,8 @@ test("lineless stages show one anchored pill on select, and remove it when desel
     await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
     await waitForMapIdle(page);
     expect(await renderedStagePills(page), `expected no visible pills after deselect on ${scenario.routeId}`).toHaveLength(0);
-  }
-});
+  });
+}
 
 test("hovering lineless stages shows a pill, and unhovering hides it @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
   const scenarios = [
@@ -3434,7 +3459,7 @@ test("selected lineless stage yields to hovered line stage pill, then restores o
   await waitForMapIdle(page);
 
   await clickRouteStageCard(page, 3);
-  await waitForMapIdle(page);
+  await waitForSettledPill(page, { routeId: "jesus-2", stageId: "segment-11", label: "3" });
   let pills = await renderedStagePills(page);
   let selectedLinelessPill = pills.find((pill) => pill.routeId === "jesus-2" && pill.stageId === "segment-11");
   expect(pills).toHaveLength(1);
@@ -3482,7 +3507,7 @@ test("line stages still show pills on selection (Paul unchanged) @routes", { tag
   await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
   await waitForMapIdle(page);
   await clickRouteStageCard(page, 2);
-  await waitForMapIdle(page);
+  await waitForSettledPill(page, { routeId: "paul-2", label: "2" });
   const pills = await renderedStagePills(page);
   expect(pills).toHaveLength(1);
   expect(pills[0]?.routeId).toBe("paul-2");
