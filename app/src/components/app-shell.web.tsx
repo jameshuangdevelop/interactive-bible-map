@@ -56,7 +56,7 @@ import {
 import type { LoadedRoutesData, RouteStopRecord, RouteStopResolved } from "../features/routes/types";
 import type { RouteMapOverlayData } from "../features/routes/map-overlay";
 import { buildMentionedPointFeatures } from "../features/routes/overlay-mentioned";
-import { RoutesPanel } from "../features/routes/routes-panel.web";
+import { RoutesPanel, routeGroupIdForRouteId } from "../features/routes/routes-panel.web";
 import { tokens } from "../theme/tokens";
 
 const PANEL_WIDTH = 408;
@@ -429,7 +429,7 @@ export function AppShell() {
   const [routesLoadState, setRoutesLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [routesData, setRoutesData] = useState<LoadedRoutesData | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
-  const [routeToRevealOnList, setRouteToRevealOnList] = useState<string | null>(null);
+  const [openRouteGroups, setOpenRouteGroups] = useState<Record<string, boolean>>({});
   const [highlightedStageIndex, setHighlightedStageIndex] = useState<number | null>(null);
   const [selectedStageIndex, setSelectedStageIndex] = useState<number | null>(null);
   const [selectedRouteStopId, setSelectedRouteStopId] = useState<string | null>(null);
@@ -471,6 +471,24 @@ export function AppShell() {
     () => hydratedRoutes.find((entry) => entry.route.id === selectedRouteId) ?? null,
     [hydratedRoutes, selectedRouteId]
   );
+  const applySelectedRouteId = useCallback((nextRouteId: string | null) => {
+    setSelectedRouteId(nextRouteId);
+    if (!nextRouteId) {
+      return;
+    }
+    const groupId = routeGroupIdForRouteId(nextRouteId);
+    if (!groupId) {
+      return;
+    }
+    setOpenRouteGroups((current) =>
+      current[groupId]
+        ? current
+        : {
+            ...current,
+            [groupId]: true
+          }
+    );
+  }, []);
   const selectedRouteTimelineStop = useMemo(() => {
     if (!selectedRoute || !ancientTimeline || ancientTimeline.stops.length === 0) {
       return null;
@@ -707,8 +725,7 @@ export function AppShell() {
         }
         setMapMode(parsedMapMode);
         setViewTab(parsedViewTab);
-        setSelectedRouteId(parsedRouteId);
-        setRouteToRevealOnList(parsedRouteId);
+        applySelectedRouteId(parsedRouteId);
         setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
 
@@ -740,7 +757,7 @@ export function AppShell() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [applySelectedRouteId]);
 
   useEffect(() => {
     if (viewTab !== "routes" || routesLoadStateRef.current !== "idle") {
@@ -957,8 +974,7 @@ export function AppShell() {
       }
       setMapMode(parsedMapMode);
       setViewTab(parsedViewTab);
-      setSelectedRouteId(parsedRouteId);
-      setRouteToRevealOnList(parsedRouteId);
+      applySelectedRouteId(parsedRouteId);
       setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
       if (ancientTimeline) {
         const resolvedStop = resolveStopForYear(
@@ -1002,7 +1018,7 @@ export function AppShell() {
     return () => {
       window.removeEventListener("popstate", onPopState);
     };
-  }, [ancientTimeline, loading, placesById, urlStateReady]);
+  }, [ancientTimeline, applySelectedRouteId, loading, placesById, urlStateReady]);
 
   const closePanel = useCallback((restoreFocus: boolean) => {
     setSelectionOrigin("url");
@@ -2205,15 +2221,14 @@ export function AppShell() {
     : null;
 
   const handleSelectRoute = useCallback((routeId: string) => {
-    setSelectedRouteId(routeId);
-    setRouteToRevealOnList(routeId);
+    applySelectedRouteId(routeId);
     setSelectedStageIndex(null);
     setHighlightedStageIndex(null);
     setSelectedRouteStopId(null);
     setSelectionOrigin("url");
     setSelection(null);
     setStatusMessage(null);
-  }, []);
+  }, [applySelectedRouteId]);
 
   const handleSelectRouteMapEntry = useCallback(
     (
@@ -2230,8 +2245,7 @@ export function AppShell() {
           }
     ) => {
       setViewTab("routes");
-      setSelectedRouteId(entry.routeId);
-      setRouteToRevealOnList(entry.routeId);
+      applySelectedRouteId(entry.routeId);
       setSelectedStageIndex(entry.stageIndex);
       setSelectedRouteStopId(null);
       if (entry.kind === "stop") {
@@ -2244,7 +2258,7 @@ export function AppShell() {
         }
       }
     },
-    []
+    [applySelectedRouteId]
   );
 
   return (
@@ -2758,7 +2772,7 @@ export function AppShell() {
             <RoutesPanel
               hydratedRoutes={hydratedRoutes}
               onBackToAllRoutes={() => {
-                setSelectedRouteId(null);
+                applySelectedRouteId(null);
                 setSelectedStageIndex(null);
                 setHighlightedStageIndex(null);
                 setSelectedRouteStopId(null);
@@ -2798,7 +2812,14 @@ export function AppShell() {
               selectedRoute={selectedRoute}
               selectedRouteBorderYear={selectedRoute?.route.fromYear ?? null}
               selectedStageIndex={selectedStageIndex}
-              routeToRevealOnList={selectedRouteId ?? routeToRevealOnList}
+              openRouteGroups={openRouteGroups}
+              onToggleRouteGroup={(groupId) =>
+                setOpenRouteGroups((current) => ({
+                  ...current,
+                  [groupId]: !(current[groupId] ?? false)
+                }))
+              }
+              prefersReducedMotion={prefersReducedMotion}
             />
           </div>
         </section>

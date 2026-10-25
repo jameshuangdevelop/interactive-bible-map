@@ -11,8 +11,37 @@ import type {
   RouteStopResolved
 } from "./types";
 import { tokens } from "../../theme/tokens";
+import {
+  CollapsibleChevron,
+  collapsibleHeadingButtonStyle,
+  collapsibleHeadingChevronContainerStyle
+} from "../../components/collapsible-heading.web";
 
 type RoutesLoadState = "idle" | "loading" | "ready" | "error";
+
+type RouteGroupDefinition = {
+  id: string;
+  heading: string;
+  matchesRouteId: (routeId: string) => boolean;
+};
+
+export const ROUTE_GROUP_DEFINITIONS: readonly RouteGroupDefinition[] = [
+  {
+    id: "jesus",
+    heading: "Jesus' journeys",
+    matchesRouteId: (routeId) => routeId.startsWith("jesus-")
+  },
+  {
+    id: "paul",
+    heading: "Paul's journeys",
+    matchesRouteId: (routeId) => routeId.startsWith("paul-")
+  }
+];
+
+export function routeGroupIdForRouteId(routeId: string): string | null {
+  const match = ROUTE_GROUP_DEFINITIONS.find((group) => group.matchesRouteId(routeId));
+  return match?.id ?? null;
+}
 
 function formatApproximateYears(fromYear: number, toYear: number) {
   const start = fromYear < 0 ? `${Math.abs(fromYear)} BC` : `AD ${fromYear}`;
@@ -121,7 +150,9 @@ export function RoutesPanel({
   onBackToAllRoutes,
   onResolveStopSelection,
   onHighlightStage,
-  routeToRevealOnList = null
+  openRouteGroups = {},
+  onToggleRouteGroup = () => {},
+  prefersReducedMotion = false
 }: {
   routesLoadState: RoutesLoadState;
   routesData: LoadedRoutesData | null;
@@ -137,48 +168,27 @@ export function RoutesPanel({
   onBackToAllRoutes: () => void;
   onResolveStopSelection: (resolved: RouteStopResolved, stageIndex: number) => void;
   onHighlightStage: (stageIndex: number | null) => void;
-  routeToRevealOnList?: string | null;
+  openRouteGroups?: Record<string, boolean>;
+  onToggleRouteGroup?: (groupId: string) => void;
+  prefersReducedMotion?: boolean;
 }) {
   const stageItemRefs = useRef(new Map<number, HTMLLIElement | null>());
   const suppressScrollStageIndexRef = useRef<number | null>(null);
   const previousSelectedStageIndexRef = useRef<number | null>(null);
   const bibliographyById = routesData?.bibliographyById ?? new Map();
-  const [openRouteGroups, setOpenRouteGroups] = useState<Record<string, boolean>>({});
+  const [hoveredGroupId, setHoveredGroupId] = useState<string | null>(null);
 
   const groupedRoutes = useMemo(
     () =>
-      [
-        {
-          id: "jesus",
-          heading: "Jesus' journeys",
-          routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("jesus-"))
-        },
-        {
-          id: "paul",
-          heading: "Paul's journeys",
-          routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("paul-"))
-        },
-        {
-          id: "other",
-          heading: "Other routes",
-          routes: hydratedRoutes.filter(
-            (entry) => !entry.route.id.startsWith("paul-") && !entry.route.id.startsWith("jesus-")
-          )
-        }
-      ].filter((group) => group.routes.length > 0),
+      ROUTE_GROUP_DEFINITIONS
+        .map((group) => ({
+          id: group.id,
+          heading: group.heading,
+          routes: hydratedRoutes.filter((entry) => group.matchesRouteId(entry.route.id))
+        }))
+        .filter((group) => group.routes.length > 0),
     [hydratedRoutes]
   );
-  const routeGroupIdByRouteId = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const group of groupedRoutes) {
-      for (const entry of group.routes) {
-        map.set(entry.route.id, group.id);
-      }
-    }
-    return map;
-  }, [groupedRoutes]);
-  const revealGroupId =
-    !selectedRoute && routeToRevealOnList ? routeGroupIdByRouteId.get(routeToRevealOnList) ?? null : null;
 
   useEffect(() => {
     if (!selectedRoute || selectedStageIndex === null || selectedStageIndex < 0) {
@@ -272,16 +282,17 @@ export function RoutesPanel({
             {(() => {
               const groupButtonId = `route-group-button-${group.id}`;
               const groupPanelId = `route-group-panel-${group.id}`;
-              const groupOpen = openRouteGroups[group.id] ?? (revealGroupId === group.id);
+              const groupOpen = openRouteGroups[group.id] ?? false;
+              const isHovered = hoveredGroupId === group.id;
               return (
                 <>
                   <h3
                     style={{
                       margin: 0,
-                      fontSize: `${tokens.typography.captionSize}px`,
-                      letterSpacing: "0.02em",
-                      textTransform: "uppercase",
-                      color: tokens.color.textSecondary
+                      fontSize: `${tokens.typography.sectionHeadingSize}px`,
+                      lineHeight: `${tokens.typography.sectionHeadingLineHeight}px`,
+                      color: tokens.color.textPrimary,
+                      fontWeight: 500
                     }}
                   >
                     <button
@@ -289,46 +300,31 @@ export function RoutesPanel({
                       aria-expanded={groupOpen}
                       data-route-group-button={group.id}
                       id={groupButtonId}
-                      onClick={() =>
-                        setOpenRouteGroups((current) => {
-                          const currentOpen = current[group.id] ?? (revealGroupId === group.id);
-                          return {
-                            ...current,
-                            [group.id]: !currentOpen
-                          };
-                        })
-                      }
+                      onClick={() => onToggleRouteGroup(group.id)}
+                      onMouseEnter={() => {
+                        setHoveredGroupId(group.id);
+                      }}
+                      onMouseLeave={() => {
+                        setHoveredGroupId((current) => (current === group.id ? null : current));
+                      }}
                       style={{
-                        width: "100%",
-                        minHeight: "44px",
-                        border: `1px solid ${tokens.color.divider}`,
-                        borderRadius: "10px",
-                        padding: `${tokens.spacing.sm}px`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        background: "#FFFFFF",
-                        color: tokens.color.textSecondary,
-                        cursor: "pointer",
-                        fontSize: "inherit",
-                        letterSpacing: "inherit",
-                        textTransform: "inherit",
-                        fontWeight: 600,
-                        textAlign: "left",
-                        outlineOffset: "2px"
+                        ...collapsibleHeadingButtonStyle,
+                        backgroundColor: isHovered ? tokens.color.subtleSurface : "transparent"
                       }}
                       type="button"
                     >
-                      <span>{`${group.heading} · ${group.routes.length}`}</span>
+                      <span>
+                        {group.heading}
+                        <span style={{ color: tokens.color.textSecondary }}>{` · ${group.routes.length}`}</span>
+                      </span>
                       <span
                         aria-hidden="true"
-                        style={{
-                          display: "inline-block",
-                          transform: groupOpen ? "rotate(180deg)" : "rotate(0deg)",
-                          fontSize: "12px"
-                        }}
+                        style={collapsibleHeadingChevronContainerStyle}
                       >
-                        ▼
+                        <CollapsibleChevron
+                          expanded={groupOpen}
+                          prefersReducedMotion={prefersReducedMotion}
+                        />
                       </span>
                     </button>
                   </h3>

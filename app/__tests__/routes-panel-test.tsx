@@ -46,7 +46,7 @@ const routeStopFixture: RouteStopRecord = {
 const routeEntries: HydratedRoute[] = [
   {
     route: {
-      id: "single-stage",
+      id: "jesus-1",
       title: "Single stage route",
       fromYear: 46,
       toYear: 47,
@@ -78,7 +78,7 @@ const routeEntries: HydratedRoute[] = [
   },
   {
     route: {
-      id: "double-stage",
+      id: "paul-1",
       title: "Double stage route",
       fromYear: 48,
       toYear: 49,
@@ -171,7 +171,9 @@ const defaultProps = {
 
 describe("routes panel", () => {
   test("uses singular and plural stage labels in the route list", () => {
-    const markup = renderToStaticMarkup(<RoutesPanel {...defaultProps} />);
+    const markup = renderToStaticMarkup(
+      <RoutesPanel {...defaultProps} openRouteGroups={{ jesus: true, paul: true }} />
+    );
     expect(markup).toContain("1 stage");
     expect(markup).toContain("2 stages");
     expect(markup).not.toContain("1 stages");

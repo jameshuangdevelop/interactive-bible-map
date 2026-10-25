@@ -3572,6 +3572,22 @@ test("back to all routes opens selected route's group and keeps that route visib
   await expect(page.locator("[data-route-group-button='jesus']")).toHaveAttribute("aria-expanded", "false");
 });
 
+test("route group open state persists across map-tab round trip in-session @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  const jesusGroupButton = page.locator("[data-route-group-button='jesus']");
+  const paulGroupButton = page.locator("[data-route-group-button='paul']");
+  await jesusGroupButton.click();
+  await expect(jesusGroupButton).toHaveAttribute("aria-expanded", "true");
+  await expect(paulGroupButton).toHaveAttribute("aria-expanded", "false");
+  await page.getByRole("tab", { name: "Map" }).click();
+  await page.getByRole("tab", { name: "Routes" }).click();
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await expect(page.locator("[data-route-group-button='jesus']")).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("[data-route-group-button='paul']")).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("[data-routes-panel='true'] li > button", { hasText: "Jesus' early ministry" })).toBeVisible();
+});
+
 // The sheet's handle tap and drags are covered by tests/browser/phone-sheet.spec.mjs.
 test("phone layout keeps search/toggle spacing, drawer fit, and routes panel fit (replaces phoneBasicsChecks) @phone", { tag: ["@phone"] }, async ({ browser, baseUrl }) => {
   const context = await browser.newContext({

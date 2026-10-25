@@ -46,6 +46,11 @@ import {
   buildCommonsThumbnailUrl,
   selectCommonsThumbnailWidthForFrame
 } from "./commons-thumbnail";
+import {
+  CollapsibleChevron,
+  collapsibleHeadingButtonStyle,
+  collapsibleHeadingChevronContainerStyle
+} from "../../components/collapsible-heading.web";
 import { SmallScreenSheetTopStrip } from "../../components/small-screen-sheet-top-strip.web";
 import { tokens } from "../../theme/tokens";
 
@@ -868,27 +873,9 @@ function CollapsibleSectionHeading({
           aria-hidden="true"
           data-panel-section-chevron={sectionId}
           data-panel-section-chevron-state={chevronState}
-          style={sectionHeadingChevronContainerStyle}
+          style={collapsibleHeadingChevronContainerStyle}
         >
-          <svg
-            aria-hidden="true"
-            focusable="false"
-            style={{
-              ...sectionHeadingChevronStyle,
-              transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
-              transition: prefersReducedMotion ? "none" : "transform 180ms ease"
-            }}
-            viewBox="0 0 12 12"
-          >
-            <path
-              d="M4 2.5L8 6L4 9.5"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.75"
-            />
-          </svg>
+          <CollapsibleChevron expanded={expanded} prefersReducedMotion={prefersReducedMotion} />
         </span>
       </button>
     </h2>
@@ -2638,42 +2625,7 @@ const sectionHeadingStyle: CSSProperties = {
   fontWeight: 500
 };
 
-const sectionHeadingToggleButtonStyle: CSSProperties = {
-  width: "100%",
-  minHeight: "44px",
-  border: "none",
-  background: "transparent",
-  padding: "2px 4px",
-  borderRadius: "4px",
-  color: tokens.color.textPrimary,
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: `${tokens.spacing.sm}px`,
-  textAlign: "left",
-  fontFamily: tokens.typography.uiFont,
-  fontSize: `${tokens.typography.sectionHeadingSize}px`,
-  lineHeight: `${tokens.typography.sectionHeadingLineHeight}px`,
-  fontWeight: 500
-};
-
-const sectionHeadingChevronContainerStyle: CSSProperties = {
-  width: "16px",
-  height: "16px",
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: tokens.color.textSecondary,
-  flexShrink: 0
-};
-
-const sectionHeadingChevronStyle: CSSProperties = {
-  width: "12px",
-  height: "12px",
-  display: "block",
-  transformOrigin: "50% 50%"
-};
+const sectionHeadingToggleButtonStyle: CSSProperties = collapsibleHeadingButtonStyle;
 
 const secondaryTextStyle: CSSProperties = {
   marginTop: `${tokens.spacing.xs}px`,
