@@ -10825,7 +10825,7 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     desktopRouteList: path.join(screenshotDirectory, "desktop-route-list-no-lines.png"),
     desktopPaul2Hovered: path.join(screenshotDirectory, "desktop-paul-2-stage-hovered.png"),
     desktopPaulRomeHovered: path.join(screenshotDirectory, "desktop-paul-rome-stage-hovered.png"),
-    desktopJesusSelected: path.join(screenshotDirectory, "desktop-jesus-segment-selected.png"),
+    desktopJesusSelected: path.join(screenshotDirectory, "desktop-jesus-part-selected.png"),
     desktopRouteNotesEnd: path.join(screenshotDirectory, "desktop-route-notes-end.png"),
     phoneRouteSelected: path.join(screenshotDirectory, "phone-route-chosen.png")
   };
@@ -10834,7 +10834,12 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     { title: "Paul's second journey", stageCount: 14 },
     { title: "Paul's third journey", stageCount: 15 },
     { title: "Paul's voyage to Rome", stageCount: 8 },
-    { title: "Jesus' journeys", stageCount: 32 }
+    { title: "Jesus' early ministry", stageCount: 10 },
+    { title: "Jesus in Galilee", stageCount: 4 },
+    { title: "Jesus beyond Galilee", stageCount: 7 },
+    { title: "Jesus' final journey to Jerusalem", stageCount: 7 },
+    { title: "Jesus' last week in Jerusalem", stageCount: 2 },
+    { title: "Jesus after the resurrection", stageCount: 2 }
   ];
 
   const desktopContext = await browser.newContext({
@@ -11398,9 +11403,9 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         heading: "Paul's voyage to Rome"
       },
       {
-        label: "jesus fitted view",
-        url: `${baseUrl}/?tab=routes&route=jesus`,
-        heading: "Jesus' journeys"
+        label: "jesus-1 fitted view",
+        url: `${baseUrl}/?tab=routes&route=jesus-1`,
+        heading: "Jesus' early ministry"
       },
       {
         label: "paul-2 place=corinth",
@@ -11587,7 +11592,7 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       }, mapTestHookKey);
     };
 
-    let routeStopTargets = await loadRouteStopTargets("jesus", "Jesus' journeys");
+    let routeStopTargets = await loadRouteStopTargets("jesus-1", "Jesus' early ministry");
     if (!routeStopTargets || routeStopTargets.routeStopCount < 1) {
       routeStopTargets = await loadRouteStopTargets("paul-rome", "Paul's voyage to Rome");
     }
@@ -11995,7 +12000,7 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         await desktopPage.waitForTimeout(120);
         await desktopPage.screenshot({ path: screenshotPaths.desktopPaulRomeHovered, fullPage: true });
       }
-      if (route.title === "Jesus' journeys") {
+      if (route.title === "Jesus' early ministry") {
         const segment = desktopPage.locator("[data-route-stage-index='5']");
         await segment.click();
         await desktopPage.waitForTimeout(180);
@@ -12023,13 +12028,17 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       .waitFor({ timeout: 30_000 });
 
     await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
-    await desktopPage.getByRole("button", { name: "Jesus' journeys" }).click();
+    await desktopPage.getByRole("button", { name: "Jesus' early ministry" }).click();
     const noLineStage = desktopPage
       .locator("[data-route-stage-index]")
       .filter({ hasText: "Site disputed" })
       .first();
     await noLineStage.waitFor({ timeout: 30_000 });
-    await desktopPage.locator("[data-route-stage-index='4']").getByText("Path not known", { exact: true }).waitFor({ timeout: 30_000 });
+    await desktopPage
+      .locator("[data-route-stage-index]")
+      .filter({ hasText: "Path not known" })
+      .first()
+      .waitFor({ timeout: 30_000 });
     const notesSection = desktopPage.locator("[data-route-notes='true']");
     await notesSection.scrollIntoViewIfNeeded();
     await desktopPage.screenshot({ path: screenshotPaths.desktopRouteNotesEnd, fullPage: true });
@@ -12096,13 +12105,37 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       .locator("[data-route-stage-index='14'][data-route-stage-selected='true']")
       .waitFor({ timeout: 30_000 });
 
-    await desktopPage.goto(`${baseUrl}/?tab=routes&route=jesus`, {
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=jesus-4&stage=5`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage
+      .getByRole("heading", { name: "Jesus' final journey to Jerusalem" })
+      .waitFor({ timeout: 30_000 });
+    await desktopPage
+      .locator("[data-route-stage-index='5'][data-route-stage-selected='true']")
+      .waitFor({ timeout: 30_000 });
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=jesus&stage=9`, {
       waitUntil: "domcontentloaded",
       timeout: 150_000
     });
     await waitForMapToSettle(desktopPage);
     await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
-    await desktopPage.getByRole("heading", { name: "Jesus' journeys" }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByRole("heading", { name: "Jesus' early ministry" }).waitFor({ timeout: 30_000 });
+    const normalizedLegacyDeepLink = await desktopPage.evaluate(() => {
+      const params = new URLSearchParams(window.location.search);
+      return { route: params.get("route"), stage: params.get("stage") };
+    });
+    if (
+      normalizedLegacyDeepLink.route !== "jesus-1" ||
+      normalizedLegacyDeepLink.stage !== "6"
+    ) {
+      throw new Error(
+        `Routes real-data check: expected legacy jesus deep link to normalize to route=jesus-1&stage=6, got ${JSON.stringify(normalizedLegacyDeepLink)}.`
+      );
+    }
     await desktopPage.waitForFunction((testHook) => Boolean(window[testHook]), mapTestHookKey, {
       timeout: 30_000
     });

@@ -988,7 +988,7 @@ test("route stage selection only updates route sources and never touches layout 
     expect(probeResult.layoutCalls).toEqual([]);
   };
 
-  for (const routeId of ["paul-rome", "jesus"]) {
+  for (const routeId of ["paul-rome", "jesus-1"]) {
     await runSelectAssertion({ routeId, stageIndex: 2 });
   }
 });
@@ -1163,6 +1163,14 @@ test("Asia Minor towns render black dots under names at year 50 (major + standar
     timeout: 120_000
   });
   await waitForMapIdle(page);
+  await page.waitForFunction(
+    () => {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("route") === "jesus-1" && params.get("stage") === "6";
+    },
+    { timeout: 30_000 }
+  );
+  await expect(page.getByRole("heading", { name: "Jesus' early ministry" })).toBeVisible();
   const sycharRouteTarget = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
     const feature = map
@@ -1177,6 +1185,14 @@ test("Asia Minor towns render black dots under names at year 50 (major + standar
   expect(sycharRouteTarget).toBeTruthy();
   const sycharRouteDotPixels = await countNearPureBlackTownDotPixels(page, sycharRouteTarget.x, sycharRouteTarget.y);
   expect(sycharRouteDotPixels, "expected no black town dot under sychar in routes mode").toBeLessThanOrEqual(1);
+
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-4&stage=5&year=30`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await waitForMapIdle(page);
+  await expect(page.getByRole("heading", { name: "Jesus' final journey to Jerusalem" })).toBeVisible();
+  await expect(page.locator("[data-route-stage-index='5'][data-route-stage-selected='true']")).toBeVisible();
 });
 
 test("selecting a town replaces its black dot with the selected pin @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
@@ -3173,7 +3189,12 @@ test("each real route renders lines, stops, and panel content (replaces routesRe
     ["paul-2", "Paul's second journey", "Corinth"],
     ["paul-3", "Paul's third journey", "Ephesus"],
     ["paul-rome", "Paul's voyage to Rome", "Rome"],
-    ["jesus", "Jesus' journeys", "Jerusalem"]
+    ["jesus-1", "Jesus' early ministry", "Jerusalem"],
+    ["jesus-2", "Jesus in Galilee", "Jerusalem"],
+    ["jesus-3", "Jesus beyond Galilee", "Capernaum"],
+    ["jesus-4", "Jesus' final journey to Jerusalem", "Jerusalem"],
+    ["jesus-5", "Jesus' last week in Jerusalem", "Jerusalem"],
+    ["jesus-6", "Jesus after the resurrection", "Emmaus"]
   ];
   for (const [routeId, heading, expectedStopLabel] of routes) {
     await page.goto(`${baseUrl}/?tab=routes&route=${routeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });

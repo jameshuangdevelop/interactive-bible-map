@@ -2575,7 +2575,9 @@
       "id": "isbe-lasea",
       "type": "chapter",
       "title": "Lasea",
-      "authors": ["James Orr"],
+      "authors": [
+        "James Orr"
+      ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
@@ -2916,6 +2918,31 @@
       "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
       "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=ampsaga-geo",
       "accessed": "2026-10-18"
+    },
+    {
+      "id": "robertson-harmony-of-the-gospels",
+      "type": "book",
+      "title": "A Harmony of the Gospels for Students of the Life of Christ, Based on the Broadus Harmony in the Revised Version",
+      "authors": [
+        "A. T. Robertson"
+      ],
+      "year": 1922,
+      "publisher": "George H. Doran Company",
+      "url": "https://archive.org/details/harmonyofgospels00robeuoft",
+      "accessed": "2026-10-23"
+    },
+    {
+      "id": "stevens-burton-harmony-of-the-gospels",
+      "type": "book",
+      "title": "A Harmony of the Gospels for Historical Study: An Analytical Synopsis of the Four Gospels (third edition, revised)",
+      "authors": [
+        "William Arnold Stevens",
+        "Ernest De Witt Burton"
+      ],
+      "year": 1904,
+      "publisher": "Charles Scribner's Sons",
+      "url": "https://archive.org/details/aga1254.0001.001.umich.edu",
+      "accessed": "2026-10-23"
     }
   ]
 }
