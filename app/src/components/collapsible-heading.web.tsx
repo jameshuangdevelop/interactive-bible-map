@@ -19,8 +19,7 @@ export const collapsibleHeadingButtonStyle: CSSProperties = {
   fontFamily: tokens.typography.uiFont,
   fontSize: `${tokens.typography.sectionHeadingSize}px`,
   lineHeight: `${tokens.typography.sectionHeadingLineHeight}px`,
-  fontWeight: 500,
-  outlineOffset: "2px"
+  fontWeight: 500
 };
 
 export const collapsibleHeadingChevronContainerStyle: CSSProperties = {

@@ -35,12 +35,17 @@ export const ROUTE_GROUP_DEFINITIONS: readonly RouteGroupDefinition[] = [
     id: "paul",
     heading: "Paul's journeys",
     matchesRouteId: (routeId) => routeId.startsWith("paul-")
+  },
+  // Catches every route the groups above don't, so a new route is never left off the list.
+  {
+    id: "other",
+    heading: "Other routes",
+    matchesRouteId: () => true
   }
 ];
 
-export function routeGroupIdForRouteId(routeId: string): string | null {
-  const match = ROUTE_GROUP_DEFINITIONS.find((group) => group.matchesRouteId(routeId));
-  return match?.id ?? null;
+export function routeGroupIdForRouteId(routeId: string): string {
+  return ROUTE_GROUP_DEFINITIONS.find((group) => group.matchesRouteId(routeId))?.id ?? "other";
 }
 
 function formatApproximateYears(fromYear: number, toYear: number) {
@@ -184,7 +189,7 @@ export function RoutesPanel({
         .map((group) => ({
           id: group.id,
           heading: group.heading,
-          routes: hydratedRoutes.filter((entry) => group.matchesRouteId(entry.route.id))
+          routes: hydratedRoutes.filter((entry) => routeGroupIdForRouteId(entry.route.id) === group.id)
         }))
         .filter((group) => group.routes.length > 0),
     [hydratedRoutes]

@@ -477,9 +477,6 @@ export function AppShell() {
       return;
     }
     const groupId = routeGroupIdForRouteId(nextRouteId);
-    if (!groupId) {
-      return;
-    }
     setOpenRouteGroups((current) =>
       current[groupId]
         ? current

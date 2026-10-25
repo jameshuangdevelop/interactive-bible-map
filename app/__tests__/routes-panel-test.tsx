@@ -46,7 +46,7 @@ const routeStopFixture: RouteStopRecord = {
 const routeEntries: HydratedRoute[] = [
   {
     route: {
-      id: "jesus-1",
+      id: "single-stage",
       title: "Single stage route",
       fromYear: 46,
       toYear: 47,
@@ -78,7 +78,7 @@ const routeEntries: HydratedRoute[] = [
   },
   {
     route: {
-      id: "paul-1",
+      id: "double-stage",
       title: "Double stage route",
       fromYear: 48,
       toYear: 49,
@@ -171,12 +171,34 @@ const defaultProps = {
 
 describe("routes panel", () => {
   test("uses singular and plural stage labels in the route list", () => {
-    const markup = renderToStaticMarkup(
-      <RoutesPanel {...defaultProps} openRouteGroups={{ jesus: true, paul: true }} />
-    );
+    const markup = renderToStaticMarkup(<RoutesPanel {...defaultProps} />);
     expect(markup).toContain("1 stage");
     expect(markup).toContain("2 stages");
     expect(markup).not.toContain("1 stages");
+  });
+
+  test("lists a route no group claims under Other routes, after the named groups", () => {
+    const entryWithId = (id: string): HydratedRoute => ({
+      ...routeEntries[0],
+      route: { ...routeEntries[0].route, id, title: `Route ${id}` }
+    });
+    const markup = renderToStaticMarkup(
+      <RoutesPanel
+        {...defaultProps}
+        hydratedRoutes={[entryWithId("paul-1"), entryWithId("exodus"), entryWithId("jesus-1")]}
+      />
+    );
+    const positions = [
+      "Jesus&#x27; journeys",
+      "Route jesus-1",
+      "Paul&#x27;s journeys",
+      "Route paul-1",
+      "Other routes",
+      "Route exodus"
+    ].map((text) => markup.indexOf(text));
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    expect(markup.match(/Route exodus/gu)).toHaveLength(1);
   });
 
   test("shows stage-level and route-level sources when a route is selected", () => {
