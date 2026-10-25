@@ -1,4 +1,4 @@
-import type { PlaceIndexRecord } from "../map/types";
+import type { Coordinates, PlaceIndexRecord } from "../map/types";
 import type {
   HydratedRoute,
   LoadedRoutesData,
@@ -163,6 +163,26 @@ export function routeLineFeatureByStage(
 
 export function stageLabelNumber(routeStructure: "connected" | "standalone-segments", stageIndex: number) {
   return routeStructure === "standalone-segments" ? `Segment ${stageIndex + 1}` : `Stage ${stageIndex + 1}`;
+}
+
+function hasSeveralSites(resolved: RouteStopResolved) {
+  const candidates = resolved.kind === "route-stop" ? resolved.stop?.candidates : resolved.place?.candidates;
+  return (candidates?.length ?? 0) > 1;
+}
+
+// Where a stage without a line shows its number (ADR-0041's 2026-10-24 update): on the end whose site
+// isn't disputed; with both ends disputed, or neither, on the destination. If that end has no
+// coordinates, the other end's are used.
+export function linelessStagePillCoordinate(
+  stage: Pick<RouteStageRecord, "from" | "to">,
+  placesById: Map<string, PlaceIndexRecord>,
+  stopsById: Map<string, RouteStopRecord>
+): Coordinates | null {
+  const from = resolveRouteStop(stage.from, placesById, stopsById);
+  const to = resolveRouteStop(stage.to, placesById, stopsById);
+  const anchor = hasSeveralSites(to) && !hasSeveralSites(from) ? from : to;
+  const other = anchor === to ? from : to;
+  return anchor.coordinates ?? other.coordinates ?? null;
 }
 
 export function stageHasDisputedStop(stage: RouteStageRecord, stopsById: Map<string, RouteStopRecord>) {

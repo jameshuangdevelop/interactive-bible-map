@@ -445,7 +445,8 @@ export function RoutesPanel({
                   onSelectStage(stageIndex);
                 }
               }}
-              onMouseEnter={() => onHighlightStage(stageIndex)}
+              // mouseover/mouseout rather than enter/leave, so moving between rows never passes through
+              // "no stage"; mousemove restores the hover after onBlur clears it under a still pointer.
               onMouseMove={() => onHighlightStage(stageIndex)}
               onMouseOver={() => onHighlightStage(stageIndex)}
               onMouseOut={(event) => {
@@ -458,7 +459,6 @@ export function RoutesPanel({
                 }
                 onHighlightStage(null);
               }}
-              onPointerEnter={() => onHighlightStage(stageIndex)}
               ref={(element) => {
                 stageItemRefs.current.set(stageIndex, element);
               }}

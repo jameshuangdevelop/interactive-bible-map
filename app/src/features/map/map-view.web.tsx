@@ -4060,8 +4060,11 @@ export function MapView({
                 layerRoutesLinesForegroundId
               ]
             });
+          // A stage's number has no name of its own: skip it here, so it never shows as "2, place".
           const routeFeature = routeFeatures.find(
-            (feature) => feature.layer?.id !== layerRoutesLinesForegroundId
+            (feature) =>
+              feature.layer?.id !== layerRoutesLinesForegroundId &&
+              feature.layer?.id !== layerRoutesStagePillIconId
           );
           const routeProperties = routeFeature ? asObject(routeFeature.properties) : null;
           const routeLabel = routeProperties ? asString(routeProperties.label) : null;
@@ -4081,10 +4084,13 @@ export function MapView({
             setInteractiveCursor(true);
             return;
           }
-          const routeLine = routeFeatures.find(
-            (feature) => feature.layer?.id === layerRoutesLinesForegroundId
+          // Over a stage's line or its number (with no stop under the pointer): clickable, no tooltip.
+          const routeLineOrPill = routeFeatures.find(
+            (feature) =>
+              feature.layer?.id === layerRoutesLinesForegroundId ||
+              feature.layer?.id === layerRoutesStagePillIconId
           );
-          if (routeLine) {
+          if (routeLineOrPill) {
             clearHoveredFeatureState();
             hideTooltip();
             setInteractiveCursor(true);

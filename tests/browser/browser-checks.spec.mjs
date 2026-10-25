@@ -3493,6 +3493,67 @@ test("selected lineless stage yields to hovered line stage pill, then restores o
   expect(Math.abs((selectedLinelessPill?.y ?? 0) - capernaumPoint.y)).toBeLessThanOrEqual(4);
 });
 
+test("hovering a stage's number on the map never shows the number as a place @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  // Stage 4 of the voyage to Rome (Fair Havens → Malta) has its number at its line's middle, in open sea,
+  // with no place under it.
+  await page.goto(`${baseUrl}/?tab=routes&route=paul-rome`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await waitForMapIdle(page);
+  await clickRouteStageCard(page, 4);
+  await waitForSettledPill(page, { routeId: "paul-rome", label: "4" });
+  const [pill] = await renderedStagePills(page);
+  await moveMouseToMapPoint(page, { x: pill.x, y: pill.y });
+  // The pointer cursor shows the hover handler has run over the number.
+  await page.waitForFunction(
+    (testHookKey) => window[testHookKey].getCanvas().style.cursor === "pointer",
+    mapTestHookKey,
+    { timeout: 5_000 }
+  );
+  await expect(page.locator("div[role='tooltip']").first()).toBeHidden();
+});
+
+test("hovering another stage never moves the camera while a lineless stage is selected @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await waitForMapIdle(page);
+  await clickRouteStageCard(page, 3);
+  await waitForSettledPill(page, { routeId: "jesus-2", stageId: "segment-11", label: "3" });
+
+  // Centre on stage 1's line, zoomed in, so the selected stage's stop (Capernaum) is off the screen
+  // while the hovered stage's number is on it.
+  const stage1Midpoint = await routeStageLineMidpointScreenPoint(page, "segment-20");
+  expect(stage1Midpoint).toBeTruthy();
+  const { center, zoom } = await page.evaluate(
+    ({ testHookKey, point }) => {
+      const map = window[testHookKey];
+      return { center: map.unproject([point.x, point.y]).toArray(), zoom: map.getZoom() + 2 };
+    },
+    { testHookKey: mapTestHookKey, point: stage1Midpoint }
+  );
+  await jumpMap(page, center, zoom);
+  expect(await routeStopScreenPoint(page, "capernaum"), "Capernaum should be off the screen").toBeNull();
+  const centerBefore = await page.evaluate((testHookKey) => window[testHookKey].getCenter().toArray(), mapTestHookKey);
+
+  const stage1Item = page.locator("[data-route-stage-index='1']");
+  await stage1Item.hover();
+  await waitForSinglePillStage(page, "segment-20");
+  await stage1Item.evaluate((element) => {
+    element.dispatchEvent(new MouseEvent("mouseout", { bubbles: true, relatedTarget: document.body }));
+  });
+  await page.waitForFunction(
+    (testHookKey) =>
+      !window[testHookKey]
+        .queryRenderedFeatures(undefined, { layers: ["ibm-routes-stage-pill-icon"] })
+        .some((feature) => feature.properties?.stageId === "segment-20"),
+    mapTestHookKey,
+    { timeout: 5_000 }
+  );
+  await waitForMapIdle(page);
+  const centerAfter = await page.evaluate((testHookKey) => window[testHookKey].getCenter().toArray(), mapTestHookKey);
+  expect(Math.abs(centerAfter[0] - centerBefore[0]), "hovering must not pan the map").toBeLessThan(1e-6);
+  expect(Math.abs(centerAfter[1] - centerBefore[1]), "hovering must not pan the map").toBeLessThan(1e-6);
+});
+
 test("with no hovered or selected stage, routes show no stage pills @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
   for (const routeId of ["jesus-1", "jesus-2", "jesus-6", "paul-2"]) {
     await page.goto(`${baseUrl}/?tab=routes&route=${routeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });

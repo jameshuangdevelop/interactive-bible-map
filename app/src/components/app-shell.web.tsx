@@ -49,6 +49,7 @@ import type {
   SelectionOrigin
 } from "../features/map/types";
 import {
+  linelessStagePillCoordinate,
   loadRoutesData,
   resolveRouteStop,
   routeLineFeatureByStage
@@ -1494,29 +1495,6 @@ export function AppShell() {
       return midpointOfCoordinates(merged);
     };
 
-    const routeStopHasMultipleCandidates = (resolved: RouteStopResolved) => {
-      if (resolved.kind === "route-stop") {
-        return (resolved.stop?.candidates.length ?? 0) > 1;
-      }
-
-      return (resolved.place?.candidates.length ?? 0) > 1;
-    };
-
-    const linelessPillCoordinate = (stage: (typeof selectedRouteEntry.stages)[number]) => {
-      const from = resolveRouteStop(stage.from, placesById, routeStopsById);
-      const to = resolveRouteStop(stage.to, placesById, routeStopsById);
-      const fromDisputed = routeStopHasMultipleCandidates(from);
-      const toDisputed = routeStopHasMultipleCandidates(to);
-      const anchor =
-        fromDisputed && !toDisputed
-          ? to
-          : !fromDisputed && toDisputed
-            ? from
-            : to;
-      const fallback = anchor.id === from.id ? to : from;
-      return (anchor.coordinates ?? fallback.coordinates ?? null) as [number, number] | null;
-    };
-
     const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
     const lineFeatureByStageId = new Map<string, (typeof lineFeatures)[number]>();
     const selectedRoutePlaceId = selection?.placeId ?? null;
@@ -1524,6 +1502,10 @@ export function AppShell() {
     for (const [index, stage] of selectedRouteEntry.stages.entries()) {
       const feature = routeLineFeatureByStage(routesData.lines, selectedRouteId, stage.id, stage.lineId);
       if (!feature) {
+        // Kept apart from hover, so hovering another stage never changes it (and never pans the map).
+        if (selectedStageId === stage.id) {
+          selectedStageCenter = linelessStagePillCoordinate(stage, placesById, routeStopsById);
+        }
         continue;
       }
 
@@ -1806,8 +1788,9 @@ export function AppShell() {
     if (emphasizedStage) {
       const lineFeature = lineFeatureByStageId.get(emphasizedStage.id) ?? null;
       const stageIndex = selectedRouteEntry.stages.findIndex((candidate) => candidate.id === emphasizedStage.id);
-      const pillCoordinate =
-        lineFeature ? midpointOfGeometry(lineFeature.geometry) : linelessPillCoordinate(emphasizedStage);
+      const pillCoordinate = lineFeature
+        ? midpointOfGeometry(lineFeature.geometry)
+        : linelessStagePillCoordinate(emphasizedStage, placesById, routeStopsById);
       if (stageIndex >= 0 && pillCoordinate) {
         pointFeatures.push({
           type: "Feature",
@@ -1828,10 +1811,6 @@ export function AppShell() {
             isSelectedPlace: false
           }
         });
-
-        if (selectedStageId === emphasizedStage.id) {
-          selectedStageCenter = pillCoordinate;
-        }
       }
     }
 
