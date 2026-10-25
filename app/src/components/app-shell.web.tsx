@@ -429,6 +429,7 @@ export function AppShell() {
   const [routesLoadState, setRoutesLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [routesData, setRoutesData] = useState<LoadedRoutesData | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [routeToRevealOnList, setRouteToRevealOnList] = useState<string | null>(null);
   const [highlightedStageIndex, setHighlightedStageIndex] = useState<number | null>(null);
   const [selectedStageIndex, setSelectedStageIndex] = useState<number | null>(null);
   const [selectedRouteStopId, setSelectedRouteStopId] = useState<string | null>(null);
@@ -707,6 +708,7 @@ export function AppShell() {
         setMapMode(parsedMapMode);
         setViewTab(parsedViewTab);
         setSelectedRouteId(parsedRouteId);
+        setRouteToRevealOnList(parsedRouteId);
         setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
 
@@ -956,6 +958,7 @@ export function AppShell() {
       setMapMode(parsedMapMode);
       setViewTab(parsedViewTab);
       setSelectedRouteId(parsedRouteId);
+      setRouteToRevealOnList(parsedRouteId);
       setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
       if (ancientTimeline) {
         const resolvedStop = resolveStopForYear(
@@ -2203,6 +2206,7 @@ export function AppShell() {
 
   const handleSelectRoute = useCallback((routeId: string) => {
     setSelectedRouteId(routeId);
+    setRouteToRevealOnList(routeId);
     setSelectedStageIndex(null);
     setHighlightedStageIndex(null);
     setSelectedRouteStopId(null);
@@ -2227,6 +2231,7 @@ export function AppShell() {
     ) => {
       setViewTab("routes");
       setSelectedRouteId(entry.routeId);
+      setRouteToRevealOnList(entry.routeId);
       setSelectedStageIndex(entry.stageIndex);
       setSelectedRouteStopId(null);
       if (entry.kind === "stop") {
@@ -2793,6 +2798,7 @@ export function AppShell() {
               selectedRoute={selectedRoute}
               selectedRouteBorderYear={selectedRoute?.route.fromYear ?? null}
               selectedStageIndex={selectedStageIndex}
+              routeToRevealOnList={selectedRouteId ?? routeToRevealOnList}
             />
           </div>
         </section>

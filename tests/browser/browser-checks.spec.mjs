@@ -3494,30 +3494,82 @@ test("line stages still show pills on selection (Paul unchanged) @routes", { tag
   expect(lineCount).toBeGreaterThan(0);
 });
 
-test("routes list groups Paul then Jesus headings with expected route counts @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+test("routes list defaults to collapsed groups with Jesus first and no visible route buttons @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
-  await expect(page.getByRole("heading", { level: 3, name: "Paul's journeys" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 3, name: "Jesus' journeys" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 3, name: "Paul's journeys" })).toBeVisible();
 
   const groups = await page.evaluate(() => {
-    return [...document.querySelectorAll("[data-routes-panel='true'] section")].map((section) => ({
-      heading: section.querySelector("h3")?.textContent?.trim() ?? "",
-      routes: [...section.querySelectorAll("button > div:first-child")].map((node) => node.textContent?.trim() ?? "")
-    }));
+    return [...document.querySelectorAll("[data-routes-panel='true'] section")].map((section) => {
+      const button = section.querySelector("h3 > button");
+      const panelId = button?.getAttribute("aria-controls");
+      const panel = panelId ? document.getElementById(panelId) : null;
+      const routeButtons = panel
+        ? [...panel.querySelectorAll("li > button > div:first-child")].map((node) => node.textContent?.trim() ?? "")
+        : [];
+      return {
+        heading: section.querySelector("h3")?.textContent?.trim() ?? "",
+        expanded: button?.getAttribute("aria-expanded"),
+        routeButtons,
+        hidden: panel?.hasAttribute("hidden") ?? null
+      };
+    });
   });
 
   expect(groups).toHaveLength(2);
-  expect(groups[0]?.heading).toBe("Paul's journeys");
-  expect(groups[1]?.heading).toBe("Jesus' journeys");
-  expect(groups[0]?.routes).toHaveLength(4);
-  expect(groups[1]?.routes).toHaveLength(6);
-  expect(groups[0]?.routes).toEqual([
-    "Paul's first journey",
-    "Paul's second journey",
-    "Paul's third journey",
-    "Paul's voyage to Rome"
-  ]);
+  expect(groups[0]?.heading).toContain("Jesus' journeys");
+  expect(groups[1]?.heading).toContain("Paul's journeys");
+  expect(groups[0]?.expanded).toBe("false");
+  expect(groups[1]?.expanded).toBe("false");
+  expect(groups[0]?.hidden).toBe(true);
+  expect(groups[1]?.hidden).toBe(true);
+  expect(groups[0]?.routeButtons).toHaveLength(6);
+  expect(groups[1]?.routeButtons).toHaveLength(4);
+  await expect(page.locator("[data-routes-panel='true'] li > button", { hasText: "Paul's first journey" })).toBeHidden();
+  await expect(page.locator("[data-routes-panel='true'] li > button", { hasText: "Jesus' early ministry" })).toBeHidden();
+});
+
+test("routes list group buttons toggle by click and keyboard with aria-expanded updates @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+
+  const jesusGroupButton = page.locator("[data-route-group-button='jesus']");
+  await expect(jesusGroupButton).toHaveAttribute("aria-expanded", "false");
+  await jesusGroupButton.click();
+  await expect(jesusGroupButton).toHaveAttribute("aria-expanded", "true");
+  for (const routeTitle of [
+    "Jesus' early ministry",
+    "Jesus in Galilee",
+    "Jesus beyond Galilee",
+    "Jesus' final journey to Jerusalem",
+    "Jesus' last week in Jerusalem",
+    "Jesus after the resurrection"
+  ]) {
+    await expect(page.locator("[data-routes-panel='true'] li > button", { hasText: routeTitle })).toBeVisible();
+  }
+
+  await jesusGroupButton.click();
+  await expect(jesusGroupButton).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("[data-routes-panel='true'] li > button", { hasText: "Jesus' early ministry" })).toBeHidden();
+
+  await jesusGroupButton.focus();
+  await page.keyboard.press("Enter");
+  await expect(jesusGroupButton).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("[data-routes-panel='true'] li > button", { hasText: "Jesus' early ministry" })).toBeVisible();
+  await page.keyboard.press(" ");
+  await expect(jesusGroupButton).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("[data-routes-panel='true'] li > button", { hasText: "Jesus' early ministry" })).toBeHidden();
+});
+
+test("back to all routes opens selected route's group and keeps that route visible @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=paul-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await page.getByRole("button", { name: "‹ All routes" }).click();
+  const paulGroupButton = page.locator("[data-route-group-button='paul']");
+  await expect(paulGroupButton).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("[data-routes-panel='true'] li > button", { hasText: "Paul's second journey" })).toBeVisible();
+  await expect(page.locator("[data-route-group-button='jesus']")).toHaveAttribute("aria-expanded", "false");
 });
 
 // The sheet's handle tap and drags are covered by tests/browser/phone-sheet.spec.mjs.

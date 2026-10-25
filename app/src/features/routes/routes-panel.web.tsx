@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { formatSourceCitation } from "../place-panel/source-format";
 import type { PlaceIndexRecord } from "../map/types";
@@ -120,7 +120,8 @@ export function RoutesPanel({
   onSelectStage,
   onBackToAllRoutes,
   onResolveStopSelection,
-  onHighlightStage
+  onHighlightStage,
+  routeToRevealOnList = null
 }: {
   routesLoadState: RoutesLoadState;
   routesData: LoadedRoutesData | null;
@@ -136,11 +137,48 @@ export function RoutesPanel({
   onBackToAllRoutes: () => void;
   onResolveStopSelection: (resolved: RouteStopResolved, stageIndex: number) => void;
   onHighlightStage: (stageIndex: number | null) => void;
+  routeToRevealOnList?: string | null;
 }) {
   const stageItemRefs = useRef(new Map<number, HTMLLIElement | null>());
   const suppressScrollStageIndexRef = useRef<number | null>(null);
   const previousSelectedStageIndexRef = useRef<number | null>(null);
   const bibliographyById = routesData?.bibliographyById ?? new Map();
+  const [openRouteGroups, setOpenRouteGroups] = useState<Record<string, boolean>>({});
+
+  const groupedRoutes = useMemo(
+    () =>
+      [
+        {
+          id: "jesus",
+          heading: "Jesus' journeys",
+          routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("jesus-"))
+        },
+        {
+          id: "paul",
+          heading: "Paul's journeys",
+          routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("paul-"))
+        },
+        {
+          id: "other",
+          heading: "Other routes",
+          routes: hydratedRoutes.filter(
+            (entry) => !entry.route.id.startsWith("paul-") && !entry.route.id.startsWith("jesus-")
+          )
+        }
+      ].filter((group) => group.routes.length > 0),
+    [hydratedRoutes]
+  );
+  const routeGroupIdByRouteId = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const group of groupedRoutes) {
+      for (const entry of group.routes) {
+        map.set(entry.route.id, group.id);
+      }
+    }
+    return map;
+  }, [groupedRoutes]);
+  const revealGroupId =
+    !selectedRoute && routeToRevealOnList ? routeGroupIdByRouteId.get(routeToRevealOnList) ?? null : null;
 
   useEffect(() => {
     if (!selectedRoute || selectedStageIndex === null || selectedStageIndex < 0) {
@@ -198,25 +236,6 @@ export function RoutesPanel({
   }
 
   if (!selectedRoute) {
-    const groupedRoutes = [
-      {
-        id: "paul",
-        heading: "Paul's journeys",
-        routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("paul-"))
-      },
-      {
-        id: "jesus",
-        heading: "Jesus' journeys",
-        routes: hydratedRoutes.filter((entry) => entry.route.id.startsWith("jesus-"))
-      },
-      {
-        id: "other",
-        heading: "Other routes",
-        routes: hydratedRoutes.filter(
-          (entry) => !entry.route.id.startsWith("paul-") && !entry.route.id.startsWith("jesus-")
-        )
-      }
-    ].filter((group) => group.routes.length > 0);
     const routesList = (entries: HydratedRoute[]) => (
       <ul style={{ listStyle: "none", padding: 0, margin: `${tokens.spacing.sm}px 0 0` }}>
         {entries.map((entry) => (
@@ -250,18 +269,80 @@ export function RoutesPanel({
         <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>Routes</h2>
         {groupedRoutes.map((group) => (
           <section key={group.id} style={{ marginTop: `${tokens.spacing.sm}px` }}>
-            <h3
-              style={{
-                margin: 0,
-                fontSize: `${tokens.typography.captionSize}px`,
-                letterSpacing: "0.02em",
-                textTransform: "uppercase",
-                color: tokens.color.textSecondary
-              }}
-            >
-              {group.heading}
-            </h3>
-            {routesList(group.routes)}
+            {(() => {
+              const groupButtonId = `route-group-button-${group.id}`;
+              const groupPanelId = `route-group-panel-${group.id}`;
+              const groupOpen = openRouteGroups[group.id] ?? (revealGroupId === group.id);
+              return (
+                <>
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: `${tokens.typography.captionSize}px`,
+                      letterSpacing: "0.02em",
+                      textTransform: "uppercase",
+                      color: tokens.color.textSecondary
+                    }}
+                  >
+                    <button
+                      aria-controls={groupPanelId}
+                      aria-expanded={groupOpen}
+                      data-route-group-button={group.id}
+                      id={groupButtonId}
+                      onClick={() =>
+                        setOpenRouteGroups((current) => {
+                          const currentOpen = current[group.id] ?? (revealGroupId === group.id);
+                          return {
+                            ...current,
+                            [group.id]: !currentOpen
+                          };
+                        })
+                      }
+                      style={{
+                        width: "100%",
+                        minHeight: "44px",
+                        border: `1px solid ${tokens.color.divider}`,
+                        borderRadius: "10px",
+                        padding: `${tokens.spacing.sm}px`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        background: "#FFFFFF",
+                        color: tokens.color.textSecondary,
+                        cursor: "pointer",
+                        fontSize: "inherit",
+                        letterSpacing: "inherit",
+                        textTransform: "inherit",
+                        fontWeight: 600,
+                        textAlign: "left",
+                        outlineOffset: "2px"
+                      }}
+                      type="button"
+                    >
+                      <span>{`${group.heading} · ${group.routes.length}`}</span>
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          display: "inline-block",
+                          transform: groupOpen ? "rotate(180deg)" : "rotate(0deg)",
+                          fontSize: "12px"
+                        }}
+                      >
+                        ▼
+                      </span>
+                    </button>
+                  </h3>
+                  <div
+                    aria-labelledby={groupButtonId}
+                    hidden={!groupOpen}
+                    id={groupPanelId}
+                    role="region"
+                  >
+                    {routesList(group.routes)}
+                  </div>
+                </>
+              );
+            })()}
           </section>
         ))}
       </div>
