@@ -49,6 +49,7 @@ import type {
   SelectionOrigin
 } from "../features/map/types";
 import {
+  linelessStagePillCoordinate,
   loadRoutesData,
   resolveRouteStop,
   routeLineFeatureByStage
@@ -56,7 +57,7 @@ import {
 import type { LoadedRoutesData, RouteStopRecord, RouteStopResolved } from "../features/routes/types";
 import type { RouteMapOverlayData } from "../features/routes/map-overlay";
 import { buildMentionedPointFeatures } from "../features/routes/overlay-mentioned";
-import { RoutesPanel } from "../features/routes/routes-panel.web";
+import { RoutesPanel, routeGroupIdForRouteId } from "../features/routes/routes-panel.web";
 import { tokens } from "../theme/tokens";
 
 const PANEL_WIDTH = 408;
@@ -429,6 +430,7 @@ export function AppShell() {
   const [routesLoadState, setRoutesLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [routesData, setRoutesData] = useState<LoadedRoutesData | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [openRouteGroups, setOpenRouteGroups] = useState<Record<string, boolean>>({});
   const [highlightedStageIndex, setHighlightedStageIndex] = useState<number | null>(null);
   const [selectedStageIndex, setSelectedStageIndex] = useState<number | null>(null);
   const [selectedRouteStopId, setSelectedRouteStopId] = useState<string | null>(null);
@@ -470,6 +472,21 @@ export function AppShell() {
     () => hydratedRoutes.find((entry) => entry.route.id === selectedRouteId) ?? null,
     [hydratedRoutes, selectedRouteId]
   );
+  const applySelectedRouteId = useCallback((nextRouteId: string | null) => {
+    setSelectedRouteId(nextRouteId);
+    if (!nextRouteId) {
+      return;
+    }
+    const groupId = routeGroupIdForRouteId(nextRouteId);
+    setOpenRouteGroups((current) =>
+      current[groupId]
+        ? current
+        : {
+            ...current,
+            [groupId]: true
+          }
+    );
+  }, []);
   const selectedRouteTimelineStop = useMemo(() => {
     if (!selectedRoute || !ancientTimeline || ancientTimeline.stops.length === 0) {
       return null;
@@ -706,7 +723,7 @@ export function AppShell() {
         }
         setMapMode(parsedMapMode);
         setViewTab(parsedViewTab);
-        setSelectedRouteId(parsedRouteId);
+        applySelectedRouteId(parsedRouteId);
         setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
 
@@ -738,7 +755,7 @@ export function AppShell() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [applySelectedRouteId]);
 
   useEffect(() => {
     if (viewTab !== "routes" || routesLoadStateRef.current !== "idle") {
@@ -955,7 +972,7 @@ export function AppShell() {
       }
       setMapMode(parsedMapMode);
       setViewTab(parsedViewTab);
-      setSelectedRouteId(parsedRouteId);
+      applySelectedRouteId(parsedRouteId);
       setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
       if (ancientTimeline) {
         const resolvedStop = resolveStopForYear(
@@ -999,7 +1016,7 @@ export function AppShell() {
     return () => {
       window.removeEventListener("popstate", onPopState);
     };
-  }, [ancientTimeline, loading, placesById, urlStateReady]);
+  }, [ancientTimeline, applySelectedRouteId, loading, placesById, urlStateReady]);
 
   const closePanel = useCallback((restoreFocus: boolean) => {
     setSelectionOrigin("url");
@@ -1485,6 +1502,10 @@ export function AppShell() {
     for (const [index, stage] of selectedRouteEntry.stages.entries()) {
       const feature = routeLineFeatureByStage(routesData.lines, selectedRouteId, stage.id, stage.lineId);
       if (!feature) {
+        // Kept apart from hover, so hovering another stage never changes it (and never pans the map).
+        if (selectedStageId === stage.id) {
+          selectedStageCenter = linelessStagePillCoordinate(stage, placesById, routeStopsById);
+        }
         continue;
       }
 
@@ -1761,30 +1782,36 @@ export function AppShell() {
       );
     }
 
-    const pillStage = selectedRouteEntry.stages.find((stage) => stage.id === emphasizedStageId) ?? null;
-    const pillFeature = pillStage ? lineFeatureByStageId.get(pillStage.id) ?? null : null;
-    const pillCoordinate = pillFeature ? midpointOfGeometry(pillFeature.geometry) : null;
-    if (pillStage && pillFeature && pillCoordinate) {
-      const stageIndex = selectedRouteEntry.stages.findIndex((stage) => stage.id === pillStage.id);
-      pointFeatures.push({
-        type: "Feature",
-        geometry: { type: "Point", coordinates: pillCoordinate },
-        properties: {
-          id: `${selectedRouteId}:${pillStage.id}:pill`,
-          routeId: selectedRouteId,
-          stageId: pillStage.id,
-          stageIndex: stageIndex >= 0 ? stageIndex : 0,
-          kind: "stage-pill",
-          stopKind: "location",
-          stopId: pillStage.id,
-          label: `${Math.max(1, stageIndex + 1)}`,
-          isInSelectedRoute: true as const,
-          isSelectedStage: selectedStageId === pillStage.id,
-          isHighlightedStage: highlightedStageId === pillStage.id,
-          isDimmed: false,
-          isSelectedPlace: false
-        }
-      });
+    const emphasizedStage = emphasizedStageId
+      ? selectedRouteEntry.stages.find((stage) => stage.id === emphasizedStageId) ?? null
+      : null;
+    if (emphasizedStage) {
+      const lineFeature = lineFeatureByStageId.get(emphasizedStage.id) ?? null;
+      const stageIndex = selectedRouteEntry.stages.findIndex((candidate) => candidate.id === emphasizedStage.id);
+      const pillCoordinate = lineFeature
+        ? midpointOfGeometry(lineFeature.geometry)
+        : linelessStagePillCoordinate(emphasizedStage, placesById, routeStopsById);
+      if (stageIndex >= 0 && pillCoordinate) {
+        pointFeatures.push({
+          type: "Feature",
+          geometry: { type: "Point", coordinates: pillCoordinate },
+          properties: {
+            id: `${selectedRouteId}:${emphasizedStage.id}:pill`,
+            routeId: selectedRouteId,
+            stageId: emphasizedStage.id,
+            stageIndex,
+            kind: "stage-pill",
+            stopKind: "location",
+            stopId: emphasizedStage.id,
+            label: `${Math.max(1, stageIndex + 1)}`,
+            isInSelectedRoute: true as const,
+            isSelectedStage: selectedStageId === emphasizedStage.id,
+            isHighlightedStage: highlightedStageId === emphasizedStage.id,
+            isDimmed: false,
+            isSelectedPlace: false
+          }
+        });
+      }
     }
 
     let minLon = Number.POSITIVE_INFINITY;
@@ -2170,14 +2197,14 @@ export function AppShell() {
     : null;
 
   const handleSelectRoute = useCallback((routeId: string) => {
-    setSelectedRouteId(routeId);
+    applySelectedRouteId(routeId);
     setSelectedStageIndex(null);
     setHighlightedStageIndex(null);
     setSelectedRouteStopId(null);
     setSelectionOrigin("url");
     setSelection(null);
     setStatusMessage(null);
-  }, []);
+  }, [applySelectedRouteId]);
 
   const handleSelectRouteMapEntry = useCallback(
     (
@@ -2194,7 +2221,7 @@ export function AppShell() {
           }
     ) => {
       setViewTab("routes");
-      setSelectedRouteId(entry.routeId);
+      applySelectedRouteId(entry.routeId);
       setSelectedStageIndex(entry.stageIndex);
       setSelectedRouteStopId(null);
       if (entry.kind === "stop") {
@@ -2207,7 +2234,7 @@ export function AppShell() {
         }
       }
     },
-    []
+    [applySelectedRouteId]
   );
 
   return (
@@ -2721,7 +2748,7 @@ export function AppShell() {
             <RoutesPanel
               hydratedRoutes={hydratedRoutes}
               onBackToAllRoutes={() => {
-                setSelectedRouteId(null);
+                applySelectedRouteId(null);
                 setSelectedStageIndex(null);
                 setHighlightedStageIndex(null);
                 setSelectedRouteStopId(null);
@@ -2761,6 +2788,14 @@ export function AppShell() {
               selectedRoute={selectedRoute}
               selectedRouteBorderYear={selectedRoute?.route.fromYear ?? null}
               selectedStageIndex={selectedStageIndex}
+              openRouteGroups={openRouteGroups}
+              onToggleRouteGroup={(groupId) =>
+                setOpenRouteGroups((current) => ({
+                  ...current,
+                  [groupId]: !(current[groupId] ?? false)
+                }))
+              }
+              prefersReducedMotion={prefersReducedMotion}
             />
           </div>
         </section>

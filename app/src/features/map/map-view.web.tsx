@@ -220,6 +220,7 @@ const interactiveLayerIds = [
   layerRoutesStopsId,
   layerRoutesViaId,
   layerRoutesMentionedId,
+  layerRoutesStagePillIconId,
   layerRoutesLinesHighlightId,
   layerRoutesLinesForegroundId
 ] as const;
@@ -1106,16 +1107,12 @@ function ensureTownDotImages(map: MapLibreMap) {
 }
 
 function ensureRouteStagePillImage(map: MapLibreMap) {
-  if (map.hasImage(routeStagePillImageId)) {
-    return;
+  if (!map.hasImage(routeStagePillImageId)) {
+    const image = createRouteStagePillImage();
+    if (image) {
+      map.addImage(routeStagePillImageId, image.image, { pixelRatio: image.pixelRatio });
+    }
   }
-
-  const image = createRouteStagePillImage();
-  if (!image) {
-    return;
-  }
-
-  map.addImage(routeStagePillImageId, image.image, { pixelRatio: image.pixelRatio });
 }
 
 function ensureRouteDirectionArrowImage(map: MapLibreMap) {
@@ -1843,6 +1840,7 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         "icon-image": routeStagePillImageId,
         "icon-anchor": "center",
+        "icon-offset": ["literal", [0, 0]],
         "icon-size": 1,
         "icon-allow-overlap": true,
         "icon-ignore-placement": true
@@ -1864,6 +1862,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-font": ["Noto Sans Bold"],
         "text-size": 10,
         "text-anchor": "center",
+        "text-offset": ["literal", [0, 0]],
         "text-allow-overlap": true,
         "text-ignore-placement": true
       },
@@ -4053,10 +4052,19 @@ export function MapView({
         if (routesModeEnabledRef.current) {
           const routeFeatures = map
             .queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
-              layers: [layerRoutesStopsId, layerRoutesViaId, layerRoutesMentionedId, layerRoutesLinesForegroundId]
+              layers: [
+                layerRoutesStopsId,
+                layerRoutesViaId,
+                layerRoutesMentionedId,
+                layerRoutesStagePillIconId,
+                layerRoutesLinesForegroundId
+              ]
             });
+          // A stage's number has no name of its own: skip it here, so it never shows as "2, place".
           const routeFeature = routeFeatures.find(
-            (feature) => feature.layer?.id !== layerRoutesLinesForegroundId
+            (feature) =>
+              feature.layer?.id !== layerRoutesLinesForegroundId &&
+              feature.layer?.id !== layerRoutesStagePillIconId
           );
           const routeProperties = routeFeature ? asObject(routeFeature.properties) : null;
           const routeLabel = routeProperties ? asString(routeProperties.label) : null;
@@ -4076,10 +4084,13 @@ export function MapView({
             setInteractiveCursor(true);
             return;
           }
-          const routeLine = routeFeatures.find(
-            (feature) => feature.layer?.id === layerRoutesLinesForegroundId
+          // Over a stage's line or its number (with no stop under the pointer): clickable, no tooltip.
+          const routeLineOrPill = routeFeatures.find(
+            (feature) =>
+              feature.layer?.id === layerRoutesLinesForegroundId ||
+              feature.layer?.id === layerRoutesStagePillIconId
           );
-          if (routeLine) {
+          if (routeLineOrPill) {
             clearHoveredFeatureState();
             hideTooltip();
             setInteractiveCursor(true);
@@ -4743,6 +4754,7 @@ export function MapView({
             layerRoutesStopsId,
             layerRoutesViaId,
             layerRoutesMentionedId,
+            layerRoutesStagePillIconId,
             layerRoutesLinesHighlightId,
             layerRoutesLinesForegroundId
           ]
@@ -4774,6 +4786,24 @@ export function MapView({
               stopKind,
               stopId,
               origin: "map-dot"
+            });
+            return;
+          }
+        }
+
+        const pillMatch = routeFeatures.find((feature) => feature.layer?.id === layerRoutesStagePillIconId);
+        if (pillMatch) {
+          const properties = asObject(pillMatch.properties);
+          const routeId = asString(properties?.routeId);
+          const stageId = asString(properties?.stageId);
+          const stageIndex = asNumber(properties?.stageIndex);
+          if (routeId && stageId && stageIndex !== null) {
+            onSelectRouteMapEntry({
+              kind: "line",
+              routeId,
+              stageId,
+              stageIndex,
+              origin: "map-line"
             });
             return;
           }

@@ -1,11 +1,12 @@
 import {
+  linelessStagePillCoordinate,
   loadRoutesData,
   resolveRouteStop,
   routeLineFeatureByStage,
   stageHasDisputedStop
 } from "../src/features/routes/routes-data";
 import type { PlaceIndexRecord } from "../src/features/map/types";
-import type { RouteLinesPayload, RouteStageRecord, RouteStopRecord } from "../src/features/routes/types";
+import type { RouteLinesPayload, RouteStageRecord, RouteStopRecord, RouteStopRef } from "../src/features/routes/types";
 
 const placeFixture: PlaceIndexRecord = {
   id: "capernaum",
@@ -78,6 +79,54 @@ describe("routes data helpers", () => {
     };
     const stopsById = new Map([[stopFixture.id, stopFixture]]);
     expect(stageHasDisputedStop(stage, stopsById)).toBe(true);
+  });
+
+  describe("where a stage without a line shows its number", () => {
+    const place = (id: string, coordinates: [number, number][]): PlaceIndexRecord => ({
+      ...placeFixture,
+      id,
+      names: { ancient: [id], alternate: [] },
+      candidates: coordinates.map((point, index) => ({
+        label: `${id} ${index}`,
+        coordinates: point,
+        confidence: "high" as const
+      }))
+    });
+    const twoSiteStop: RouteStopRecord = {
+      ...stopFixture,
+      id: "two-site-stop",
+      candidates: [
+        { ...stopFixture.candidates[0], coordinates: [35.55, 31.84] },
+        { ...stopFixture.candidates[0], label: "B", coordinates: [35.6, 32.1] }
+      ]
+    };
+    const placesById = new Map([
+      ["nazareth", place("nazareth", [[35.3, 32.7]])],
+      ["capernaum", place("capernaum", [[35.575, 32.88]])],
+      ["cana", place("cana", [[35.34, 32.75], [35.28, 32.78]])]
+    ]);
+    const stopsById = new Map([[twoSiteStop.id, twoSiteStop]]);
+    const at = (from: RouteStopRef, to: RouteStopRef) =>
+      linelessStagePillCoordinate({ from, to }, placesById, stopsById);
+    const nazareth: RouteStopRef = { kind: "location", locationId: "nazareth" };
+    const capernaum: RouteStopRef = { kind: "location", locationId: "capernaum" };
+    const cana: RouteStopRef = { kind: "location", locationId: "cana" };
+    const twoSites: RouteStopRef = { kind: "route-stop", stopId: "two-site-stop" };
+
+    test("uses the end whose site isn't disputed, else the destination", () => {
+      expect(at(cana, nazareth)).toEqual([35.3, 32.7]);
+      expect(at(nazareth, cana)).toEqual([35.3, 32.7]);
+      expect(at(twoSites, cana)).toEqual([35.34, 32.75]);
+      expect(at(twoSites, { ...cana, candidateIndex: 1 })).toEqual([35.28, 32.78]);
+      expect(at(capernaum, nazareth)).toEqual([35.3, 32.7]);
+      expect(at(nazareth, nazareth)).toEqual([35.3, 32.7]);
+    });
+
+    test("falls back to the other end, or null, when a record is missing", () => {
+      expect(at(nazareth, { kind: "location", locationId: "nowhere" })).toEqual([35.3, 32.7]);
+      expect(at({ kind: "route-stop", stopId: "no-such-stop" }, cana)).toEqual([35.34, 32.75]);
+      expect(at({ kind: "location", locationId: "nowhere" }, { kind: "route-stop", stopId: "no-such-stop" })).toBeNull();
+    });
   });
 
   test("finds line features by route-stage-line key", () => {

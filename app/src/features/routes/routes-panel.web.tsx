@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { formatSourceCitation } from "../place-panel/source-format";
 import type { PlaceIndexRecord } from "../map/types";
@@ -11,8 +11,42 @@ import type {
   RouteStopResolved
 } from "./types";
 import { tokens } from "../../theme/tokens";
+import {
+  CollapsibleChevron,
+  collapsibleHeadingButtonStyle,
+  collapsibleHeadingChevronContainerStyle
+} from "../../components/collapsible-heading.web";
 
 type RoutesLoadState = "idle" | "loading" | "ready" | "error";
+
+type RouteGroupDefinition = {
+  id: string;
+  heading: string;
+  matchesRouteId: (routeId: string) => boolean;
+};
+
+export const ROUTE_GROUP_DEFINITIONS: readonly RouteGroupDefinition[] = [
+  {
+    id: "jesus",
+    heading: "Jesus' journeys",
+    matchesRouteId: (routeId) => routeId.startsWith("jesus-")
+  },
+  {
+    id: "paul",
+    heading: "Paul's journeys",
+    matchesRouteId: (routeId) => routeId.startsWith("paul-")
+  },
+  // Catches every route the groups above don't, so a new route is never left off the list.
+  {
+    id: "other",
+    heading: "Other routes",
+    matchesRouteId: () => true
+  }
+];
+
+export function routeGroupIdForRouteId(routeId: string): string {
+  return ROUTE_GROUP_DEFINITIONS.find((group) => group.matchesRouteId(routeId))?.id ?? "other";
+}
 
 function formatApproximateYears(fromYear: number, toYear: number) {
   const start = fromYear < 0 ? `${Math.abs(fromYear)} BC` : `AD ${fromYear}`;
@@ -120,7 +154,10 @@ export function RoutesPanel({
   onSelectStage,
   onBackToAllRoutes,
   onResolveStopSelection,
-  onHighlightStage
+  onHighlightStage,
+  openRouteGroups = {},
+  onToggleRouteGroup = () => {},
+  prefersReducedMotion = false
 }: {
   routesLoadState: RoutesLoadState;
   routesData: LoadedRoutesData | null;
@@ -136,11 +173,27 @@ export function RoutesPanel({
   onBackToAllRoutes: () => void;
   onResolveStopSelection: (resolved: RouteStopResolved, stageIndex: number) => void;
   onHighlightStage: (stageIndex: number | null) => void;
+  openRouteGroups?: Record<string, boolean>;
+  onToggleRouteGroup?: (groupId: string) => void;
+  prefersReducedMotion?: boolean;
 }) {
   const stageItemRefs = useRef(new Map<number, HTMLLIElement | null>());
   const suppressScrollStageIndexRef = useRef<number | null>(null);
   const previousSelectedStageIndexRef = useRef<number | null>(null);
   const bibliographyById = routesData?.bibliographyById ?? new Map();
+  const [hoveredGroupId, setHoveredGroupId] = useState<string | null>(null);
+
+  const groupedRoutes = useMemo(
+    () =>
+      ROUTE_GROUP_DEFINITIONS
+        .map((group) => ({
+          id: group.id,
+          heading: group.heading,
+          routes: hydratedRoutes.filter((entry) => routeGroupIdForRouteId(entry.route.id) === group.id)
+        }))
+        .filter((group) => group.routes.length > 0),
+    [hydratedRoutes]
+  );
 
   useEffect(() => {
     if (!selectedRoute || selectedStageIndex === null || selectedStageIndex < 0) {
@@ -198,34 +251,101 @@ export function RoutesPanel({
   }
 
   if (!selectedRoute) {
+    const routesList = (entries: HydratedRoute[]) => (
+      <ul style={{ listStyle: "none", padding: 0, margin: `${tokens.spacing.sm}px 0 0` }}>
+        {entries.map((entry) => (
+          <li key={entry.route.id}>
+            <button
+              onClick={() => onSelectRoute(entry.route.id)}
+              style={{
+                width: "100%",
+                textAlign: "left",
+                borderRadius: "8px",
+                border: `1px solid ${tokens.color.divider}`,
+                background: "#FFFFFF",
+                padding: `${tokens.spacing.sm}px`,
+                marginBottom: `${tokens.spacing.sm}px`,
+                cursor: "pointer"
+              }}
+              type="button"
+            >
+              <div style={{ fontWeight: 600 }}>{entry.route.title}</div>
+              <div style={{ color: tokens.color.textSecondary, marginTop: `${tokens.spacing.xs}px` }}>
+                {formatApproximateYears(entry.route.fromYear, entry.route.toYear)} · {formatStageCount(entry.stages.length)}
+              </div>
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+
     return (
       <div>
         <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>Routes</h2>
-        <ul style={{ listStyle: "none", padding: 0, margin: `${tokens.spacing.sm}px 0 0` }}>
-          {hydratedRoutes.map((entry) => (
-            <li key={entry.route.id}>
-              <button
-                onClick={() => onSelectRoute(entry.route.id)}
-                style={{
-                  width: "100%",
-                  textAlign: "left",
-                  borderRadius: "8px",
-                  border: `1px solid ${tokens.color.divider}`,
-                  background: "#FFFFFF",
-                  padding: `${tokens.spacing.sm}px`,
-                  marginBottom: `${tokens.spacing.sm}px`,
-                  cursor: "pointer"
-                }}
-                type="button"
-              >
-                <div style={{ fontWeight: 600 }}>{entry.route.title}</div>
-                <div style={{ color: tokens.color.textSecondary, marginTop: `${tokens.spacing.xs}px` }}>
-                  {formatApproximateYears(entry.route.fromYear, entry.route.toYear)} · {formatStageCount(entry.stages.length)}
-                </div>
-              </button>
-            </li>
-          ))}
-        </ul>
+        {groupedRoutes.map((group) => (
+          <section key={group.id} style={{ marginTop: `${tokens.spacing.sm}px` }}>
+            {(() => {
+              const groupButtonId = `route-group-button-${group.id}`;
+              const groupPanelId = `route-group-panel-${group.id}`;
+              const groupOpen = openRouteGroups[group.id] ?? false;
+              const isHovered = hoveredGroupId === group.id;
+              return (
+                <>
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: `${tokens.typography.sectionHeadingSize}px`,
+                      lineHeight: `${tokens.typography.sectionHeadingLineHeight}px`,
+                      color: tokens.color.textPrimary,
+                      fontWeight: 500
+                    }}
+                  >
+                    <button
+                      aria-controls={groupPanelId}
+                      aria-expanded={groupOpen}
+                      data-route-group-button={group.id}
+                      id={groupButtonId}
+                      onClick={() => onToggleRouteGroup(group.id)}
+                      onMouseEnter={() => {
+                        setHoveredGroupId(group.id);
+                      }}
+                      onMouseLeave={() => {
+                        setHoveredGroupId((current) => (current === group.id ? null : current));
+                      }}
+                      style={{
+                        ...collapsibleHeadingButtonStyle,
+                        backgroundColor: isHovered ? tokens.color.subtleSurface : "transparent"
+                      }}
+                      type="button"
+                    >
+                      <span>
+                        {group.heading}
+                        <span style={{ color: tokens.color.textSecondary }}>{` · ${group.routes.length}`}</span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        style={collapsibleHeadingChevronContainerStyle}
+                      >
+                        <CollapsibleChevron
+                          expanded={groupOpen}
+                          prefersReducedMotion={prefersReducedMotion}
+                        />
+                      </span>
+                    </button>
+                  </h3>
+                  <div
+                    aria-labelledby={groupButtonId}
+                    hidden={!groupOpen}
+                    id={groupPanelId}
+                    role="region"
+                  >
+                    {routesList(group.routes)}
+                  </div>
+                </>
+              );
+            })()}
+          </section>
+        ))}
       </div>
     );
   }
@@ -279,7 +399,10 @@ export function RoutesPanel({
           {selectedRoute.route.bibleText}
         </p>
       </div>
-      <ol style={{ paddingLeft: "20px", margin: `${tokens.spacing.sm}px 0 0` }}>
+      <ol
+        onMouseLeave={() => onHighlightStage(null)}
+        style={{ paddingLeft: "20px", margin: `${tokens.spacing.sm}px 0 0` }}
+      >
         {selectedRoute.stages.map((stage, stageIndex) => {
           const from = resolveRouteStop(stage.from, placesById, routeStopsById);
           const to = resolveRouteStop(stage.to, placesById, routeStopsById);
@@ -322,8 +445,20 @@ export function RoutesPanel({
                   onSelectStage(stageIndex);
                 }
               }}
-              onMouseEnter={() => onHighlightStage(stageIndex)}
-              onMouseLeave={() => onHighlightStage(null)}
+              // mouseover/mouseout rather than enter/leave, so moving between rows never passes through
+              // "no stage"; mousemove restores the hover after onBlur clears it under a still pointer.
+              onMouseMove={() => onHighlightStage(stageIndex)}
+              onMouseOver={() => onHighlightStage(stageIndex)}
+              onMouseOut={(event) => {
+                if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                  return;
+                }
+                const nextElement = event.relatedTarget as Element | null;
+                if (nextElement?.closest("li[data-route-stage-index]")) {
+                  return;
+                }
+                onHighlightStage(null);
+              }}
               ref={(element) => {
                 stageItemRefs.current.set(stageIndex, element);
               }}
