@@ -2,20 +2,18 @@
 
 Shared memory for all agents. Every session reads this first. Only the PO edits it, in a docs PR after each batch of merges (ADR-0051). Other PRs give their status in their description, and agents report open questions to the PO.
 
-**Current milestone:** M5 – Routes Tab (CP4 approved 2026-10-12, #58) · **Status:** everything through #91 is merged (2026-10-23). Next: the human chooses from the PO's proposal (resume point 2). M5-20 (the seven deferred outlines) starts with research. CP5 follows M5.
+**Current milestone:** M5 – Routes Tab (CP4 approved 2026-10-12, #58) · **Status:** everything through #96 is merged (2026-10-24). Next: M5-24, Jesus' journeys in six parts (resume point 2). CP5 follows M5.
 
 ## Resume point
-1. **Merged:** everything through #91 (2026-10-23). This round:
-   - the ledgers (#89);
-   - the region outlines in the app (#90). All 11 regions draw. In the ancient map, the five islands stored as natural features (Chios, Cos, Malta, Rhodes, Samos) behave like Crete: no pin, and the camera doesn't move.
-   - browser tests without the network (#91). They replay the pinned pre-release `test-fixture-basemap-2026-10-23`. Because of OpenFreeMap's Terms of 2026-10-14, nothing is recorded from its tile service (`docs/verification/M5-22-basemap-fixture.md`). The browser jobs' time limit is now 20 minutes.
-   Earlier: everything through #88 (2026-10-22).
-2. **Now (2026-10-23):** ADR-0051 applies. Every PR branches from `main` and merges on its own, and only the PO's ledger PRs edit this file and `docs/BUDGET.md`. At most one open PR changes the map's code. `main` requires the checks `static`, `unit`, `validate`, `build` and `browser-report`, and branches that are up to date.
-   The PO's proposal for the rest of M5, in order. The human chooses; these are backlog items until then.
-   1. Cache Playwright's Chromium in CI: the install alone took 7–12 minutes on some runners.
-   2. Jesus' journeys in a few parts (the human, 2026-10-22).
-   3. Two map fixes found while checking M5-21: desktop camera fits ignore the timeline card, and a selected region's blue name can be hidden.
-   4. M5-20, the seven deferred outlines; it starts with research and can run alongside.
+1. **Merged:** everything through #96 (2026-10-24). This round:
+   - the ledgers (#92);
+   - browser jobs in Playwright's container image (#93, M5-23). Browser time per CI run fell from about 1,143 s to about 530 s, with no `apt` step.
+   - camera fits that keep clear of the desktop timeline card, and a selected region's blue name that no longer hides (#94, M5-25).
+   - outlines for six of the seven regions M5-19 deferred (#96, M5-20): Pisidia, Lycaonia, Mysia, Phrygia, Media and Mesopotamia, each signed off by the Fact-Checker (`docs/verification/M5-20-region-anchors.md`). The Parthian Empire keeps its name only, because no source gives its eastern edge (PO-1). `check:ancient-geo` now traces every edge to a permitted source.
+   Earlier: everything through #91 (2026-10-23).
+2. **Now (2026-10-24):** M5-24, Jesus' journeys in six parts. The human chose six on 2026-10-24 (ADR-0038's update of that date).
+   1. The data PR (#95) splits the `jesus` route into `jesus-1` to `jesus-6`, keeps old `route=jesus` links working, and updates the tests. It is the only open PR that changes the map's code (ADR-0051 item 4).
+   2. Then the Routes tab PR: the human picks the look of the stages without a line from prototypes, before it merges.
    Then CP5.
 3. **Cloudflare secrets:** renewed on 2026-10-05; the token expires in about a year (`docs/DEPLOY.md`).
 4. **The human's Mac (from 2026-10-12):** use the official Node 24 build at `$HOME/.local/node-v24/bin` (v24.21.0, the same build CI uses): start each shell with `export PATH=$HOME/.local/node-v24/bin:$PATH`. The default `node` is 14, and Homebrew's `node@24` uses macOS's zlib 1.2.12, which makes the ancient layer about 1.4 KB larger compressed than CI's build does, so `build:data` fails its 300,000-byte budget with it. Playwright's Chromium is installed, and `gh` is logged in.
@@ -89,12 +87,16 @@ Shared memory for all agents. Every session reads this first. Only the PO edits 
 | M5-16 | Selected regions and the pin, like Google Maps (ADR-0048, the human's notes on #75) | frontend-engineer | `feat/m5-16-selected-regions`, `fix/m5-16-merged-land` | Merged: #81 (the pin and held land) and #87 (merged land built ahead of time, and the Roman label rule) | #81, #87 |
 | M5-18 | Towns on the ancient map get a dot, as on the modern map (ADR-0049, the human's note after play-testing #79) | frontend-engineer | `feat/m5-18-ancient-town-dots` | Merged | #84 |
 | M5-19 | An outline for every region: the clickable regions with no drawn land (Samaria, Galilee, Judea, Pisidia, Lycaonia, Mysia, Phrygia, Pontus, Media, Mesopotamia, the Parthian Empire, and the islands and parts) get sourced outlines (ADR-0050) | research-lead, fact-checker, gis-engineer | `data/m5-19-region-outlines` | Merged: outlines for 11 regions, verified (`docs/verification/M5-19-region-outlines.md`); 7 regions deferred to M5-20 | #86 |
-| M5-20 | Outlines for the seven regions M5-19 deferred: Pisidia, Lycaonia, Mysia, Phrygia, Media, Mesopotamia and the Parthian Empire (ADR-0050 update) | research-lead → fact-checker → gis-engineer | `data/m5-20-region-anchors` | Not started: the card is `docs/tasks/M5-20-region-anchors.md`. | |
+| M5-20 | Outlines for the seven regions M5-19 deferred: Pisidia, Lycaonia, Mysia, Phrygia, Media, Mesopotamia and the Parthian Empire (ADR-0050 update) | research-lead → fact-checker → gis-engineer | `data/m5-20-region-anchors` | Merged; verified (`docs/verification/M5-20-region-anchors.md`, phase 4). Six regions outlined; the Parthian Empire keeps its name only (PO-1) | #96 |
 | — | Every PR merges on its own, in any order, and `main` is protected (ADR-0051) | project-owner | `docs/adr-0051-merge-in-any-order` | Merged | #88 |
 | — | The ledgers after #81 to #88, the backlog, and cards M5-21 and M5-22 | project-owner | `docs/ledgers-2026-10-22` | Merged | #89 |
 | M5-21 | The region outlines in the app: selecting one of M5-19's 11 regions shows the veil and the red dotted line, from outlines loaded on first use (ADR-0050) | frontend-engineer | `feat/m5-21-region-outlines-in-app` | Merged. All 11 regions draw by ADR-0050's order, and the outlines load on first use. In the ancient map, the five islands stored as natural features behave like Crete | #90 |
 | M5-22 | Browser tests without the network: the tests replay the basemap's requests, so a slow OpenFreeMap can't make a test flaky (BACKLOG; ADR-0045) | frontend-engineer, fact-checker | `chore/m5-22-tests-without-network` | Merged. The tests replay the pinned pre-release `test-fixture-basemap-2026-10-23`, recorded within OpenFreeMap's Terms and signed off (`docs/verification/M5-22-basemap-fixture.md`); CI showed 0 flaky | #91 |
-| — | The ledgers after #89 to #91, and the backlog | project-owner | `docs/ledgers-2026-10-23` | In review (this PR) | |
+| — | The ledgers after #89 to #91, and the backlog | project-owner | `docs/ledgers-2026-10-23` | Merged | #92 |
+| M5-23 | Browser jobs in Playwright's container image: no `apt` step, about half the browser time (BACKLOG; ADR-0045) | frontend-engineer | `chore/m5-23-ci-playwright-container` | Merged | #93 |
+| M5-25 | Two map fixes: camera fits keep clear of the desktop timeline card, and a selected region's blue name shows (BACKLOG, found while checking #90) | frontend-engineer | `fix/m5-25-fit-and-selected-name` | Merged | #94 |
+| M5-24 | Jesus' journeys in six parts, each shown on its own with numbered stages (the human, 2026-10-22; ADR-0038 update of 2026-10-24) | research-lead → fact-checker → gis-engineer → frontend-engineer | `data/m5-24-jesus-journey-parts`, then `feat/m5-24-jesus-journey-parts` | In progress: research and check signed off; the data step is in #95 | #95 |
+| — | The ledgers after #92 to #96, and the backlog | project-owner | `docs/ledgers-2026-10-24` | In review (this PR) | |
 | M5-17 | Failing fast: time limits for actions and page loads, the flaky full-sheet test, and flaky and slow tests on each CI run's page (ADR-0045) | frontend-engineer | `chore/m5-17-fail-fast` | Merged | #82 |
 | M5-06 | Route text (summary, what the Bible says, notes last) and every place the passages name (ADR-0041) | gis-engineer → research-lead → fact-checker | `data/m5-route-text` | Merged; verified (`docs/verification/M5-route-text.md`) | #66 |
 | Fix | Fix: a place's title on phones without images | frontend-engineer | `fix/phone-panel-title` | Merged | #68 |
