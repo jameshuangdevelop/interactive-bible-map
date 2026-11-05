@@ -54,7 +54,12 @@ import {
   resolveRouteStop,
   routeLineFeatureByStage
 } from "../features/routes/routes-data";
-import type { LoadedRoutesData, RouteStopRecord, RouteStopResolved } from "../features/routes/types";
+import type {
+  LoadedRoutesData,
+  RouteStopRecord,
+  RouteStopRef,
+  RouteStopResolved
+} from "../features/routes/types";
 import type { RouteMapOverlayData } from "../features/routes/map-overlay";
 import { buildMentionedPointFeatures } from "../features/routes/overlay-mentioned";
 import { RoutesPanel, routeGroupIdForRouteId } from "../features/routes/routes-panel.web";
@@ -433,6 +438,10 @@ export function AppShell() {
   const [openRouteGroups, setOpenRouteGroups] = useState<Record<string, boolean>>({});
   const [highlightedStageIndex, setHighlightedStageIndex] = useState<number | null>(null);
   const [selectedStageIndex, setSelectedStageIndex] = useState<number | null>(null);
+  const [selectedStageFocusRequestIndex, setSelectedStageFocusRequestIndex] = useState<number | null>(
+    null
+  );
+  const [selectedStageFocusRequestToken, setSelectedStageFocusRequestToken] = useState(0);
   const [selectedRouteStopId, setSelectedRouteStopId] = useState<string | null>(null);
   const [routesReloadToken, setRoutesReloadToken] = useState(0);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
@@ -459,6 +468,13 @@ export function AppShell() {
     movedPx: number;
   } | null>(null);
   const suppressNextHandleClickRef = useRef(false);
+  const selectedRouteStageRef = useRef<{
+    routeId: string | null;
+    stageIndex: number | null;
+  }>({
+    routeId: selectedRouteId,
+    stageIndex: selectedStageIndex
+  });
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
@@ -487,12 +503,28 @@ export function AppShell() {
           }
     );
   }, []);
+  const setSelectedStageWithoutFocus = useCallback((stageIndex: number | null) => {
+    setSelectedStageIndex(stageIndex);
+    setSelectedStageFocusRequestIndex(null);
+  }, []);
+  const requestSelectedStageFocus = useCallback((stageIndex: number) => {
+    setSelectedStageIndex(stageIndex);
+    setSelectedStageFocusRequestIndex(stageIndex);
+    setSelectedStageFocusRequestToken((value) => value + 1);
+  }, []);
   const selectedRouteTimelineStop = useMemo(() => {
     if (!selectedRoute || !ancientTimeline || ancientTimeline.stops.length === 0) {
       return null;
     }
     return resolveStopForYear(ancientTimeline.stops, selectedRoute.route.fromYear);
   }, [ancientTimeline, selectedRoute]);
+  useEffect(() => {
+    selectedRouteStageRef.current = {
+      routeId: selectedRouteId,
+      stageIndex: selectedStageIndex
+    };
+  }, [selectedRouteId, selectedStageIndex]);
+
   useEffect(() => {
     routesLoadStateRef.current = routesLoadState;
   }, [routesLoadState]);
@@ -718,13 +750,18 @@ export function AppShell() {
         const parsedViewTab = parseViewTabFromSearch(window.location.search);
         const parsedRouteId = parseRouteIdFromSearch(window.location.search);
         const parsedStage = parseRouteStageFromSearch(window.location.search);
+        const parsedStageIndex = parsedStage ? parsedStage - 1 : null;
         if (parsedMapMode !== "ancient") {
           setTimelineSourcesOpen(false);
         }
         setMapMode(parsedMapMode);
         setViewTab(parsedViewTab);
         applySelectedRouteId(parsedRouteId);
-        setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
+        if (parsedStageIndex === null) {
+          setSelectedStageWithoutFocus(null);
+        } else {
+          requestSelectedStageFocus(parsedStageIndex);
+        }
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
 
         if (parsedSelection && !normalized) {
@@ -755,7 +792,7 @@ export function AppShell() {
     return () => {
       cancelled = true;
     };
-  }, [applySelectedRouteId]);
+  }, [applySelectedRouteId, requestSelectedStageFocus, setSelectedStageWithoutFocus]);
 
   useEffect(() => {
     if (viewTab !== "routes" || routesLoadStateRef.current !== "idle") {
@@ -966,6 +1003,10 @@ export function AppShell() {
       const parsedViewTab = parseViewTabFromSearch(window.location.search);
       const parsedRouteId = parseRouteIdFromSearch(window.location.search);
       const parsedStage = parseRouteStageFromSearch(window.location.search);
+      const parsedStageIndex = parsedStage ? parsedStage - 1 : null;
+      const routeOrStageChanged =
+        selectedRouteStageRef.current.routeId !== parsedRouteId ||
+        selectedRouteStageRef.current.stageIndex !== parsedStageIndex;
       const normalized = normalizeSelection(parsedSelection, placesById);
       if (parsedMapMode !== "ancient") {
         setTimelineSourcesOpen(false);
@@ -973,7 +1014,17 @@ export function AppShell() {
       setMapMode(parsedMapMode);
       setViewTab(parsedViewTab);
       applySelectedRouteId(parsedRouteId);
-      setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
+      if (parsedStageIndex === null) {
+        setSelectedStageWithoutFocus(null);
+      } else if (routeOrStageChanged) {
+        requestSelectedStageFocus(parsedStageIndex);
+      } else {
+        setSelectedStageWithoutFocus(parsedStageIndex);
+      }
+      selectedRouteStageRef.current = {
+        routeId: parsedRouteId,
+        stageIndex: parsedStageIndex
+      };
       if (ancientTimeline) {
         const resolvedStop = resolveStopForYear(
           ancientTimeline.stops,
@@ -1016,7 +1067,15 @@ export function AppShell() {
     return () => {
       window.removeEventListener("popstate", onPopState);
     };
-  }, [ancientTimeline, applySelectedRouteId, loading, placesById, urlStateReady]);
+  }, [
+    ancientTimeline,
+    applySelectedRouteId,
+    loading,
+    placesById,
+    requestSelectedStageFocus,
+    setSelectedStageWithoutFocus,
+    urlStateReady
+  ]);
 
   const closePanel = useCallback((restoreFocus: boolean) => {
     setSelectionOrigin("url");
@@ -1427,6 +1486,7 @@ export function AppShell() {
         bounds: null,
         routeFocusKey: null,
         selectedStageFocusKey: null,
+        selectedStageBounds: null,
         selectedStageCenter: null
       };
     }
@@ -1439,6 +1499,10 @@ export function AppShell() {
       selectedStageIndex !== null && selectedStageIndex >= 0
         ? selectedRouteEntry.stages[selectedStageIndex]?.id ?? null
         : null;
+    const shouldFocusSelectedStage =
+      selectedStageIndex !== null &&
+      selectedStageFocusRequestIndex !== null &&
+      selectedStageFocusRequestIndex === selectedStageIndex;
     const emphasizedStageId = highlightedStageId ?? selectedStageId;
     const selectedRouteId = selectedRouteEntry.route.id;
 
@@ -1494,33 +1558,155 @@ export function AppShell() {
       const merged = geometry.coordinates.flat() as [number, number][];
       return midpointOfCoordinates(merged);
     };
+    const coordinatesFromGeometry = (
+      geometry:
+        | { type: "LineString"; coordinates: number[][] }
+        | { type: "MultiLineString"; coordinates: number[][][] }
+    ) =>
+      (geometry.type === "LineString"
+        ? geometry.coordinates
+        : geometry.coordinates.flat()) as [number, number][];
+    const coordinatesForStopReference = (
+      reference: RouteStopRef,
+      options?: { includeAllCandidates?: boolean }
+    ): [number, number][] => {
+      const includeAllCandidates = options?.includeAllCandidates ?? true;
+      if (!includeAllCandidates) {
+        const mappedStop = resolveRouteStop(reference, placesById, routeStopsById);
+        return mappedStop.coordinates ? [mappedStop.coordinates] : [];
+      }
+
+      if (reference.kind === "location" && reference.locationId) {
+        const place = placesById.get(reference.locationId);
+        if (!place || place.candidates.length === 0) {
+          const fallback = resolveRouteStop(reference, placesById, routeStopsById);
+          return fallback.coordinates ? [fallback.coordinates] : [];
+        }
+        return place.candidates.map((candidate) => candidate.coordinates);
+      }
+
+      if (reference.kind === "route-stop" && reference.stopId) {
+        const stop = routeStopsById.get(reference.stopId);
+        if (!stop || stop.candidates.length === 0) {
+          const fallback = resolveRouteStop(reference, placesById, routeStopsById);
+          return fallback.coordinates ? [fallback.coordinates] : [];
+        }
+        return stop.candidates.map((candidate) => candidate.coordinates);
+      }
+
+      const fallback = resolveRouteStop(reference, placesById, routeStopsById);
+      return fallback.coordinates ? [fallback.coordinates] : [];
+    };
+    const boundsFromCoordinates = (
+      coordinates: [number, number][]
+    ): [[number, number], [number, number]] | null => {
+      if (coordinates.length === 0) {
+        return null;
+      }
+      let minLon = Number.POSITIVE_INFINITY;
+      let minLat = Number.POSITIVE_INFINITY;
+      let maxLon = Number.NEGATIVE_INFINITY;
+      let maxLat = Number.NEGATIVE_INFINITY;
+      for (const coordinate of coordinates) {
+        if (coordinate[0] < minLon) minLon = coordinate[0];
+        if (coordinate[1] < minLat) minLat = coordinate[1];
+        if (coordinate[0] > maxLon) maxLon = coordinate[0];
+        if (coordinate[1] > maxLat) maxLat = coordinate[1];
+      }
+      if (minLon === Number.POSITIVE_INFINITY) {
+        return null;
+      }
+      return [
+        [minLon, minLat],
+        [maxLon, maxLat]
+      ];
+    };
+    const uniqueCoordinates = (coordinates: [number, number][]) => {
+      const seen = new Set<string>();
+      const deduplicated: [number, number][] = [];
+      for (const coordinate of coordinates) {
+        const key = `${coordinate[0]}:${coordinate[1]}`;
+        if (seen.has(key)) {
+          continue;
+        }
+        seen.add(key);
+        deduplicated.push(coordinate);
+      }
+      return deduplicated;
+    };
+    const illustrativeLineGeometryForStage = (stage: (typeof selectedRouteEntry.stages)[number]) => {
+      if (stage.lineId || !stage.noLineReason) {
+        return null;
+      }
+      const stopCoordinates = [
+        ...coordinatesForStopReference(stage.from, { includeAllCandidates: false }),
+        ...(stage.via ?? []).flatMap((via) =>
+          coordinatesForStopReference(via, { includeAllCandidates: false })
+        ),
+        ...coordinatesForStopReference(stage.to, { includeAllCandidates: false })
+      ];
+      const consecutiveDeduplicated: [number, number][] = [];
+      for (const coordinate of stopCoordinates) {
+        const previous = consecutiveDeduplicated[consecutiveDeduplicated.length - 1];
+        if (previous && previous[0] === coordinate[0] && previous[1] === coordinate[1]) {
+          continue;
+        }
+        consecutiveDeduplicated.push(coordinate);
+      }
+      if (consecutiveDeduplicated.length < 2) {
+        return null;
+      }
+      return {
+        type: "LineString" as const,
+        coordinates: consecutiveDeduplicated
+      };
+    };
 
     const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
     const lineFeatureByStageId = new Map<string, (typeof lineFeatures)[number]>();
     const selectedRoutePlaceId = selection?.placeId ?? null;
     let selectedStageCenter: [number, number] | null = null;
+    let selectedStageBounds: [[number, number], [number, number]] | null = null;
     for (const [index, stage] of selectedRouteEntry.stages.entries()) {
-      const feature = routeLineFeatureByStage(routesData.lines, selectedRouteId, stage.id, stage.lineId);
-      if (!feature) {
+      const verifiedFeature = routeLineFeatureByStage(
+        routesData.lines,
+        selectedRouteId,
+        stage.id,
+        stage.lineId
+      );
+      const geometry = verifiedFeature
+        ? verifiedFeature.geometry.type === "LineString"
+          ? (verifiedFeature.geometry as { type: "LineString"; coordinates: number[][] })
+          : (verifiedFeature.geometry as { type: "MultiLineString"; coordinates: number[][][] })
+        : illustrativeLineGeometryForStage(stage);
+      if (!geometry) {
         // Kept apart from hover, so hovering another stage never changes it (and never pans the map).
         if (selectedStageId === stage.id) {
           selectedStageCenter = linelessStagePillCoordinate(stage, placesById, routeStopsById);
+          const includeAllCandidatesForNoLineStage = stage.travelMode !== "sea";
+          const endpointCoordinates = uniqueCoordinates([
+            ...coordinatesForStopReference(stage.from, {
+              includeAllCandidates: includeAllCandidatesForNoLineStage
+            }),
+            ...coordinatesForStopReference(stage.to, {
+              includeAllCandidates: includeAllCandidatesForNoLineStage
+            })
+          ]);
+          selectedStageBounds = boundsFromCoordinates(endpointCoordinates);
         }
         continue;
       }
 
       const mappedFeature = {
         type: "Feature" as const,
-        geometry:
-          feature.geometry.type === "LineString"
-            ? (feature.geometry as { type: "LineString"; coordinates: number[][] })
-            : (feature.geometry as { type: "MultiLineString"; coordinates: number[][][] }),
+        geometry,
         properties: {
           routeId: selectedRouteId,
           stageId: stage.id,
           stageIndex: index,
           stageLabel: `${index + 1}`,
           travelMode: stage.travelMode,
+          isIllustrative: verifiedFeature ? false : true,
           isInSelectedRoute: true as const,
           isSelectedStage: selectedStageId === stage.id,
           isHighlightedStage: highlightedStageId === stage.id,
@@ -1531,6 +1717,7 @@ export function AppShell() {
       lineFeatureByStageId.set(stage.id, mappedFeature);
       if (selectedStageId === stage.id) {
         selectedStageCenter = midpointOfGeometry(mappedFeature.geometry);
+        selectedStageBounds = boundsFromCoordinates(coordinatesFromGeometry(mappedFeature.geometry));
       }
     }
 
@@ -1868,7 +2055,10 @@ export function AppShell() {
       bounds,
       routeFocusKey: bounds ? selectedRouteId : null,
       selectedStageFocusKey:
-        selectedStageId && selectedStageCenter ? `${selectedRouteId}:${selectedStageId}` : null,
+        shouldFocusSelectedStage && selectedStageId && (selectedStageBounds || selectedStageCenter)
+          ? `${selectedRouteId}:${selectedStageId}:${selectedStageFocusRequestToken}`
+          : null,
+      selectedStageBounds,
       selectedStageCenter
     };
   }, [
@@ -1878,6 +2068,8 @@ export function AppShell() {
     routesData,
     selection?.placeId,
     selectedRoute,
+    selectedStageFocusRequestIndex,
+    selectedStageFocusRequestToken,
     selectedStageIndex,
     viewTab
   ]);
@@ -2198,13 +2390,13 @@ export function AppShell() {
 
   const handleSelectRoute = useCallback((routeId: string) => {
     applySelectedRouteId(routeId);
-    setSelectedStageIndex(null);
+    setSelectedStageWithoutFocus(null);
     setHighlightedStageIndex(null);
     setSelectedRouteStopId(null);
     setSelectionOrigin("url");
     setSelection(null);
     setStatusMessage(null);
-  }, [applySelectedRouteId]);
+  }, [applySelectedRouteId, setSelectedStageWithoutFocus]);
 
   const handleSelectRouteMapEntry = useCallback(
     (
@@ -2222,7 +2414,11 @@ export function AppShell() {
     ) => {
       setViewTab("routes");
       applySelectedRouteId(entry.routeId);
-      setSelectedStageIndex(entry.stageIndex);
+      if (entry.kind === "line") {
+        requestSelectedStageFocus(entry.stageIndex);
+      } else {
+        setSelectedStageWithoutFocus(entry.stageIndex);
+      }
       setSelectedRouteStopId(null);
       if (entry.kind === "stop") {
         if (entry.stopKind === "location") {
@@ -2234,7 +2430,7 @@ export function AppShell() {
         }
       }
     },
-    [applySelectedRouteId]
+    [applySelectedRouteId, requestSelectedStageFocus, setSelectedStageWithoutFocus]
   );
 
   return (
@@ -2749,7 +2945,7 @@ export function AppShell() {
               hydratedRoutes={hydratedRoutes}
               onBackToAllRoutes={() => {
                 applySelectedRouteId(null);
-                setSelectedStageIndex(null);
+                setSelectedStageWithoutFocus(null);
                 setHighlightedStageIndex(null);
                 setSelectedRouteStopId(null);
                 setSelectionOrigin("url");
@@ -2759,7 +2955,7 @@ export function AppShell() {
               onResolveStopSelection={(resolvedStop, stageIndex) => {
                 setSmallScreenSheetPosition("half");
                 setSmallScreenSheetDragHeightPx(null);
-                setSelectedStageIndex(stageIndex);
+                setSelectedStageWithoutFocus(stageIndex);
                 if (resolvedStop.kind === "location") {
                   setSelectedRouteStopId(null);
                   setSelectionOrigin("route-panel-stop");
@@ -2779,7 +2975,7 @@ export function AppShell() {
                 setSelectedRouteStopId(null);
                 setSelectionOrigin("url");
                 setSelection(null);
-                setSelectedStageIndex(stageIndex);
+                requestSelectedStageFocus(stageIndex);
               }}
               placesById={placesById}
               routeStopsById={routeStopsById}

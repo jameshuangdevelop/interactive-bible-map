@@ -179,6 +179,7 @@ const gestureReleaseDelayMs = 1_000;
 const mapLabelPaddingTop = 96;
 const mapLabelPaddingEdge = 16;
 const focusPaddingTop = 96;
+const routeStageFitMaxZoom = 11;
 const interactiveHitPaddingPx = 8;
 const majorInteractionPreferencePx = 3;
 const mainStyleReliefLayerId = "natural_earth";
@@ -4057,6 +4058,7 @@ export function MapView({
                 layerRoutesViaId,
                 layerRoutesMentionedId,
                 layerRoutesStagePillIconId,
+                layerRoutesStagePillLabelId,
                 layerRoutesLinesForegroundId
               ]
             });
@@ -4064,7 +4066,8 @@ export function MapView({
           const routeFeature = routeFeatures.find(
             (feature) =>
               feature.layer?.id !== layerRoutesLinesForegroundId &&
-              feature.layer?.id !== layerRoutesStagePillIconId
+              feature.layer?.id !== layerRoutesStagePillIconId &&
+              feature.layer?.id !== layerRoutesStagePillLabelId
           );
           const routeProperties = routeFeature ? asObject(routeFeature.properties) : null;
           const routeLabel = routeProperties ? asString(routeProperties.label) : null;
@@ -4088,7 +4091,8 @@ export function MapView({
           const routeLineOrPill = routeFeatures.find(
             (feature) =>
               feature.layer?.id === layerRoutesLinesForegroundId ||
-              feature.layer?.id === layerRoutesStagePillIconId
+              feature.layer?.id === layerRoutesStagePillIconId ||
+              feature.layer?.id === layerRoutesStagePillLabelId
           );
           if (routeLineOrPill) {
             clearHoveredFeatureState();
@@ -4755,6 +4759,7 @@ export function MapView({
             layerRoutesViaId,
             layerRoutesMentionedId,
             layerRoutesStagePillIconId,
+            layerRoutesStagePillLabelId,
             layerRoutesLinesHighlightId,
             layerRoutesLinesForegroundId
           ]
@@ -4791,7 +4796,10 @@ export function MapView({
           }
         }
 
-        const pillMatch = routeFeatures.find((feature) => feature.layer?.id === layerRoutesStagePillIconId);
+        const pillMatch = routeFeatures.find((feature) =>
+          feature.layer?.id === layerRoutesStagePillIconId ||
+          feature.layer?.id === layerRoutesStagePillLabelId
+        );
         if (pillMatch) {
           const properties = asObject(pillMatch.properties);
           const routeId = asString(properties?.routeId);
@@ -5151,7 +5159,10 @@ export function MapView({
     if (!routesOverlay) {
       return;
     }
-    if (!routesOverlay.selectedStageFocusKey || !routesOverlay.selectedStageCenter) {
+    if (
+      !routesOverlay.selectedStageFocusKey ||
+      (!routesOverlay.selectedStageBounds && !routesOverlay.selectedStageCenter)
+    ) {
       previousSelectedStageFocusKeyRef.current = null;
       return;
     }
@@ -5164,23 +5175,53 @@ export function MapView({
       return;
     }
 
-    if (
-      !isPointOffScreen(map, routesOverlay.selectedStageCenter, {
-        leftInset: panelInset,
-        bottomInset
-      })
-    ) {
+    if (routesOverlay.selectedStageBounds) {
+      const [southWest, northEast] = routesOverlay.selectedStageBounds;
+      const stageBounds = new LngLatBounds(southWest, northEast);
+      map.fitBounds(stageBounds, {
+        padding: resolveMapFitPadding({
+          leftInset: panelInset,
+          bottomInset: fitBottomInset,
+          top: focusPaddingTop,
+          side: 64,
+          bottom: 64
+        }),
+        maxZoom: routeStageFitMaxZoom,
+        duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
+      });
       previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
       return;
     }
 
-    map.easeTo({
-      center: routesOverlay.selectedStageCenter,
-      zoom: map.getZoom(),
-      duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
-    });
+    if (!routesOverlay.selectedStageCenter) {
+      previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
+      return;
+    }
+
+    flyOrJump(
+      map,
+      {
+        center: routesOverlay.selectedStageCenter,
+        zoom: routeStageFitMaxZoom,
+        padding: resolveMapFitPadding({
+          leftInset: panelInset,
+          bottomInset: fitBottomInset,
+          top: focusPaddingTop,
+          side: 64,
+          bottom: 64
+        })
+      },
+      runtimeTuning.controlZoomDurationMs,
+      prefersReducedMotion()
+    );
     previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
-  }, [bottomInset, panelInset, routesOverlay, runtimeTuning.controlZoomDurationMs, styleReadyVersion]);
+  }, [
+    fitBottomInset,
+    panelInset,
+    routesOverlay,
+    runtimeTuning.controlZoomDurationMs,
+    styleReadyVersion
+  ]);
 
   useEffect(() => {
     if (!routesModeEnabled || !selectedRouteStopFocusKey || !selectedRouteStopCoordinates) {

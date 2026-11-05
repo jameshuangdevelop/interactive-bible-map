@@ -11,6 +11,7 @@ export interface RouteMapLineFeatureProperties {
   stageIndex: number;
   stageLabel: string;
   travelMode: "land" | "sea" | "unknown";
+  isIllustrative?: boolean;
   isInSelectedRoute: true;
   isSelectedStage: boolean;
   isHighlightedStage: boolean;
@@ -50,5 +51,6 @@ export interface RouteMapOverlayData {
   bounds: [Coordinates, Coordinates] | null;
   routeFocusKey: string | null;
   selectedStageFocusKey: string | null;
+  selectedStageBounds: [Coordinates, Coordinates] | null;
   selectedStageCenter: Coordinates | null;
 }

@@ -467,7 +467,8 @@ export function RoutesPanel({
                 marginBottom: `${tokens.spacing.sm}px`,
                 borderRadius: "8px",
                 border: `1px solid ${isActive ? tokens.color.accent : tokens.color.divider}`,
-                padding: `${tokens.spacing.sm}px`
+                padding: `${tokens.spacing.sm}px`,
+                cursor: "pointer"
               }}
             >
               <div style={{ fontWeight: 600 }}>
@@ -476,7 +477,6 @@ export function RoutesPanel({
                 <button
                   onClick={(event) => {
                     event.stopPropagation();
-                    onSelectStage(stageIndex);
                     onResolveStopSelection(from, stageIndex);
                   }}
                   style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
@@ -488,7 +488,6 @@ export function RoutesPanel({
                 <button
                   onClick={(event) => {
                     event.stopPropagation();
-                    onSelectStage(stageIndex);
                     onResolveStopSelection(to, stageIndex);
                   }}
                   style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
@@ -509,7 +508,6 @@ export function RoutesPanel({
                       <button
                         onClick={(event) => {
                           event.stopPropagation();
-                          onSelectStage(stageIndex);
                           onResolveStopSelection(viaStop, stageIndex);
                         }}
                         style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
@@ -530,7 +528,6 @@ export function RoutesPanel({
                       <button
                         onClick={(event) => {
                           event.stopPropagation();
-                          onSelectStage(stageIndex);
                           onResolveStopSelection(mentionedStop, stageIndex);
                         }}
                         style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
@@ -559,7 +556,7 @@ export function RoutesPanel({
                     fontSize: `${tokens.typography.captionSize}px`
                   }}
                 >
-                  Site disputed
+                  Disputed site; illustrative line—not a verified route
                 </div>
               ) : null}
               <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
