@@ -17,7 +17,7 @@ The human wants a segment click to zoom to that segment's vicinity, instead of o
 - Support explicit list/keyboard activation and map stage selection, including refocusing the same stage after a manual pan.
 - Respect desktop panels and the phone sheet, with sensible zoom limits for short or point-like stages.
 - Keep hovering camera-free. Preserve place clicks (including route-stop dots that also select a stage), route-level fitting, tab changes, disputed-site handling, and reduced-motion behaviour. A segment-focus request comes from a list/keyboard activation or a stage line/number, not merely from a stage id changing.
-- Keep directly dependent stage deep-link behaviour and existing tests consistent.
+- Opening a stage deep link and Back/Forward that changes the route/stage fit the selected stage once. History changes only to place/other parameters do not refocus the segment; cover these directly dependent navigation cases.
 - Do not edit the shared progress or budget ledgers; give the PO the status and usage in the PR description (ADR-0051).
 
 ## Acceptance criteria

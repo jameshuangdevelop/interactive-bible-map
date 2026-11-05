@@ -3242,7 +3242,17 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
     }
   );
   expect(names.length).toBeGreaterThan(0);
-  const preferredStablePlaceOrder = ["myra", "crete", "fair-havens", "cnidus", "salmone"];
+  const preferredStablePlaceOrder = [
+    "phoenix",
+    "lasea",
+    "cauda",
+    "fair-havens",
+    "malta",
+    "myra",
+    "crete",
+    "cnidus",
+    "salmone"
+  ];
   const scannedPlaceIds = preferredStablePlaceOrder.filter((placeId) =>
     names.some((entry) => entry.placeId === placeId)
   );
@@ -3573,6 +3583,106 @@ test("selecting a route stage stop keeps reader zoom while selecting stage and p
   expect(Math.abs(after.zoom - before.zoom)).toBeLessThan(0.01);
 });
 
+test("deep-linked stage selection fits once and stays segment-focused after map idle @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-2&stage=2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await waitForMapIdle(page);
+  await expect(page.locator("[data-route-stage-index='2'][data-route-stage-selected='true']")).toBeVisible();
+
+  const initial = await readMapCamera(page);
+  expect(
+    initial.bounds[0][1],
+    "stage deep link should fit segment 2, not leave the whole-route southern extent in view"
+  ).toBeGreaterThan(32.2);
+
+  await waitForMapIdle(page);
+  const settled = await readMapCamera(page);
+  expect(
+    settled.bounds[0][1],
+    "no later route-level override should replace the selected-stage fit"
+  ).toBeGreaterThan(32.2);
+  expect(Math.abs(settled.center[0] - initial.center[0])).toBeLessThan(0.02);
+  expect(Math.abs(settled.center[1] - initial.center[1])).toBeLessThan(0.02);
+});
+
+test("history popstate refits only when stage changes, not for place-only updates on same stage @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-2&stage=2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await waitForMapIdle(page);
+  await expect(page.locator("[data-route-stage-index='2'][data-route-stage-selected='true']")).toBeVisible();
+  const stage2Focused = await readMapCamera(page);
+
+  await page.evaluate(() => {
+    window.history.pushState({}, "", "?tab=routes&route=jesus-2&stage=1");
+    window.history.pushState({}, "", "?tab=routes&route=jesus-2&stage=2&place=nain");
+  });
+
+  await jumpMap(page, [35.23, 31.77], 10.6);
+  const detouredForStageChange = await readMapCamera(page);
+  await page.goBack();
+  await page.waitForFunction(
+    () => {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("route") === "jesus-2" && params.get("stage") === "1" && params.get("place") === null;
+    },
+    undefined,
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect(page.locator("[data-route-stage-index='1'][data-route-stage-selected='true']")).toBeVisible();
+  const stage1FromHistory = await readMapCamera(page);
+  expect(stage1FromHistory.bounds[0][1], "back to stage 1 should refit to stage 1 vicinity").toBeLessThan(32.05);
+  expect(
+    Math.hypot(
+      stage1FromHistory.center[0] - detouredForStageChange.center[0],
+      stage1FromHistory.center[1] - detouredForStageChange.center[1]
+    ),
+    "stage change via history should move camera from manual detour"
+  ).toBeGreaterThan(0.5);
+
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-2&stage=2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await waitForMapIdle(page);
+  await expect(page.locator("[data-route-stage-index='2'][data-route-stage-selected='true']")).toBeVisible();
+
+  await page.evaluate(() => {
+    window.history.pushState({}, "", "?tab=routes&route=jesus-2&stage=2&place=nain");
+    window.history.pushState({}, "", "?tab=routes&route=jesus-2&stage=2&place=capernaum");
+  });
+
+  await jumpMap(page, [35.2, 32.95], 9.2);
+  const detouredForPlaceOnly = await readMapCamera(page);
+  await page.goBack();
+  await page.waitForFunction(
+    () => {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("route") === "jesus-2" && params.get("stage") === "2" && params.get("place") === "nain";
+    },
+    undefined,
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  const afterPlaceOnlyBack = await readMapCamera(page);
+  await expect(page.locator("[data-route-stage-index='2'][data-route-stage-selected='true']")).toBeVisible();
+  expect(Math.abs(afterPlaceOnlyBack.zoom - detouredForPlaceOnly.zoom)).toBeLessThan(0.01);
+  expect(Math.abs(afterPlaceOnlyBack.zoom - stage2Focused.zoom)).toBeGreaterThan(0.8);
+
+  await page.goForward();
+  await page.waitForFunction(
+    () => {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("route") === "jesus-2" && params.get("stage") === "2" && params.get("place") === "capernaum";
+    },
+    undefined,
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  const afterPlaceOnlyForward = await readMapCamera(page);
+  await expect(page.locator("[data-route-stage-index='2'][data-route-stage-selected='true']")).toBeVisible();
+  expect(Math.abs(afterPlaceOnlyForward.zoom - detouredForPlaceOnly.zoom)).toBeLessThan(0.01);
+  expect(Math.abs(afterPlaceOnlyForward.zoom - stage2Focused.zoom)).toBeGreaterThan(0.8);
+});
+
 test("hovering lineless stages shows a pill, and unhovering hides it @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
   const scenarios = [
     { routeId: "jesus-1", stageIndex: 2, stageId: "segment-05" },
@@ -3652,13 +3762,20 @@ test("hovering a stage's number on the map never shows the number as a place @ro
   await clickRouteStageCard(page, 4);
   await waitForSettledPill(page, { routeId: "paul-rome", label: "4" });
   const [pill] = await renderedStagePills(page);
-  await moveMouseToMapPoint(page, { x: pill.x, y: pill.y });
-  // The pointer cursor shows the hover handler has run over the number.
-  await page.waitForFunction(
-    (testHookKey) => window[testHookKey].getCanvas().style.cursor === "pointer",
-    mapTestHookKey,
-    { timeout: 5_000 }
+  const stageNumberHit = await page.evaluate(
+    ({ testHookKey, point }) =>
+      window[testHookKey].queryRenderedFeatures(
+        [
+          [point.x - 4, point.y - 4],
+          [point.x + 4, point.y + 4]
+        ],
+        { layers: ["ibm-routes-stage-pill-icon"] }
+      ).length > 0,
+    { testHookKey: mapTestHookKey, point: { x: pill.x, y: pill.y } }
   );
+  expect(stageNumberHit).toBe(true);
+  await moveMouseToMapPoint(page, { x: pill.x, y: pill.y });
+  await page.waitForTimeout(80);
   await expect(page.locator("div[role='tooltip']").first()).toBeHidden();
 });
 

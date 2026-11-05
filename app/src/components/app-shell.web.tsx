@@ -468,6 +468,13 @@ export function AppShell() {
     movedPx: number;
   } | null>(null);
   const suppressNextHandleClickRef = useRef(false);
+  const selectedRouteStageRef = useRef<{
+    routeId: string | null;
+    stageIndex: number | null;
+  }>({
+    routeId: selectedRouteId,
+    stageIndex: selectedStageIndex
+  });
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
@@ -511,6 +518,13 @@ export function AppShell() {
     }
     return resolveStopForYear(ancientTimeline.stops, selectedRoute.route.fromYear);
   }, [ancientTimeline, selectedRoute]);
+  useEffect(() => {
+    selectedRouteStageRef.current = {
+      routeId: selectedRouteId,
+      stageIndex: selectedStageIndex
+    };
+  }, [selectedRouteId, selectedStageIndex]);
+
   useEffect(() => {
     routesLoadStateRef.current = routesLoadState;
   }, [routesLoadState]);
@@ -990,6 +1004,9 @@ export function AppShell() {
       const parsedRouteId = parseRouteIdFromSearch(window.location.search);
       const parsedStage = parseRouteStageFromSearch(window.location.search);
       const parsedStageIndex = parsedStage ? parsedStage - 1 : null;
+      const routeOrStageChanged =
+        selectedRouteStageRef.current.routeId !== parsedRouteId ||
+        selectedRouteStageRef.current.stageIndex !== parsedStageIndex;
       const normalized = normalizeSelection(parsedSelection, placesById);
       if (parsedMapMode !== "ancient") {
         setTimelineSourcesOpen(false);
@@ -999,9 +1016,15 @@ export function AppShell() {
       applySelectedRouteId(parsedRouteId);
       if (parsedStageIndex === null) {
         setSelectedStageWithoutFocus(null);
-      } else {
+      } else if (routeOrStageChanged) {
         requestSelectedStageFocus(parsedStageIndex);
+      } else {
+        setSelectedStageWithoutFocus(parsedStageIndex);
       }
+      selectedRouteStageRef.current = {
+        routeId: parsedRouteId,
+        stageIndex: parsedStageIndex
+      };
       if (ancientTimeline) {
         const resolvedStop = resolveStopForYear(
           ancientTimeline.stops,
