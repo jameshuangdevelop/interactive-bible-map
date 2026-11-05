@@ -79,4 +79,14 @@ These are fresh desktop runs. They are separate from CI's results in §2 and §3
 - **MC10b:** closed by ADR-0043 (items 6 and 7) and ADR-0046. #69 and #70 merged on 2026-10-19, after MC12's play-test.
 - **MC13:** closed when #75 and #76 merged on 2026-10-19. The notes on #75 became ADR-0048. P4 kept the PO's defaults (`docs/verification/M5-borders.md`, `5251b96`).
 
-No human play-test has been recorded since #98 merged. CP5 asks for one.
+At the initial collection above, no human play-test had been recorded since #98 merged. The subsequent approvals and follow-up are recorded below.
+
+## 6. Approved closeout and M6 handoff (2026-11-05)
+- The human approved CP5 by merging #99 at 2026-11-05 07:18:25 UTC. The M5-26 interaction follow-up, including the later pointer/sea-framing/disputed-line feedback, was approved and merged as #100 at 22:10:01 UTC (`fde21d1`).
+- #100's final [run 42116927874](https://github.com/jameshuangdevelop/interactive-bible-map/actions/runs/42116927874) passed on `655ec2a`: static checks, unit tests, data validation, build, all six browser shards and `browser-report`, plus preview smoke/accessibility. The report records 139 passed, 3 documented skips, 0 flaky and 0 failed. All 12 disputed-stage rendering cases were executed, including actual rendered-line assertions.
+- The merge's [main run 42119126869](https://github.com/jameshuangdevelop/interactive-bible-map/actions/runs/42119126869) passed and deployed `fde21d1` to production, which returned HTTP 200 on 2026-11-05. Main skips the PR browser shards; its implementation files match the tested PR head.
+- The dataset remains 122 verified locations, 10 routes and 83 stages, with 71 canonical line features. The 12 disputed stages now have client-rendered illustrative connections with a visible uncertainty disclaimer (ADR-0052), rather than hidden lines. Candidate coordinates/indices, historical claims, scripture, attestation and sources were not changed; 17 display-policy strings were updated so their wording matches the UI.
+- All current route stops are full place records: `data/routes/stops.json` has no entries and no stage references `kind: "route-stop"`. Do not repeat that completed M5 work in an M6 batch.
+- The #100 build reports 347,091 bytes gzip across the ancient files; subtracting the 19,209-byte lazy region outlines yields 327,882 / 330,000 startup bytes, leaving 2,118 bytes. Routes is 26,305 / 100,000 bytes gzip. The startup exclusion is enforced in `scripts/lib/app-data-builder.mjs`.
+- The original MC11 measurements in section 4 remain pinned to `1ebaa67`; they are not fresh real-GPU measurements of #100. The unexplained first camera assertion failure remains an accepted historical caveat, not erased by the later clean functional CI.
+- The human has assigned another agent to lead M6. `docs/PROGRESS.md` gives the exact resume point: fresh `main`, authoritative November budget confirmation, the outstanding CP2 unmapped-candidate requirement and a measured capacity plan, then a deduplicated first-batch proposal. The outgoing PO has not started M6 records or task cards.

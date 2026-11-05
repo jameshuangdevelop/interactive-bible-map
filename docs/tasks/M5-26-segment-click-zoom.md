@@ -7,6 +7,7 @@
 | PR target | `main` |
 | Depends on | #99 merged; ADR-0052 |
 | Scheduling | Focused Routes follow-up before M6; CP5 is already approved |
+| Status | Human approved and merged as #100, 2026-11-05; merge `fde21d1` |
 
 ## Goal
 The human wants a segment click to zoom to that segment's vicinity, instead of only highlighting it or panning at the current zoom.
@@ -21,12 +22,14 @@ The human wants a segment click to zoom to that segment's vicinity, instead of o
 - Do not edit the shared progress or budget ledgers; give the PO the status and usage in the PR description (ADR-0051).
 
 ## Acceptance criteria
-- [ ] Clicking a visible stage zooms to its own vicinity, even when it was already on screen.
-- [ ] Verified and illustrative stage lines fit the usable map area on desktop and phone.
-- [ ] Activating the same stage again refocuses it; hovering another stage never moves the camera.
-- [ ] Focused regression tests fail before the change and pass after it; existing route interactions remain intact.
-- [ ] Relevant unit/browser checks, lint, type-check and export pass; the PR's full CI supplies the broader suite.
-- [ ] The PR explains that this is a pre-M6 follow-up, links ADR-0052, and supplies its preview, status and honest budget row.
+- [x] Clicking a visible stage zooms to its own vicinity, even when it was already on screen.
+- [x] Verified and illustrative stage lines fit the usable map area on desktop and phone.
+- [x] Activating the same stage again refocuses it; hovering another stage never moves the camera.
+- [x] Focused regression tests fail before the change and pass after it; existing route interactions remain intact.
+- [x] Relevant unit/browser checks, lint, type-check and export pass; the PR's full CI supplies the broader suite.
+- [x] The PR explains that this is a pre-M6 follow-up, links ADR-0052, and supplies its preview, status and honest budget row.
+
+Evidence: #100's final CI run [42116927874](https://github.com/jameshuangdevelop/interactive-bible-map/actions/runs/42116927874) passed on `655ec2a` (139 browser tests passed, 3 documented skips, 0 flaky/failed), including all 12 disputed-line rendering cases. Main run [42119126869](https://github.com/jameshuangdevelop/interactive-bible-map/actions/runs/42119126869) passed and deployed the merge.
 
 ## Review feedback (2026-11-05)
 - Segment rows and interactive stage lines/numbers use the pointer cursor on hover; camera-free hover and accurate place tooltips stay intact.
