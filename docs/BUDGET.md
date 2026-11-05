@@ -80,6 +80,7 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | CP2 | 2026-09 | ~22,666 | ~25,926 | ~2.6% |
 | CP3a | 2026-09 | ~2,560 | ~28,490 | ~2.8% |
 | CP3.5 | 2026-10 | ~64,835 (about 7,100 of it on 2026-09-30) | ~57,735 | ~5.8% |
+| CP5 (awaiting approval) | 2026-10 | ~238,800 since MC7's measurement (195,472 at 2026-10-10 08:10 UTC): M5, M7-02 to M7-04, and the test and CI work beside them. Known rows only; the unmeasured items are listed in the ledger | ~434,236 known | ~43.4% |
 
 September closed at about **75,500 credits (7.6% of that month's cap)**. That covered M3's build (M3-02 to M3-13, counted at CP3b) and the start of M3.5.
 
@@ -555,3 +556,14 @@ September closed at about **75,500 credits (7.6% of that month's cap)**. That co
 | 2026-10-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M5-20 phase 4 and its re-checks: found Pisidia in Lycia, Phrygia in Bithynia, Mesopotamia over Syria and an overlap check that read 0; the six notes' texts; all six signed off; measured | 166,202k / 376k | 3,481 | 410,739 |
 | 2026-10-24 | pr-reviewer | Claude Sonnet 5 (Copilot CLI) | Review and delta review of #96 (M5-20): 1 must-consider (Mesopotamia), 1 suggestion adopted; measured | 43,086k / 138k | 716 | 411,455 |
 | 2026-10-24 | project-owner | Claude Opus 5.5 (Copilot CLI) | Coordination from #91's merge (2026-10-23 16:28 UTC) to 2026-10-24 19:09 UTC: the #92 ledger; cards M5-23 to M5-25 and their PRs; M5-20's verification (found the Matiane seed, five seed errors, the missing Araxes edge, the typed north line, the check's loopholes and its false overlap figure), two PO fixes and the PR (#96); M5-24's decisions and ADR-0038's update; this ledger. M5-24's research (3,149) and check (2,031) go in with #95; with them, this session measures October at about 430,200 to 19:09 UTC. Measured | 357,028k / 463k | 13,352 | 424,807 |
+| 2026-10-24 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M5-24 research, #95; measured, from #95's Budget table | 101,311k / 329k | 3,149 | 427,956 |
+| 2026-10-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M5-24 check before phase 3, #95; measured, from #95's Budget table. That table's 2,377 is later than the 2,031 in the PO row above, and replaces it. Phase 3's check (D1–D6) recorded no figure; see the unmeasured row below | 35,319k / 319k | 2,377 | 430,333 |
+| 2026-10-24 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M5-24 data step, #95; measured, from #95's Budget table | 12,158k / 32k | 368 | 430,701 |
+| 2026-10-24 | pr-reviewer | Claude Sonnet 5 (Copilot CLI) | Review of #95 (M5-24): 1 must-consider (the data step's sign-off), 2 suggestions, 2 nits; the reviewer's own estimate, from its comment | ~70,000k / ~220k (est.) | ~1,900 (est.) | ~432,601 |
+| 2026-10-25 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M5-24 Routes tab, #98: numbers for the stages without a line, and collapsible route groups; measured, from #98's Budget table | 54,592k / 193k | 1,635 | ~434,236 |
+| 2026-10-24 to 2026-10-30 | — | — | **Unmeasured; reconcile when measured.** None of these recorded a figure on its PR: #95's delta review, the Fact-Checker's phase 3 for #95, #98's review and delta review, and the PO's coordination from 2026-10-24 19:09 UTC to #98's merge (the prototypes, the PO's commits on #98, the replies to the review, and #97). They aren't estimated here | — | — | ~434,236 (known rows only) |
+
+## Ledger — 2026-11
+| Date | Agent | Model | Task | Tokens in / out (est.) | AI credits | Month total |
+|---|---|---|---|---|---:|---:|
+| 2026-11-01 to 2026-11-05 | — | — | **Unknown; not measured or estimated.** No usage figure is recorded yet for November's sessions, this CP5 session included. Before M6 starts, the PO adds measured session rows where a measurement is available. If none is, the human confirms November's usage on the Copilot usage page before M6 starts. GitHub's Copilot usage and billing report is the authority (ADR-0005) | — | — | unknown |
