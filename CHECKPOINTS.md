@@ -11,7 +11,7 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP3.5 | M3.5 Images | 5–10 images for each of 31 major places and 1–3 for the rest, cited AI reconstructions, link checks, and a larger gallery | Approved 2026-10-02 | #29–#37 |
 | CP3b | M3 MVP App | Working MVP deployed to a preview | Approved 2026-10-07 (live at https://interactive-bible-map.pages.dev) | #38–#50 |
 | CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Approved 2026-10-12; on `main` through #59 | #51–#59 |
-| CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | In progress (started 2026-10-12) | |
+| CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Awaiting your review (not approved). M5 is complete on `main` at `1ebaa67` (2026-10-30); MC11 is done, with one caveat (CP5 below) | #60–#98; #99 (CP5) |
 | CP6+ | M6 Expansion | About 50 verified locations per batch, one checkpoint per batch, up to about 300 | Not started | |
 | CP7 | M7 Mobile-web polish | Responsive layout, touch gestures, performance | Not started | |
 
@@ -31,10 +31,10 @@ Lighter stops between checkpoints: the PO opens the app with the work so far on 
 | MC8 | CP4 | Everything merged and built as it will deploy, with the speed results | The push | Done 2026-10-10: the assembled stack, with the MC7 changes, passed the full browser suite and the desktop speed check (CP4, below); you approved the push |
 | MC9 | CP5 | The Routes tab (M5-05) with the first verified routes, and the list of Jesus' journeys with the rule that chose them (M5-03) | The tab's look (ADR-0038 item 6) and which of Jesus' journeys to show (item 3) | Done 2026-10-14: the human found the routes "extremely confusing to look at" and asked for eight changes: only the chosen route drawn, the route's year, an animation when a segment is clicked, no numbers in the dots, disclaimers last and no dotted lines, other lines greyed out on hover, the reader's zoom kept, and every place the passages name on the map (ADR-0041). The PO's design for the stops and one solid line for land and sea were chosen while the human was away. The list of Jesus' journeys had no comments |
 | MC10 | CP5 | The Routes tab redone after MC9 (ADR-0041; M5-05's third round), with the route text and places named (M5-06) and the reworked lines (M5-04) | The push of M5-05, which can be play-tested (ADR-0040) | Done 2026-10-15: the human asked to remove the stage animation, open place details on the Routes tab to the right of the route panel, give every route place details, draw the routes on top of the full map, make names show what can be clicked (grey italic if not; natural features green), remove the red dots on the Map tab, and point out every place the routes name (ADR-0042). What "remove the red dots" means, water's colour and the timeline on the Routes tab are open questions |
-| MC10b | CP5 | The Routes tab on top of the map (M5-05's sixth round, ADR-0042), and the first route places with details (M5-07, batch A) | The push of M5-05, and the answers to ADR-0042 items 6 and 7 | Opened 2026-10-15 on a local preview (port 8096), with rounds 6 and 7, batch A and the phone-title fix. On 2026-10-16 the human answered item 6 (ADR-0043) and asked for batches B and C; the push isn't approved yet |
+| MC10b | CP5 | The Routes tab on top of the map (M5-05's sixth round, ADR-0042), and the first route places with details (M5-07, batch A) | The push of M5-05, and the answers to ADR-0042 items 6 and 7 | Closed 2026-10-19, replaced by later steps rather than finished as a local stop. On 2026-10-16 you answered item 6, and ADR-0043 item 8 settled item 7 (the timeline stays hidden on the Routes tab). ADR-0046 (2026-10-18) replaced the local-preview push gate with PR previews. You play-tested M5-05 and M5-07 at MC12, and merged them as #69 and #70 on 2026-10-19 |
 | MC12 | CP5 | Names instead of pins, and no ancient places on the modern map (M5-08, ADR-0043), with batches B and C of the route places | The push | Done 2026-10-18: the human play-tested with friends and gave five notes. Names should work like Google Maps' (no "+N" groups, clicks keep the zoom, a red pin, blue on hover, the arrow cursor), every upright name should work on the Routes tab, and borders should be drawn the way Google Maps draws them (ADR-0044; M5-09 to M5-11) |
-| MC13 | CP5 | Names like Google Maps' (M5-09) and borders like Google Maps' (M5-10), on their PRs' preview links (ADR-0046) | The human's notes on the previews, and the lines only a look at Google can settle (M5-10's verification, P4) | Opened 2026-10-19 as draft PRs |
-| MC11 | CP5 | Everything merged and built as it will deploy, with the speed results | The merge of the last M5 PRs | Not started |
+| MC13 | CP5 | Names like Google Maps' (M5-09) and borders like Google Maps' (M5-10), on their PRs' preview links (ADR-0046) | The human's notes on the previews, and the lines only a look at Google can settle (M5-10's verification, P4) | Closed 2026-10-19 when you merged #75 and #76. Your notes on #75's preview became ADR-0048 (M5-16, #81 and #87). P4 shipped with the PO's defaults (`docs/verification/M5-borders.md`, commit `5251b96`). No separate ruling from you on P4 is recorded, so CP5 lists the defaults for your information |
+| MC11 | CP5 | Everything merged and built as it will deploy, with the speed results | Your CP5 approval | Done 2026-11-05, with one caveat. Everything is merged (`main` at `1ebaa67`), and CI and the weekly full suite pass on that commit. On an Apple M1, Lighthouse passed (in software), the headed benchmark had no long tasks, and the `@gpu` test failed once (the opening camera drifted) before a rerun passed. See CP5 below |
 
 ---
 
@@ -485,3 +485,123 @@ M5-00 recorded this approval and planned M5 (ADR-0038). Two lanes run in paralle
 | CP5 | The routes | project-owner | M5's tasks merged |
 
 The mini checkpoints on the way (MC9 and MC10) are in the table at the top.
+
+## CP5 — Routes
+
+**Status: awaiting your review. CP5 is not approved yet.** M5 is complete on `main` at `1ebaa67` (#98, merged 2026-10-30), and the live site serves it. MC11's desktop speed check is done, with one caveat: the GPU test's first run failed once, and its rerun passed (below). Approve after your play-test, by merging this PR or commenting "approved". No M6 work starts before then. The evidence, pinned to `1ebaa67`, is in [docs/verification/CP5.md](docs/verification/CP5.md).
+
+### What was delivered
+The Routes tab draws Paul's four journeys and six parts of Jesus' journeys on top of the full map. Every stage cites its passages, and every place a route names is a clickable place.
+
+| Area | Output | PRs |
+|---|---|---|
+| Plan | CP4 recorded; ADR-0038 (the routes); stacked PRs target `main` (ADR-0039); play-test notes; pushing rules (ADR-0040, then ADR-0046); every PR merges on its own (ADR-0051) | #60, #63, #72, #88 |
+| Route data | The schema and build (M5-01); Paul's four journeys (M5-02); the well-attested segments of Jesus' journeys (M5-03); the lines (M5-04); route text (M5-06); every route place as a full place (M5-07); Jesus' journeys in six parts (M5-24) | #61, #62, #64–#66, #70, #95 |
+| The Routes tab | The tab (M5-05); names instead of pins (M5-08); names that work like Google Maps' (M5-09); numbers for the stages without a line, and collapsible "Jesus' journeys" and "Paul's journeys" groups (M5-24) | #69, #71, #75, #98 |
+| The map | Borders like Google Maps' (M5-10); more ancient lands (M5-11); selected regions and the pin (M5-16); town dots on the ancient map (M5-18); region outlines (M5-19 to M5-21); camera and label fixes (M5-25) | #76, #77, #81, #84, #86, #87, #90, #94, #96 |
+| Phones (brought forward from M7) | A full-screen details sheet, dragged from its whole top strip, whose top stays in view (M7-02 to M7-04); a phone title fix | #68, #79, #83, #85 |
+| Tests and CI | The full browser suite on every PR in about 6 shards, with time limits (ADR-0045; M5-12 to M5-14, M5-17); faster stage selection (M5-15); browser tests replay a pinned basemap instead of the network (M5-22); browser jobs in Playwright's container (M5-23) | #67, #73, #74, #78, #80, #82, #91, #93 |
+| Ledgers | The PO's ledger PRs | #89, #92, #97 |
+
+**The data now** (counted at `1ebaa67`):
+- **Routes:** 10 routes (Paul 4, Jesus 6) with 83 stages and 71 drawn lines.
+  - The other 12 stages are all Jesus' and have no line, because at least one end is a disputed site (Bethany beyond the Jordan, Cana, the Gadarenes, Bethsaida or Emmaus).
+  - Every stage has its sources and its passages, 181 references in all, each with its WEB text.
+  - All 32 of Jesus' stages say which Gospels tell them, and the rule that admits them.
+- **Places:** 122, up from 89 at CP4, all `verified`. No route stop is left without its own place record.
+- **Bibliography:** 238 entries, up from 185.
+
+**Old links keep working:** `?route=jesus` and `?route=jesus&stage=N` open the same segment in its new part, and a test checks all 32.
+
+### How quality was checked
+- **The Fact-Checker signed off every data step.** See `docs/verification/` M5-paul-journeys, M5-jesus-journeys, M5-route-lines, M5-route-text, M5-route-places, M5-borders, M5-ancient-lands, M5-19-region-outlines, M5-20-region-anchors, M5-22-basemap-fixture and M5-24-jesus-journey-parts.
+- **Cross-vendor review covered the code and data PRs, not the ledger PRs.**
+  - A reviewer from the other vendor reviewed the implementation and data PRs. The reviews are in the PR comments, or in the ledger's review rows (#78's, for example).
+  - #95's review asked for the data step's sign-off, and approved once it was added.
+  - #98's review found two bugs: a "4, place" tooltip, and a pan when hovering. Both were fixed with tests that fail before the fix, and the review then approved.
+  - The PO's docs and ledger PRs weren't all reviewed. #97 says it wasn't.
+  - Findings were fixed or deferred to `BACKLOG.md`.
+- **Tests on `1ebaa67`** (details in [CP5.md](docs/verification/CP5.md)):
+  - **#98's CI** passed every required check, all 6 browser shards included: 125 passed, 3 skipped, 0 flaky, 0 failed.
+  - **Push to `main`:** CI run 41135111739 passed and deployed.
+  - **Weekly on 2026-11-02:** the full suite passed (125 passed, 3 skipped), then 3 smoke tests, and the image-link check passed too.
+  - **The 3 skips** are 2 optional screenshot captures and 1 fixture case for a missing timeline. None of them is a speed or GPU check.
+- **Test health (TESTING §6), from #98's CI report:** 0 flaky and 0 failed tests, and none passed its 60 s limit. The slowest took 48.7 s (drawing real routes). The desktop GPU run below is reported separately.
+- **Mini checkpoints:** MC9 to MC13 became ADR-0041 to ADR-0044 and ADR-0048. MC10b and MC13 closed through the PRs and ADR-0046, as recorded in the table at the top. No new play-test has happened since #98 merged.
+
+### MC11: the desktop speed check (done, with one caveat)
+The Frontend Engineer ran these on 2026-11-05 on an Apple M1 desktop. They used the same export `main`'s CI built for `1ebaa67` (run 41135111739), unchanged. The CI results above don't count as speed evidence (ADR-0034, ADR-0036). The exact commands and the evidence files are in [CP5.md §4](docs/verification/CP5.md).
+
+| Check | Renderer | Gate | Result |
+|---|---|---|---|
+| Lighthouse, median of 3 (`npm run verify:web:lighthouse`) | Software (SwiftShader), because the script runs headless with the GPU off | LCP ≤ 2.5 s, TBT ≤ 200 ms | **Pass:** LCP 1.87 s, TBT 0 ms |
+| `npm run bench:map -- --mode headed` | Apple M1 GPU (Metal) | Reported | No long tasks in any of the 5 scenarios. The worst frame took 17.8 ms in three of them and 33.3 ms in two |
+| GPU smoothness (`@perf`, headed, long-task limits enforced) | Apple M1 GPU | Every test passes | **The first run failed one test**, because the opening camera assertion failed. One rerun passed all 3 |
+
+- **Lighthouse's software result isn't a real-GPU speed measurement.** The real-GPU evidence is the headed benchmark and the GPU test.
+- **The GPU failure isn't explained yet.** It was a camera position, not a long task (the reading is in CP5.md §4). The evidence was reviewed, but no cause was established. This desktop run doesn't count as a clean, 0-flaky run, and the opening-camera failure stays an open caveat. When you play-test, check that the opening map stays still after it loads.
+
+### Decisions needed from you
+**Merging this PR, or commenting "approved", approves CP5.** To change anything, comment on the PR.
+
+| # | Decision | Recommendation | Alternative |
+|---|---|---|---|
+| 1 | Approve CP5 | **Approve** after you've tried the live Routes tab (below), the opening map included. Keep in mind MC11's caveat about the GPU test | Ask for changes first; they become a fix PR before M6 |
+| 2 | M6's first verified batch, after approval (your choice) | **About 50 places that fill in the Gospels and the Holy Land**, where the brief wants the most detail. These are the lands the timeline already draws that the New Testament names but that have no record yet (such as the Decapolis, Idumea, Iturea, Trachonitis, Abilene and Phoenicia), the places inside Jerusalem the About texts name (such as the Kidron Valley), and the Gospel and Acts places still missing. These are all on the backlog already. The Research Lead's list goes to you before any record is written. | Paul's letters and Revelation first, or the light coverage of Egypt and Ethiopia first |
+
+**For your information. These are already decided, so you don't need to approve them again; say if you'd like any of them changed:**
+- **The stages without a line:** you chose six parts on 2026-10-24. #98 then gave these stages option A and the grouped list, with Jesus' journeys first.
+  - Under option A, a stage's number usually sits on the end whose site isn't disputed.
+  - One stage has both ends disputed, Bethany beyond the Jordan → Cana; its number sits on Cana's dot.
+  - None of these stages has a line.
+  - You were away when option A was chosen, and #98 asked you to say if you'd rather have B. You merged #98 with no request for B, so A stands (ADR-0038's update of 2026-10-24).
+  - Option B, a floating number, is still a small change if you want it.
+- **The P4 border lines (MC13):** these are the PO's defaults.
+  - Abkhazia and South Ossetia are dashed.
+  - Transnistria and the Kerch Strait have no line.
+  - Halaib and Bir Tawil are dashed.
+  - Algeria–Morocco is solid.
+  - Any of them can change after you compare them with Google Maps.
+
+### What to do now
+1. **Try the live site** on your computer and your phone:
+   - [the opening map](https://interactive-bible-map.pages.dev/): check that it stays still once it has loaded, with no drift (MC11's caveat);
+   - [the route list](https://interactive-bible-map.pages.dev/?tab=routes): open and close both groups;
+   - [Paul's second journey, stage 2](https://interactive-bible-map.pages.dev/?tab=routes&route=paul-2&stage=2): Derbe → Lystra, a stage with a line, numbered at its middle;
+   - [Jesus in Galilee, segment 3](https://interactive-bible-map.pages.dev/?tab=routes&route=jesus-2&stage=3): Capernaum → the country of the Gadarenes, with no line, numbered on Capernaum;
+   - [Jesus after the resurrection, segment 1](https://interactive-bible-map.pages.dev/?tab=routes&route=jesus-6&stage=1): Jerusalem → Emmaus, with no line, numbered on Jerusalem.
+
+   On each stage, open its passages and details: the Gospels that tell it, its sources, and any "Site disputed" note.
+2. **Approve CP5,** or comment with the changes you want.
+3. **Pick M6's first batch** (decision 2). Once you approve, the PO writes its cards.
+
+### Concepts for you
+- **Disputed site.** The Bible names a place whose location scholars still debate, such as Emmaus. The map shows each candidate site and draws no line to any of them, so it doesn't take a side. [Pleiades on uncertainty](https://pleiades.stoa.org/help/conceptual-overview)
+- **Software rendering.** CI's machines have no graphics card, so they draw the map on the CPU. That's fine for checking correctness, but it doesn't measure speed, which is why the speed gate runs on a desktop. [MDN: WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API)
+
+### Risks
+- **Speed on real devices:**
+  - MC11 passed on an Apple M1, apart from the GPU test's one unexplained failure.
+  - It wasn't measured on phones or weaker computers.
+  - The backlog keeps the modern map's slower drag and the re-uploads on each click.
+- **Little room left in the startup layer:** about 327,800 of its 330,000 bytes (BACKLOG). The next map data needs the deferred "load on first use" change or a trim first.
+- **Disputed sites and approximate years.** Twelve stages have no line, and the years of Jesus' journeys are ranges. Both are stated in the notes, which come last.
+- **Free services:** unchanged. OpenFreeMap has no service guarantee, but tests now replay a pinned basemap, so an outage can't break CI.
+- **Deferred findings** stay in `BACKLOG.md`. Among them: the legacy-link table is kept by hand, guarded by a test, and the Roman frontier for each year never draws.
+
+### Budget
+- **October known total:** about **434,236 of 1,000,000 credits (43.4%)**. This adds #95's and #98's recorded rows to the ledger's 424,807.
+- **Since the MC7 measurement (2026-10-10):** about 238,800 of that. It covers M5, the phone tasks M7-02 to M7-04, and the test and CI work beside them.
+- **What it leaves out:**
+  - the PO's coordination from 2026-10-24 19:09 UTC to #98's merge;
+  - the Fact-Checker's phase-3 check for #95;
+  - #95's delta review and both of #98's reviews.
+
+  None of these recorded a figure, so the ledger lists them as unmeasured instead of guessing.
+- **November:** unknown. No November usage is recorded yet, and none is estimated here.
+  - Before M6 starts, the PO adds measured session rows where a measurement is available.
+  - If November can't be measured, you may need to confirm it on your Copilot usage page before M6 starts.
+- **The authority:** GitHub's Copilot usage and billing report (ADR-0005). The ledger's rows are the agents' and the PO's records. Its measured rows aren't account totals, and no figure here claims to be your actual account usage. See [BUDGET.md](docs/BUDGET.md).
+
+### Next (after you approve)
+The PO records CP5's approval and plans M6: one card per verified batch of about 50 places, one checkpoint per batch.
