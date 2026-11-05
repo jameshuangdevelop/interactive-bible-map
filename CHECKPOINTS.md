@@ -11,7 +11,7 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP3.5 | M3.5 Images | 5–10 images for each of 31 major places and 1–3 for the rest, cited AI reconstructions, link checks, and a larger gallery | Approved 2026-10-02 | #29–#37 |
 | CP3b | M3 MVP App | Working MVP deployed to a preview | Approved 2026-10-07 (live at https://interactive-bible-map.pages.dev) | #38–#50 |
 | CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Approved 2026-10-12; on `main` through #59 | #51–#59 |
-| CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Awaiting your review (not approved). M5 is complete on `main` at `1ebaa67` (2026-10-30); MC11 is done, with one caveat (CP5 below) | #60–#98; the CP5 PR |
+| CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Awaiting your review (not approved). M5 is complete on `main` at `1ebaa67` (2026-10-30); MC11 is done, with one caveat (CP5 below) | #60–#98; #99 (CP5) |
 | CP6+ | M6 Expansion | About 50 verified locations per batch, one checkpoint per batch, up to about 300 | Not started | |
 | CP7 | M7 Mobile-web polish | Responsive layout, touch gestures, performance | Not started | |
 

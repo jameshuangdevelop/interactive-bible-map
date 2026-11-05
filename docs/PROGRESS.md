@@ -5,7 +5,7 @@ Shared memory for all agents. Every session reads this first. Only the PO edits 
 **Current milestone:** M5 – Routes Tab (CP4 approved 2026-10-12, #58) · **Status:** M5 is complete on `main` at `1ebaa67` (#98, 2026-10-30). **CP5 is awaiting the human's review and isn't approved.** No M6 work starts until it is.
 
 ## Resume point
-1. **Now (2026-11-05 UTC): waiting for the human to approve CP5** (`CHECKPOINTS.md`, CP5; evidence in `docs/verification/CP5.md`).
+1. **Now (2026-11-05 UTC): waiting for the human to approve CP5** (#99; `CHECKPOINTS.md`, CP5; evidence in `docs/verification/CP5.md`).
    1. **MC11 is done, with one caveat** (2026-11-05; CP5.md §4). On the Apple M1, using the export from `main`'s CI run 41135111739:
       - Lighthouse passed (median LCP 1,871.96 ms, TBT 0 ms), but in software (SwiftShader), not on the GPU.
       - The headed `bench:map` had 0 long tasks on the M1's GPU (ANGLE Metal).
@@ -110,7 +110,7 @@ Shared memory for all agents. Every session reads this first. Only the PO edits 
 | M5-25 | Two map fixes: camera fits keep clear of the desktop timeline card, and a selected region's blue name shows (BACKLOG, found while checking #90) | frontend-engineer | `fix/m5-25-fit-and-selected-name` | Merged | #94 |
 | M5-24 | Jesus' journeys in six parts, each shown on its own with numbered stages (the human, 2026-10-22; ADR-0038 update of 2026-10-24) | research-lead → fact-checker → gis-engineer → frontend-engineer | `data/m5-24-jesus-journey-parts`, then `feat/m5-24-jesus-journey-parts` | Merged; verified (`docs/verification/M5-24-jesus-journey-parts.md`, phases 1–3). #95 (the data, 2026-10-25) and #98 (the Routes tab: numbers on the stages without a line, option A, and the grouped list, 2026-10-30) | #95, #98 |
 | — | The ledgers after #92 to #96, and the backlog | project-owner | `docs/ledgers-2026-10-24` | Merged | #97 |
-| CP5 | CP5 summary: what M5 delivered, the evidence (`docs/verification/CP5.md`), MC10b and MC13 closed, MC11 done with one caveat (the `@gpu` camera check failed once, then a rerun passed), the ledgers after #95 and #98 | project-owner | `docs/cp5-summary` | In review (this PR); waits for the human's play-test and approval | |
+| CP5 | CP5 summary: what M5 delivered, the evidence (`docs/verification/CP5.md`), MC10b and MC13 closed, MC11 done with one caveat (the `@gpu` camera check failed once, then a rerun passed), the ledgers after #95 and #98 | project-owner | `docs/cp5-summary` | In review; waits for the human's play-test and approval | #99 |
 | M5-17 | Failing fast: time limits for actions and page loads, the flaky full-sheet test, and flaky and slow tests on each CI run's page (ADR-0045) | frontend-engineer | `chore/m5-17-fail-fast` | Merged | #82 |
 | M5-06 | Route text (summary, what the Bible says, notes last) and every place the passages name (ADR-0041) | gis-engineer → research-lead → fact-checker | `data/m5-route-text` | Merged; verified (`docs/verification/M5-route-text.md`) | #66 |
 | Fix | Fix: a place's title on phones without images | frontend-engineer | `fix/phone-panel-title` | Merged | #68 |
