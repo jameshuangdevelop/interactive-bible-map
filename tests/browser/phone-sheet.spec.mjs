@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "./fixtures.mjs";
+import { mapTestHookKey } from "../../scripts/verify-web-export-playwright.mjs";
 
 const PHONE_VIEWPORT = { width: 390, height: 844 };
 const SHEET_FULL_TOP_MAX_PX = 8;
@@ -10,6 +11,36 @@ test.use({
   hasTouch: true,
   isMobile: true
 });
+
+async function waitForMapIdle(page) {
+  await page.waitForFunction(
+    (testHookKey) => {
+      const map = window[testHookKey];
+      return Boolean(map && map.loaded() && !map.isMoving());
+    },
+    mapTestHookKey,
+    { timeout: 60_000 }
+  );
+}
+
+async function readMapCamera(page) {
+  return page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+    const center = map.getCenter();
+    const bounds = map.getBounds();
+    return {
+      center: [center.lng, center.lat],
+      zoom: map.getZoom(),
+      bounds: [
+        [bounds.getWest(), bounds.getSouth()],
+        [bounds.getEast(), bounds.getNorth()]
+      ]
+    };
+  }, mapTestHookKey);
+}
 
 async function dragHandle(page, selector, deltaY, options = {}) {
   const { steps = 14 } = options;
@@ -602,6 +633,26 @@ test("dragging from the route-list top strip moves the sheet while strip taps do
   expect(routeHandleState.topPx).toBeGreaterThanOrEqual(0);
   await routeListHandle.click();
   await expect(routeListHandle).toHaveAttribute("aria-expanded", "false");
+});
+
+test("phone routes: explicit stage activation fits center and zoom to that segment @phone", async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-2`, { waitUntil: "domcontentloaded" });
+  await waitForRoutePanelReady(page);
+  await waitForMapIdle(page);
+
+  const before = await readMapCamera(page);
+  await page.locator("[data-route-stage-index='2']").click();
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("stage") === "2",
+    undefined,
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  const after = await readMapCamera(page);
+
+  expect(Math.abs(after.zoom - before.zoom)).toBeGreaterThan(0.25);
+  expect(Math.abs(after.center[1] - before.center[1])).toBeGreaterThan(0.08);
+  expect(after.bounds[0][1]).toBeGreaterThan(32.1);
 });
 
 test("downward drags in scrolled content do not move the full sheet @phone", async ({ page, baseUrl }) => {

@@ -441,6 +441,7 @@ describe("map render data", () => {
       bounds: null,
       routeFocusKey: "paul-1",
       selectedStageFocusKey: "paul-1:stage-2",
+      selectedStageBounds: null,
       selectedStageCenter: [35.0, 32.0]
     };
 

@@ -476,7 +476,6 @@ export function RoutesPanel({
                 <button
                   onClick={(event) => {
                     event.stopPropagation();
-                    onSelectStage(stageIndex);
                     onResolveStopSelection(from, stageIndex);
                   }}
                   style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
@@ -488,7 +487,6 @@ export function RoutesPanel({
                 <button
                   onClick={(event) => {
                     event.stopPropagation();
-                    onSelectStage(stageIndex);
                     onResolveStopSelection(to, stageIndex);
                   }}
                   style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
@@ -509,7 +507,6 @@ export function RoutesPanel({
                       <button
                         onClick={(event) => {
                           event.stopPropagation();
-                          onSelectStage(stageIndex);
                           onResolveStopSelection(viaStop, stageIndex);
                         }}
                         style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
@@ -530,7 +527,6 @@ export function RoutesPanel({
                       <button
                         onClick={(event) => {
                           event.stopPropagation();
-                          onSelectStage(stageIndex);
                           onResolveStopSelection(mentionedStop, stageIndex);
                         }}
                         style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
