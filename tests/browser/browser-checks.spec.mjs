@@ -3509,6 +3509,10 @@ for (const scenario of [
   { routeId: "jesus-1", stageIndex: 8, stageId: "segment-10", label: "8" },
   { routeId: "jesus-2", stageIndex: 3, stageId: "segment-11", label: "3" },
   { routeId: "jesus-2", stageIndex: 4, stageId: "segment-12", label: "4" },
+  { routeId: "jesus-3", stageIndex: 4, stageId: "segment-16", label: "4" },
+  { routeId: "jesus-3", stageIndex: 5, stageId: "segment-17", label: "5" },
+  { routeId: "jesus-4", stageIndex: 1, stageId: "segment-25", label: "1" },
+  { routeId: "jesus-4", stageIndex: 2, stageId: "segment-26", label: "2" },
   { routeId: "jesus-6", stageIndex: 1, stageId: "segment-31", label: "1" }
 ]) {
   test(`disputed stage ${scenario.routeId} #${scenario.stageIndex} shows one mid-line pill, and none when deselected @routes`, { tag: ["@routes"] }, async ({ page, baseUrl }) => {
@@ -3599,6 +3603,12 @@ test("selecting disputed Jerusalem→Emmaus fits its illustrative line vicinity 
   expect(after.zoom, "fitting disputed illustrative segment should not zoom further in").toBeLessThan(
     before.zoom - 0.1
   );
+  await expect.poll(async () => {
+    const midpoint = await routeStageLineMidpointScreenPoint(page, "segment-31");
+    return midpoint ? routeStageLineHitsPoint(page, "segment-31", midpoint) : false;
+  }, {
+    message: "Jerusalem→Emmaus must render its illustrative line, not only move the camera"
+  }).toBe(true);
 });
 
 test("disputed stages show an explicit illustrative-line disclaimer in the panel @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
