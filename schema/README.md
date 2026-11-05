@@ -297,6 +297,12 @@ Complete example:
 
 If any candidate has confidence `disputed`, the record must include at least **two** candidates.
 
+### Unmapped candidates (CP2 decision 3)
+- `unmappedCandidates[]` stores a proposal scholars discuss when no accepted source gives a coordinate we can map.
+- Each entry must include `label`, `confidence`, `support`, `reason`, and at least **two** `sources`.
+- Entries are never drawn on the map, never get a candidate letter, and never get a `candidateIndex`.
+- Do not guess coordinates: `unmappedCandidates[]` entries must not include `coordinates` or `coordinateSource`.
+
 ### Names
 - `names.ancient[0]` is the record title and should use the spelling most of these English Bible translations agree on: NIV, ESV, NLT, KJV, NKJV, and CSB.
 - `names.ancient` and `names.alternate` are display names and should be English-only in this phase: names used in English Bible translations (for example KJV `Melita` or NIV `Berea`) or in standard English reference works.

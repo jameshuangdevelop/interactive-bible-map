@@ -256,6 +256,59 @@
         }
       }
     },
+    "unmappedCandidates": {
+      "type": "array",
+      "description": "Candidate site proposals with support but no accepted coordinate to map.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "description": "One proposed candidate without coordinates.",
+        "additionalProperties": false,
+        "required": [
+          "label",
+          "confidence",
+          "support",
+          "reason",
+          "sources"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Short label for this unmapped proposal.",
+            "minLength": 1
+          },
+          "confidence": {
+            "type": "string",
+            "description": "Confidence level for this unmapped candidate.",
+            "enum": [
+              "high",
+              "medium",
+              "low",
+              "disputed"
+            ]
+          },
+          "support": {
+            "type": "string",
+            "description": "Neutral summary of why this candidate is proposed.",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "description": "Neutral reason why this candidate has no coordinate.",
+            "minLength": 1
+          },
+          "sources": {
+            "type": "array",
+            "description": "Sources supporting this unmapped candidate.",
+            "minItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
+            }
+          }
+        }
+      }
+    },
     "summary": {
       "type": "object",
       "description": "Neutral summary text with source IDs.",

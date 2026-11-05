@@ -189,6 +189,17 @@ function toDraftRecord(record) {
   return draftRecord;
 }
 
+function createValidUnmappedCandidate(overrides = {}) {
+  return {
+    label: "Askar fixture proposal",
+    confidence: "low",
+    support: "Illustrative support summary for this fixture proposal.",
+    reason: "No accepted coordinate is available in the fixture sources.",
+    sources: ["bib:existing-bib-source", "pleiades:678231"],
+    ...overrides
+  };
+}
+
 async function runWithTemporaryCase(mutateLocations, options = {}) {
   const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "ibm-validator-"));
 
@@ -1468,6 +1479,107 @@ test("bib sources must exist in bibliography registry", async () => {
         error.message.includes("was not found in data/bibliography.json")
     )
   );
+});
+
+test("unmappedCandidates reject coordinates so unmapped proposals cannot carry map points", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.unmappedCandidates = [
+      createValidUnmappedCandidate({
+        coordinates: [35.57, 32.88]
+      })
+    ];
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.unmappedCandidates[0]" &&
+        error.message.includes("must NOT have additional properties")
+    ),
+    true
+  );
+});
+
+test("unmappedCandidates require at least two source IDs per proposal", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.unmappedCandidates = [
+      createValidUnmappedCandidate({
+        sources: ["bib:existing-bib-source"]
+      })
+    ];
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.unmappedCandidates[0].sources" &&
+        error.message.includes("must NOT have fewer than 2 items")
+    ),
+    true
+  );
+});
+
+test("unmappedCandidates sources must resolve in the bibliography registry", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.unmappedCandidates = [
+      createValidUnmappedCandidate({
+        sources: ["bib:missing-source", "pleiades:678231"]
+      })
+    ];
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.unmappedCandidates[0].sources[0]" &&
+        error.message.includes("was not found in data/bibliography.json")
+    ),
+    true
+  );
+});
+
+test("candidate labels stay unique across candidates and unmappedCandidates after trim and case-folding", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.unmappedCandidates = [
+      createValidUnmappedCandidate({
+        label: "  tell hum  "
+      })
+    ];
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.candidates" &&
+        error.message.includes("across candidates and unmappedCandidates")
+    ),
+    true
+  );
+});
+
+test("unmappedCandidates cannot be present as an empty array", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.unmappedCandidates = [];
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.unmappedCandidates" &&
+        error.message.includes("must NOT have fewer than 1 items")
+    ),
+    true
+  );
+});
+
+test("valid unmappedCandidates entries pass schema and source validation", async () => {
+  const result = await runCase("valid-unmapped-candidates");
+  assert.equal(result.errors.length, 0);
 });
 
 test("verified records require verifiedBy and lastReviewed", async () => {
