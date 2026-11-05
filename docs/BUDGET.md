@@ -80,7 +80,7 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | CP2 | 2026-09 | ~22,666 | ~25,926 | ~2.6% |
 | CP3a | 2026-09 | ~2,560 | ~28,490 | ~2.8% |
 | CP3.5 | 2026-10 | ~64,835 (about 7,100 of it on 2026-09-30) | ~57,735 | ~5.8% |
-| CP5 (awaiting approval) | 2026-10 | ~238,800 since MC7's measurement (195,472 at 2026-10-10 08:10 UTC): M5, M7-02 to M7-04, and the test and CI work beside them. Known rows only; the unmeasured items are listed in the ledger | ~434,236 known | ~43.4% |
+| CP5 (approved #99; known October rows) | 2026-10 | ~238,800 since MC7's measurement (195,472 at 2026-10-10 08:10 UTC): M5, M7-02 to M7-04, and the test and CI work beside them. Known rows only; November's M5-26 follow-up is unmeasured below | ~434,236 known | ~43.4% |
 
 September closed at about **75,500 credits (7.6% of that month's cap)**. That covered M3's build (M3-02 to M3-13, counted at CP3b) and the start of M3.5.
 
@@ -566,4 +566,4 @@ September closed at about **75,500 credits (7.6% of that month's cap)**. That co
 ## Ledger — 2026-11
 | Date | Agent | Model | Task | Tokens in / out (est.) | AI credits | Month total |
 |---|---|---|---|---|---:|---:|
-| 2026-11-01 to 2026-11-05 | — | — | **Unknown; not measured or estimated.** No usage figure is recorded yet for November's sessions, this CP5 session included. Before M6 starts, the PO adds measured session rows where a measurement is available. If none is, the human confirms November's usage on the Copilot usage page before M6 starts. GitHub's Copilot usage and billing report is the authority (ADR-0005) | — | — | unknown |
+| 2026-11-01 to 2026-11-05 | project-owner, frontend-engineer, pr-reviewer | Not fully reported | **Unknown; not measured or estimated.** This includes CP5 closeout (#99), M5-26 implementation and review rounds (#100, including the pointer/sea-framing/disputed-line feedback), and this M6 handoff. Their PRs/reports supply no measured credit figure, so no numerical rows or running total are invented. The incoming M6 lead must reconcile available measurements with GitHub's authoritative Copilot usage/billing report, or obtain the human's confirmation that usage is below the 800,000-credit soft stop before starting M6. Session rows alone are not an account-wide total; the 950,000-credit hard stop still applies (ADR-0005) | — | — | unknown |
