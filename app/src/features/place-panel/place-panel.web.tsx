@@ -38,6 +38,7 @@ import {
   isDisputedRecord,
   matchAboutPlaceMentions,
   nextImageIndex,
+  proposedSitesSummaryText,
   shouldRenderThumbnailRow,
   sortScriptureByCanonicalOrder
 } from "./panel-model";
@@ -1071,6 +1072,9 @@ export function PlacePanel({
     () => ({ ...rememberedCollapsibleSectionExpandedState })
   );
   const [expandedCandidateSupport, setExpandedCandidateSupport] = useState<Record<number, true>>({});
+  const [expandedUnmappedCandidateSupport, setExpandedUnmappedCandidateSupport] = useState<
+    Record<number, true>
+  >({});
   const [showAllScripture, setShowAllScripture] = useState(false);
   const [visibleScriptureCount, setVisibleScriptureCount] = useState(SCRIPTURE_INITIAL_COUNT);
 
@@ -1084,6 +1088,9 @@ export function PlacePanel({
   const placeForDisplay: PlaceIndexRecord | PlaceRecord = location ?? selectedPlace;
   const hasMultipleCandidates = placeForDisplay.candidates.length > 1;
   const isDisputed = isDisputedRecord(placeForDisplay);
+  const unmappedCandidates = location?.unmappedCandidates ?? [];
+  const unmappedCandidateCount = unmappedCandidates.length;
+  const hasUnmappedCandidates = unmappedCandidateCount > 0;
   const childPlaces = useMemo(
     () =>
       places
@@ -1585,24 +1592,42 @@ export function PlacePanel({
   };
 
   const locationStatusIndicator = (() => {
-    if (hasMultipleCandidates && isDisputed) {
+    if (hasUnmappedCandidates || (hasMultipleCandidates && isDisputed)) {
+      const proposedSiteSummary = proposedSitesSummaryText({
+        mappedCandidateCount: placeForDisplay.candidates.length,
+        unmappedCandidateCount
+      });
+      if (hasMultipleCandidates && isDisputed) {
+        return (
+          <span
+            data-location-chip="disputed"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              borderRadius: "999px",
+              backgroundColor: tokens.color.confidenceDisputedBackground,
+              color: tokens.color.confidenceDisputedText,
+              padding: "2px 10px",
+              fontWeight: 500,
+              fontSize: `${tokens.typography.captionSize}px`,
+              lineHeight: `${tokens.typography.captionLineHeight}px`
+            }}
+          >
+            Location disputed · {proposedSiteSummary}
+          </span>
+        );
+      }
+
       return (
         <span
-          data-location-chip="disputed"
+          data-location-chip="multi-site"
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            borderRadius: "999px",
-            backgroundColor: tokens.color.confidenceDisputedBackground,
-            color: tokens.color.confidenceDisputedText,
-            padding: "2px 10px",
-            fontWeight: 500,
-            fontSize: `${tokens.typography.captionSize}px`,
-            lineHeight: `${tokens.typography.captionLineHeight}px`
+            color: tokens.color.textSecondary,
+            fontSize: `${tokens.typography.bodySize}px`,
+            lineHeight: `${tokens.typography.bodyLineHeight}px`
           }}
         >
-          Location disputed · {placeForDisplay.candidates.length} proposed{" "}
-          {placeForDisplay.candidates.length === 1 ? "site" : "sites"}
+          {proposedSiteSummary}
         </span>
       );
     }
@@ -1875,11 +1900,15 @@ export function PlacePanel({
           </section>
         ) : null}
 
-        {location && hasMultipleCandidates ? (
+        {location && (hasMultipleCandidates || hasUnmappedCandidates) ? (
           <section data-panel-section="candidates">
             <hr style={sectionDividerStyle} />
             <h2 style={sectionHeadingStyle}>
-              {isDisputed ? "Proposed sites" : "Sites"}
+              {hasMultipleCandidates
+                ? isDisputed
+                  ? "Proposed sites"
+                  : "Sites"
+                : "Other proposed sites"}
             </h2>
             <div
               style={{
@@ -1888,76 +1917,203 @@ export function PlacePanel({
                 gap: `${tokens.spacing.sm}px`
               }}
             >
-              {location.candidates.map((candidate, candidateIndex) => {
-                const selected = selection.candidateIndex === candidateIndex;
+              {hasMultipleCandidates
+                ? location.candidates.map((candidate, candidateIndex) => {
+                    const selected = selection.candidateIndex === candidateIndex;
+                    const chip = typeChipStyle(candidate.confidence);
+                    const expanded = Boolean(expandedCandidateSupport[candidateIndex]);
+                    const support = candidate.support;
+                    const supportCanExpand = support.length > 170;
+                    const letter = candidateIndexToLetter(candidateIndex);
+                    const supportTextId = `candidate-support-${selectedPlace.id}-${candidateIndex}`;
+
+                    return (
+                      <div
+                        key={`${candidate.label}:${candidateIndex}`}
+                        style={{
+                          border: selected
+                            ? `1px solid ${tokens.color.accent}`
+                            : `1px solid ${tokens.color.divider}`,
+                          borderRadius: `${tokens.radius.panel}px`,
+                          backgroundColor: selected ? "#E8F0FE" : tokens.color.surface,
+                          padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`
+                        }}
+                      >
+                        <button
+                          aria-label={`Candidate ${letter}: ${candidate.label}`}
+                          onClick={() => onSelectCandidate(candidateIndex)}
+                          style={{
+                            border: "none",
+                            background: "transparent",
+                            width: "100%",
+                            padding: 0,
+                            cursor: "pointer",
+                            textAlign: "left"
+                          }}
+                          type="button"
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              gap: `${tokens.spacing.sm}px`
+                            }}
+                          >
+                            <strong
+                              style={{
+                                color: tokens.color.textPrimary,
+                                minWidth: 0,
+                                overflowWrap: "anywhere"
+                              }}
+                            >
+                              {letter}. {candidate.label}
+                            </strong>
+                            <span
+                              style={{
+                                borderRadius: "999px",
+                                padding: "2px 8px",
+                                fontSize: `${tokens.typography.captionSize}px`,
+                                lineHeight: `${tokens.typography.captionLineHeight}px`,
+                                fontWeight: 600,
+                                color: chip.color,
+                                backgroundColor: chip.backgroundColor
+                              }}
+                            >
+                              {confidenceLabel(candidate.confidence, false)}
+                            </span>
+                          </div>
+                        </button>
+                        <p
+                          id={supportTextId}
+                          style={{
+                            marginTop: `${tokens.spacing.sm}px`,
+                            marginBottom: `${tokens.spacing.xs}px`,
+                            color: tokens.color.textSecondary,
+                            fontSize: `${tokens.typography.bodySize}px`,
+                            lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                            overflowWrap: "anywhere",
+                            ...(expanded
+                              ? {}
+                              : {
+                                  display: "-webkit-box",
+                                  WebkitBoxOrient: "vertical",
+                                  WebkitLineClamp: 2,
+                                  overflow: "hidden"
+                                })
+                          }}
+                        >
+                          {support}
+                          <SourceMarkers
+                            onSelectSource={jumpToSource}
+                            sourceOrdinalById={sourceOrdinalById}
+                            sources={candidate.sources}
+                          />
+                        </p>
+                        {supportCanExpand ? (
+                          <button
+                            aria-controls={supportTextId}
+                            aria-expanded={expanded}
+                            data-candidate-support-toggle="true"
+                            style={{
+                              border: "none",
+                              background: "transparent",
+                              padding: "0 4px",
+                              minHeight: "44px",
+                              cursor: "pointer",
+                              color: tokens.color.accent,
+                              fontSize: `${tokens.typography.captionSize}px`,
+                              lineHeight: `${tokens.typography.captionLineHeight}px`,
+                              textDecoration: "underline",
+                              textUnderlineOffset: "2px"
+                            }}
+                            onClick={() => {
+                              setExpandedCandidateSupport((current) => {
+                                if (current[candidateIndex]) {
+                                  const { [candidateIndex]: _removed, ...rest } = current;
+                                  return rest;
+                                }
+                                return {
+                                  ...current,
+                                  [candidateIndex]: true
+                                };
+                              });
+                            }}
+                            type="button"
+                          >
+                            {expanded ? "Show less" : "Show more"}
+                          </button>
+                        ) : null}
+                      </div>
+                    );
+                  })
+                : null}
+              {unmappedCandidates.map((candidate, candidateIndex) => {
                 const chip = typeChipStyle(candidate.confidence);
-                const expanded = Boolean(expandedCandidateSupport[candidateIndex]);
-                const support = candidate.support;
-                const supportCanExpand = support.length > 170;
-                const letter = candidateIndexToLetter(candidateIndex);
-                const supportTextId = `candidate-support-${selectedPlace.id}-${candidateIndex}`;
+                const expanded = Boolean(expandedUnmappedCandidateSupport[candidateIndex]);
+                const supportCanExpand = candidate.support.length > 170;
+                const supportTextId = `unmapped-candidate-support-${selectedPlace.id}-${candidateIndex}`;
 
                 return (
                   <div
-                    key={`${candidate.label}:${candidateIndex}`}
+                    data-unmapped-candidate="true"
+                    key={`unmapped:${candidate.label}:${candidateIndex}`}
                     style={{
-                      border: selected
-                        ? `1px solid ${tokens.color.accent}`
-                        : `1px solid ${tokens.color.divider}`,
+                      border: `1px solid ${tokens.color.divider}`,
                       borderRadius: `${tokens.radius.panel}px`,
-                      backgroundColor: selected ? "#E8F0FE" : tokens.color.surface,
+                      backgroundColor: tokens.color.surface,
                       padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`
                     }}
                   >
-                    <button
-                      aria-label={`Candidate ${letter}: ${candidate.label}`}
-                      onClick={() => onSelectCandidate(candidateIndex)}
+                    <div
                       style={{
-                        border: "none",
-                        background: "transparent",
-                        width: "100%",
-                        padding: 0,
-                        cursor: "pointer",
-                        textAlign: "left"
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: `${tokens.spacing.sm}px`
                       }}
-                      type="button"
                     >
-                      <div
+                      <strong
+                        data-unmapped-candidate-label="true"
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: `${tokens.spacing.sm}px`
+                          color: tokens.color.textPrimary,
+                          minWidth: 0,
+                          overflowWrap: "anywhere"
                         }}
                       >
-                        <strong
-                          style={{
-                            color: tokens.color.textPrimary,
-                            minWidth: 0,
-                            overflowWrap: "anywhere"
-                          }}
-                        >
-                          {letter}. {candidate.label}
-                        </strong>
-                        <span
-                          style={{
-                            borderRadius: "999px",
-                            padding: "2px 8px",
-                            fontSize: `${tokens.typography.captionSize}px`,
-                            lineHeight: `${tokens.typography.captionLineHeight}px`,
-                            fontWeight: 600,
-                            color: chip.color,
-                            backgroundColor: chip.backgroundColor
-                          }}
-                        >
-                          {confidenceLabel(candidate.confidence, false)}
-                        </span>
-                      </div>
-                    </button>
+                        {candidate.label}
+                      </strong>
+                      <span
+                        style={{
+                          borderRadius: "999px",
+                          padding: "2px 8px",
+                          fontSize: `${tokens.typography.captionSize}px`,
+                          lineHeight: `${tokens.typography.captionLineHeight}px`,
+                          fontWeight: 600,
+                          color: chip.color,
+                          backgroundColor: chip.backgroundColor
+                        }}
+                      >
+                        {confidenceLabel(candidate.confidence, false)}
+                      </span>
+                    </div>
+                    <p
+                      data-unmapped-candidate-status="true"
+                      style={{
+                        marginTop: `${tokens.spacing.sm}px`,
+                        marginBottom: `${tokens.spacing.xs}px`,
+                        color: tokens.color.textSecondary,
+                        fontSize: `${tokens.typography.captionSize}px`,
+                        lineHeight: `${tokens.typography.captionLineHeight}px`,
+                        fontWeight: 600
+                      }}
+                    >
+                      Not on the map: no verified coordinate.
+                    </p>
                     <p
                       id={supportTextId}
                       style={{
-                        marginTop: `${tokens.spacing.sm}px`,
+                        marginTop: 0,
                         marginBottom: `${tokens.spacing.xs}px`,
                         color: tokens.color.textSecondary,
                         fontSize: `${tokens.typography.bodySize}px`,
@@ -1973,7 +2129,7 @@ export function PlacePanel({
                             })
                       }}
                     >
-                      {support}
+                      {candidate.support}
                       <SourceMarkers
                         onSelectSource={jumpToSource}
                         sourceOrdinalById={sourceOrdinalById}
@@ -1998,7 +2154,7 @@ export function PlacePanel({
                           textUnderlineOffset: "2px"
                         }}
                         onClick={() => {
-                          setExpandedCandidateSupport((current) => {
+                          setExpandedUnmappedCandidateSupport((current) => {
                             if (current[candidateIndex]) {
                               const { [candidateIndex]: _removed, ...rest } = current;
                               return rest;
@@ -2014,6 +2170,18 @@ export function PlacePanel({
                         {expanded ? "Show less" : "Show more"}
                       </button>
                     ) : null}
+                    <p
+                      style={{
+                        marginTop: `${tokens.spacing.xs}px`,
+                        marginBottom: 0,
+                        color: tokens.color.textSecondary,
+                        fontSize: `${tokens.typography.captionSize}px`,
+                        lineHeight: `${tokens.typography.captionLineHeight}px`,
+                        overflowWrap: "anywhere"
+                      }}
+                    >
+                      <span style={{ fontWeight: 600 }}>Reason:</span> {candidate.reason}
+                    </p>
                   </div>
                 );
               })}
