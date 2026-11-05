@@ -407,51 +407,84 @@ async function routeStageLineMidpointScreenPoint(page, stageId) {
       if (!map) {
         throw new Error("Map test hook is unavailable.");
       }
-      const renderedLines = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] });
-      const lineFeature = renderedLines.find((feature) => String(feature?.properties?.stageId ?? "") === targetStageId);
-      if (!lineFeature || !lineFeature.geometry) {
-        return null;
-      }
-
-      const points =
-        lineFeature.geometry.type === "LineString"
-          ? lineFeature.geometry.coordinates
-          : lineFeature.geometry.coordinates.flat();
-      if (!Array.isArray(points) || points.length < 2) {
-        return null;
-      }
-
-      const segmentLengths = [];
-      let totalLength = 0;
-      for (let i = 1; i < points.length; i += 1) {
-        const [x1, y1] = points[i - 1];
-        const [x2, y2] = points[i];
-        const length = Math.hypot(x2 - x1, y2 - y1);
-        segmentLengths.push(length);
-        totalLength += length;
-      }
-      if (totalLength === 0) {
-        return null;
-      }
-      let traversed = 0;
-      const target = totalLength / 2;
-      let midpoint = points[0];
-      for (let i = 1; i < points.length; i += 1) {
-        const segmentLength = segmentLengths[i - 1];
-        if (traversed + segmentLength >= target) {
-          const ratio = (target - traversed) / segmentLength;
-          midpoint = [
-            points[i - 1][0] + (points[i][0] - points[i - 1][0]) * ratio,
-            points[i - 1][1] + (points[i][1] - points[i - 1][1]) * ratio
-          ];
-          break;
+      const midpointOfGeometry = (geometry) => {
+        const points =
+          geometry.type === "LineString"
+            ? geometry.coordinates
+            : geometry.coordinates.flat();
+        if (!Array.isArray(points) || points.length < 2) {
+          return null;
         }
-        traversed += segmentLength;
+
+        const segmentLengths = [];
+        let totalLength = 0;
+        for (let i = 1; i < points.length; i += 1) {
+          const [x1, y1] = points[i - 1];
+          const [x2, y2] = points[i];
+          const length = Math.hypot(x2 - x1, y2 - y1);
+          segmentLengths.push(length);
+          totalLength += length;
+        }
+        if (totalLength === 0) {
+          return null;
+        }
+        let traversed = 0;
+        const target = totalLength / 2;
+        let midpoint = points[0];
+        for (let i = 1; i < points.length; i += 1) {
+          const segmentLength = segmentLengths[i - 1];
+          if (traversed + segmentLength >= target) {
+            const ratio = (target - traversed) / segmentLength;
+            midpoint = [
+              points[i - 1][0] + (points[i][0] - points[i - 1][0]) * ratio,
+              points[i - 1][1] + (points[i][1] - points[i - 1][1]) * ratio
+            ];
+            break;
+          }
+          traversed += segmentLength;
+        }
+        return midpoint;
+      };
+
+      const renderedLines = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] });
+      let lineFeature = renderedLines.find((feature) => String(feature?.properties?.stageId ?? "") === targetStageId);
+      if (!lineFeature?.geometry) {
+        const sourceLines = map.querySourceFeatures("ibm-route-lines");
+        lineFeature = sourceLines.find((feature) => String(feature?.properties?.stageId ?? "") === targetStageId) ?? null;
       }
+      if (!lineFeature?.geometry) {
+        return null;
+      }
+      const midpoint = midpointOfGeometry(lineFeature.geometry);
+      if (!midpoint) {
+        return null;
+      }
+
       const projected = map.project(midpoint);
       return { x: projected.x, y: projected.y };
     },
     { testHookKey: mapTestHookKey, targetStageId: stageId }
+  );
+}
+
+async function routeStageLineHitsPoint(page, stageId, point, padding = 8) {
+  return page.evaluate(
+    ({ testHookKey, targetStageId, targetPoint, targetPadding }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      return map
+        .queryRenderedFeatures(
+          [
+            [targetPoint.x - targetPadding, targetPoint.y - targetPadding],
+            [targetPoint.x + targetPadding, targetPoint.y + targetPadding]
+          ],
+          { layers: ["ibm-routes-lines-highlight", "ibm-routes-lines-foreground"] }
+        )
+        .some((feature) => String(feature?.properties?.stageId ?? "") === targetStageId);
+    },
+    { testHookKey: mapTestHookKey, targetStageId: stageId, targetPoint: point, targetPadding: padding }
   );
 }
 
@@ -554,6 +587,38 @@ async function clickMapPoint(page, point) {
   const viewportPoint = await mapPointToViewportPoint(page, point);
   expect(viewportPoint).toBeTruthy();
   await page.mouse.click(viewportPoint.x, viewportPoint.y);
+}
+
+async function fireMapMouseMoveAtPoint(page, point) {
+  await page.evaluate(
+    ({ testHookKey, mapPoint }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      const originalEvent = new MouseEvent("mousemove", {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0
+      });
+      map.fire("mousemove", {
+        point: mapPoint,
+        lngLat: map.unproject(mapPoint),
+        originalEvent
+      });
+    },
+    { testHookKey: mapTestHookKey, mapPoint: point }
+  );
+}
+
+async function waitForMapCursor(page, cursor) {
+  await page.waitForFunction(
+    ({ testHookKey, expectedCursor }) =>
+      window.getComputedStyle(window[testHookKey].getCanvas()).cursor === expectedCursor,
+    { testHookKey: mapTestHookKey, expectedCursor: cursor },
+    { timeout: 5_000 }
+  );
 }
 
 async function selectedRegionOverlayCounts(page) {
@@ -3437,16 +3502,16 @@ test("each real route renders lines, stops, and panel content (replaces routesRe
 // One test per stage, so each has its own time budget: eight in one test reloaded the map 16 times and
 // timed out on CI.
 for (const scenario of [
-  { routeId: "jesus-1", stageIndex: 1, stageId: "segment-01", label: "1", anchorStopId: "nazareth" },
-  { routeId: "jesus-1", stageIndex: 2, stageId: "segment-05", label: "2", anchorStopId: "cana" },
-  { routeId: "jesus-1", stageIndex: 3, stageId: "segment-06", label: "3", anchorStopId: "capernaum" },
-  { routeId: "jesus-1", stageIndex: 7, stageId: "segment-02", label: "7", anchorStopId: "galilee" },
-  { routeId: "jesus-1", stageIndex: 8, stageId: "segment-10", label: "8", anchorStopId: "sychar" },
-  { routeId: "jesus-2", stageIndex: 3, stageId: "segment-11", label: "3", anchorStopId: "capernaum" },
-  { routeId: "jesus-2", stageIndex: 4, stageId: "segment-12", label: "4", anchorStopId: "capernaum" },
-  { routeId: "jesus-6", stageIndex: 1, stageId: "segment-31", label: "1", anchorStopId: "jerusalem" }
+  { routeId: "jesus-1", stageIndex: 1, stageId: "segment-01", label: "1" },
+  { routeId: "jesus-1", stageIndex: 2, stageId: "segment-05", label: "2" },
+  { routeId: "jesus-1", stageIndex: 3, stageId: "segment-06", label: "3" },
+  { routeId: "jesus-1", stageIndex: 7, stageId: "segment-02", label: "7" },
+  { routeId: "jesus-1", stageIndex: 8, stageId: "segment-10", label: "8" },
+  { routeId: "jesus-2", stageIndex: 3, stageId: "segment-11", label: "3" },
+  { routeId: "jesus-2", stageIndex: 4, stageId: "segment-12", label: "4" },
+  { routeId: "jesus-6", stageIndex: 1, stageId: "segment-31", label: "1" }
 ]) {
-  test(`lineless stage ${scenario.routeId} #${scenario.stageIndex} shows one pill on ${scenario.anchorStopId}, and none when deselected @routes`, { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  test(`disputed stage ${scenario.routeId} #${scenario.stageIndex} shows one mid-line pill, and none when deselected @routes`, { tag: ["@routes"] }, async ({ page, baseUrl }) => {
     await page.goto(`${baseUrl}/?tab=routes&route=${scenario.routeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
     await waitForMapIdle(page);
@@ -3459,15 +3524,19 @@ for (const scenario of [
     );
     expect(matchingPills, `expected exactly one pill for ${scenario.routeId} stage ${scenario.stageIndex}`).toHaveLength(1);
     expect(visiblePills, `expected only one visible pill for ${scenario.routeId} stage ${scenario.stageIndex}`).toHaveLength(1);
-    const anchorPoint = await routeStopScreenPoint(page, scenario.anchorStopId);
-    expect(anchorPoint, `expected rendered stop point for ${scenario.anchorStopId}`).toBeTruthy();
+    expect(await routeLinePointCount(page, scenario.stageId)).toBeGreaterThanOrEqual(2);
     const pill = matchingPills[0];
     expect(pill.x).not.toBeNull();
     expect(pill.y).not.toBeNull();
-    const dx = Math.abs((pill.x ?? 0) - anchorPoint.x);
-    const dy = Math.abs((pill.y ?? 0) - anchorPoint.y);
-    expect(dx, `pill x offset for ${scenario.stageId} should stay on anchor stop`).toBeLessThanOrEqual(4);
-    expect(dy, `pill y offset for ${scenario.stageId} should stay on anchor stop`).toBeLessThanOrEqual(4);
+    expect(
+      await routeStageLineHitsPoint(
+        page,
+        scenario.stageId,
+        { x: pill.x ?? 0, y: pill.y ?? 0 },
+        8
+      ),
+      `pill for ${scenario.stageId} should stay on a rendered stage line`
+    ).toBe(true);
 
     await page.goto(`${baseUrl}/?tab=routes&route=${scenario.routeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
@@ -3480,12 +3549,15 @@ test("selecting a visible lined stage from the map fits that stage's own geometr
   await page.goto(`${baseUrl}/?tab=routes&route=jesus-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
   await waitForMapIdle(page);
+  await expect(page.locator("[data-route-stage-index='2']")).toHaveCSS("cursor", "pointer");
 
   const segmentPointCount = await routeLinePointCount(page, "segment-19");
   expect(segmentPointCount, "segment-19 should stay a bent line for this regression").toBeGreaterThan(2);
 
   const stageMidpoint = await routeStageLineMidpointScreenPoint(page, "segment-19");
   expect(stageMidpoint, "stage line should already be visible before explicit selection").toBeTruthy();
+  await fireMapMouseMoveAtPoint(page, stageMidpoint);
+  await waitForMapCursor(page, "pointer");
   const before = await readMapCamera(page);
 
   await clickMapPoint(page, stageMidpoint);
@@ -3502,29 +3574,84 @@ test("selecting a visible lined stage from the map fits that stage's own geometr
   ).toBeGreaterThan(32.2);
 });
 
-test("selecting a lineless stage fits mapped endpoint candidates, including disputed alternatives @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
-  await page.goto(`${baseUrl}/?tab=routes&route=jesus-1`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+test("selecting disputed Jerusalem→Emmaus fits its illustrative line vicinity @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-6`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
   await waitForMapIdle(page);
 
-  // Start from a tight view of the default endpoints. The disputed Cana candidate north of 33° is
-  // outside this view; selecting stage 2 should zoom out to include it.
-  await jumpMap(page, [35.43, 32.34], 9.8);
+  // Start tightly on Jerusalem so the disputed connection lies outside/near edge. Selecting stage 1 should
+  // frame the illustrative disputed segment geometry.
+  await jumpMap(page, [35.23, 31.77], 11.2);
   const before = await readMapCamera(page);
-  expect(before.bounds[1][1]).toBeLessThan(33);
 
-  await clickRouteStageCard(page, 2);
-  await expect(page.locator("[data-route-stage-index='2'][data-route-stage-selected='true']")).toBeVisible();
+  await clickRouteStageCard(page, 1);
+  await expect(page.locator("[data-route-stage-index='1'][data-route-stage-selected='true']")).toBeVisible();
   await waitForMapIdle(page);
   const after = await readMapCamera(page);
 
   expect(
-    after.bounds[1][1],
-    "stage fit should include disputed endpoint candidates, not only the default candidate pair"
-  ).toBeGreaterThan(33.15);
-  expect(after.zoom, "fitting broader disputed endpoints should zoom out from the tight pre-click view").toBeLessThan(
-    before.zoom - 0.3
+    after.bounds[0][0],
+    "stage fit should frame disputed Emmaus endpoints west of Jerusalem"
+  ).toBeLessThan(35.03);
+  expect(after.center[0], "fitting Jerusalem→Emmaus should shift the center westward").toBeLessThan(
+    before.center[0] - 0.08
   );
+  expect(after.zoom, "fitting disputed illustrative segment should not zoom further in").toBeLessThan(
+    before.zoom - 0.1
+  );
+});
+
+test("disputed stages show an explicit illustrative-line disclaimer in the panel @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-6`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await expect(page.getByText("Disputed site; illustrative line—not a verified route").first()).toBeVisible();
+});
+
+test("selecting disputed sea stage 3 fits the Galilee crossing vicinity (not inland alternatives) @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await waitForMapIdle(page);
+
+  await jumpMap(page, [35.25, 32.55], 6.9);
+  const before = await readMapCamera(page);
+  await clickRouteStageCard(page, 3);
+  await expect(page.locator("[data-route-stage-index='3'][data-route-stage-selected='true']")).toBeVisible();
+  await waitForMapIdle(page);
+  const after = await readMapCamera(page);
+
+  expect(after.zoom, "no-line sea segment should zoom in to the crossing vicinity").toBeGreaterThan(
+    before.zoom + 2.2
+  );
+  expect(after.bounds[0][1], "sea-stage fit should stay near the lake crossing, not widen to inland alternatives").toBeGreaterThan(32.7);
+  expect(await routeStopScreenPoint(page, "capernaum"), "crossing endpoint Capernaum should be on-screen").toBeTruthy();
+  expect(
+    await routeStopScreenPoint(page, "country-of-the-gadarenes"),
+    "crossing endpoint should use mapped Gadarenes stop"
+  ).toBeTruthy();
+});
+
+test("re-activating disputed sea stage 4 from a panned view refocuses the same crossing vicinity @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+  await waitForMapIdle(page);
+
+  await clickRouteStageCard(page, 4);
+  await expect(page.locator("[data-route-stage-index='4'][data-route-stage-selected='true']")).toBeVisible();
+  await waitForMapIdle(page);
+  const focused = await readMapCamera(page);
+  expect(focused.bounds[0][1]).toBeGreaterThan(32.7);
+
+  await jumpMap(page, [35.12, 31.9], 9.6);
+  const detoured = await readMapCamera(page);
+  expect(Math.abs(detoured.center[1] - focused.center[1])).toBeGreaterThan(0.5);
+
+  await clickRouteStageCard(page, 4);
+  await waitForMapIdle(page);
+  const refocused = await readMapCamera(page);
+  expect(Math.abs(refocused.center[0] - focused.center[0])).toBeLessThan(0.06);
+  expect(Math.abs(refocused.center[1] - focused.center[1])).toBeLessThan(0.06);
+  expect(Math.abs(refocused.zoom - focused.zoom)).toBeLessThan(0.15);
+  expect(refocused.bounds[0][1]).toBeGreaterThan(32.7);
 });
 
 test("re-activating the same stage refocuses it; hovering another stage still never moves camera @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
@@ -3683,7 +3810,7 @@ test("history popstate refits only when stage changes, not for place-only update
   expect(Math.abs(afterPlaceOnlyForward.zoom - stage2Focused.zoom)).toBeGreaterThan(0.8);
 });
 
-test("hovering lineless stages shows a pill, and unhovering hides it @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+test("hovering disputed stages shows a pill, and unhovering hides it @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
   const scenarios = [
     { routeId: "jesus-1", stageIndex: 2, stageId: "segment-05" },
     { routeId: "jesus-2", stageIndex: 3, stageId: "segment-11" },
@@ -3713,7 +3840,7 @@ test("hovering lineless stages shows a pill, and unhovering hides it @routes", {
   }
 });
 
-test("selected lineless stage yields to hovered line stage pill, then restores on unhover @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+test("selected disputed stage yields to hovered line stage pill, then restores on unhover @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=routes&route=jesus-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
   await waitForMapIdle(page);
@@ -3721,13 +3848,13 @@ test("selected lineless stage yields to hovered line stage pill, then restores o
   await clickRouteStageCard(page, 3);
   await waitForSettledPill(page, { routeId: "jesus-2", stageId: "segment-11", label: "3" });
   let pills = await renderedStagePills(page);
-  let selectedLinelessPill = pills.find((pill) => pill.routeId === "jesus-2" && pill.stageId === "segment-11");
+  let selectedDisputedPill = pills.find((pill) => pill.routeId === "jesus-2" && pill.stageId === "segment-11");
   expect(pills).toHaveLength(1);
-  expect(selectedLinelessPill).toBeTruthy();
-  const capernaumPoint = await routeStopScreenPoint(page, "capernaum");
-  expect(capernaumPoint).toBeTruthy();
-  expect(Math.abs((selectedLinelessPill?.x ?? 0) - capernaumPoint.x)).toBeLessThanOrEqual(4);
-  expect(Math.abs((selectedLinelessPill?.y ?? 0) - capernaumPoint.y)).toBeLessThanOrEqual(4);
+  expect(selectedDisputedPill).toBeTruthy();
+  const segment11Midpoint = await routeStageLineMidpointScreenPoint(page, "segment-11");
+  expect(segment11Midpoint).toBeTruthy();
+  expect(Math.abs((selectedDisputedPill?.x ?? 0) - segment11Midpoint.x)).toBeLessThanOrEqual(4);
+  expect(Math.abs((selectedDisputedPill?.y ?? 0) - segment11Midpoint.y)).toBeLessThanOrEqual(4);
 
   const stage2Item = page.locator("[data-route-stage-index='2']");
   await stage2Item.hover();
@@ -3736,31 +3863,36 @@ test("selected lineless stage yields to hovered line stage pill, then restores o
   expect(pills).toHaveLength(1);
   const hoveredLinePill = pills[0];
   expect(hoveredLinePill?.stageId).toBe("segment-19");
-  const segment19Midpoint = await routeStageLineMidpointScreenPoint(page, "segment-19");
-  expect(segment19Midpoint).toBeTruthy();
-  expect(Math.abs((hoveredLinePill?.x ?? 0) - segment19Midpoint.x)).toBeLessThanOrEqual(4);
-  expect(Math.abs((hoveredLinePill?.y ?? 0) - segment19Midpoint.y)).toBeLessThanOrEqual(4);
+  expect(
+    await routeStageLineHitsPoint(
+      page,
+      "segment-19",
+      { x: hoveredLinePill?.x ?? 0, y: hoveredLinePill?.y ?? 0 },
+      8
+    ),
+    "hovered pill should stay on stage-2 line geometry"
+  ).toBe(true);
 
   await stage2Item.evaluate((element) => {
     element.dispatchEvent(new MouseEvent("mouseout", { bubbles: true, relatedTarget: document.body }));
   });
   await waitForSinglePillStage(page, "segment-11");
   pills = await renderedStagePills(page);
-  selectedLinelessPill = pills.find((pill) => pill.routeId === "jesus-2" && pill.stageId === "segment-11");
+  selectedDisputedPill = pills.find((pill) => pill.routeId === "jesus-2" && pill.stageId === "segment-11");
   expect(pills).toHaveLength(1);
-  expect(selectedLinelessPill).toBeTruthy();
-  expect(Math.abs((selectedLinelessPill?.x ?? 0) - capernaumPoint.x)).toBeLessThanOrEqual(4);
-  expect(Math.abs((selectedLinelessPill?.y ?? 0) - capernaumPoint.y)).toBeLessThanOrEqual(4);
+  expect(selectedDisputedPill).toBeTruthy();
+  expect(Math.abs((selectedDisputedPill?.x ?? 0) - segment11Midpoint.x)).toBeLessThanOrEqual(4);
+  expect(Math.abs((selectedDisputedPill?.y ?? 0) - segment11Midpoint.y)).toBeLessThanOrEqual(4);
 });
 
 test("hovering a stage's number on the map never shows the number as a place @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
-  // Stage 4 of the voyage to Rome (Fair Havens → Malta) has its number at its line's middle, in open sea,
-  // with no place under it.
-  await page.goto(`${baseUrl}/?tab=routes&route=paul-rome`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  // Jesus route segment 11 has its stage number in open sea, with no place under it.
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
   await waitForMapIdle(page);
-  await clickRouteStageCard(page, 4);
-  await waitForSettledPill(page, { routeId: "paul-rome", label: "4" });
+  await clickRouteStageCard(page, 3);
+  await waitForSettledPill(page, { routeId: "jesus-2", stageId: "segment-11", label: "3" });
+  await waitForMapIdle(page);
   const [pill] = await renderedStagePills(page);
   const stageNumberHit = await page.evaluate(
     ({ testHookKey, point }) =>
@@ -3774,12 +3906,12 @@ test("hovering a stage's number on the map never shows the number as a place @ro
     { testHookKey: mapTestHookKey, point: { x: pill.x, y: pill.y } }
   );
   expect(stageNumberHit).toBe(true);
-  await moveMouseToMapPoint(page, { x: pill.x, y: pill.y });
-  await page.waitForTimeout(80);
+  await fireMapMouseMoveAtPoint(page, { x: pill.x, y: pill.y });
+  expect(await routeStageLineHitsPoint(page, pill.stageId, { x: pill.x, y: pill.y }, 10)).toBe(true);
   await expect(page.locator("div[role='tooltip']").first()).toBeHidden();
 });
 
-test("hovering another stage never moves the camera while a lineless stage is selected @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
+test("hovering another stage never moves the camera while a disputed stage is selected @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=routes&route=jesus-2`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
   await waitForMapIdle(page);

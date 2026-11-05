@@ -11,6 +11,7 @@ export interface RouteMapLineFeatureProperties {
   stageIndex: number;
   stageLabel: string;
   travelMode: "land" | "sea" | "unknown";
+  isIllustrative?: boolean;
   isInSelectedRoute: true;
   isSelectedStage: boolean;
   isHighlightedStage: boolean;

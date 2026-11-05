@@ -467,7 +467,8 @@ export function RoutesPanel({
                 marginBottom: `${tokens.spacing.sm}px`,
                 borderRadius: "8px",
                 border: `1px solid ${isActive ? tokens.color.accent : tokens.color.divider}`,
-                padding: `${tokens.spacing.sm}px`
+                padding: `${tokens.spacing.sm}px`,
+                cursor: "pointer"
               }}
             >
               <div style={{ fontWeight: 600 }}>
@@ -555,7 +556,7 @@ export function RoutesPanel({
                     fontSize: `${tokens.typography.captionSize}px`
                   }}
                 >
-                  Site disputed
+                  Disputed site; illustrative line—not a verified route
                 </div>
               ) : null}
               <div style={{ marginTop: `${tokens.spacing.xs}px` }}>

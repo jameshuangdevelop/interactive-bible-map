@@ -4058,6 +4058,7 @@ export function MapView({
                 layerRoutesViaId,
                 layerRoutesMentionedId,
                 layerRoutesStagePillIconId,
+                layerRoutesStagePillLabelId,
                 layerRoutesLinesForegroundId
               ]
             });
@@ -4065,7 +4066,8 @@ export function MapView({
           const routeFeature = routeFeatures.find(
             (feature) =>
               feature.layer?.id !== layerRoutesLinesForegroundId &&
-              feature.layer?.id !== layerRoutesStagePillIconId
+              feature.layer?.id !== layerRoutesStagePillIconId &&
+              feature.layer?.id !== layerRoutesStagePillLabelId
           );
           const routeProperties = routeFeature ? asObject(routeFeature.properties) : null;
           const routeLabel = routeProperties ? asString(routeProperties.label) : null;
@@ -4089,7 +4091,8 @@ export function MapView({
           const routeLineOrPill = routeFeatures.find(
             (feature) =>
               feature.layer?.id === layerRoutesLinesForegroundId ||
-              feature.layer?.id === layerRoutesStagePillIconId
+              feature.layer?.id === layerRoutesStagePillIconId ||
+              feature.layer?.id === layerRoutesStagePillLabelId
           );
           if (routeLineOrPill) {
             clearHoveredFeatureState();
@@ -4756,6 +4759,7 @@ export function MapView({
             layerRoutesViaId,
             layerRoutesMentionedId,
             layerRoutesStagePillIconId,
+            layerRoutesStagePillLabelId,
             layerRoutesLinesHighlightId,
             layerRoutesLinesForegroundId
           ]
@@ -4792,7 +4796,10 @@ export function MapView({
           }
         }
 
-        const pillMatch = routeFeatures.find((feature) => feature.layer?.id === layerRoutesStagePillIconId);
+        const pillMatch = routeFeatures.find((feature) =>
+          feature.layer?.id === layerRoutesStagePillIconId ||
+          feature.layer?.id === layerRoutesStagePillLabelId
+        );
         if (pillMatch) {
           const properties = asObject(pillMatch.properties);
           const routeId = asString(properties?.routeId);

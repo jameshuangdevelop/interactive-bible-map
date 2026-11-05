@@ -1566,7 +1566,16 @@ export function AppShell() {
       (geometry.type === "LineString"
         ? geometry.coordinates
         : geometry.coordinates.flat()) as [number, number][];
-    const coordinatesForStopReference = (reference: RouteStopRef): [number, number][] => {
+    const coordinatesForStopReference = (
+      reference: RouteStopRef,
+      options?: { includeAllCandidates?: boolean }
+    ): [number, number][] => {
+      const includeAllCandidates = options?.includeAllCandidates ?? true;
+      if (!includeAllCandidates) {
+        const mappedStop = resolveRouteStop(reference, placesById, routeStopsById);
+        return mappedStop.coordinates ? [mappedStop.coordinates] : [];
+      }
+
       if (reference.kind === "location" && reference.locationId) {
         const place = placesById.get(reference.locationId);
         if (!place || place.candidates.length === 0) {
@@ -1625,6 +1634,33 @@ export function AppShell() {
       }
       return deduplicated;
     };
+    const illustrativeLineGeometryForStage = (stage: (typeof selectedRouteEntry.stages)[number]) => {
+      if (stage.lineId || !stage.noLineReason) {
+        return null;
+      }
+      const stopCoordinates = [
+        ...coordinatesForStopReference(stage.from, { includeAllCandidates: false }),
+        ...(stage.via ?? []).flatMap((via) =>
+          coordinatesForStopReference(via, { includeAllCandidates: false })
+        ),
+        ...coordinatesForStopReference(stage.to, { includeAllCandidates: false })
+      ];
+      const consecutiveDeduplicated: [number, number][] = [];
+      for (const coordinate of stopCoordinates) {
+        const previous = consecutiveDeduplicated[consecutiveDeduplicated.length - 1];
+        if (previous && previous[0] === coordinate[0] && previous[1] === coordinate[1]) {
+          continue;
+        }
+        consecutiveDeduplicated.push(coordinate);
+      }
+      if (consecutiveDeduplicated.length < 2) {
+        return null;
+      }
+      return {
+        type: "LineString" as const,
+        coordinates: consecutiveDeduplicated
+      };
+    };
 
     const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
     const lineFeatureByStageId = new Map<string, (typeof lineFeatures)[number]>();
@@ -1632,14 +1668,29 @@ export function AppShell() {
     let selectedStageCenter: [number, number] | null = null;
     let selectedStageBounds: [[number, number], [number, number]] | null = null;
     for (const [index, stage] of selectedRouteEntry.stages.entries()) {
-      const feature = routeLineFeatureByStage(routesData.lines, selectedRouteId, stage.id, stage.lineId);
-      if (!feature) {
+      const verifiedFeature = routeLineFeatureByStage(
+        routesData.lines,
+        selectedRouteId,
+        stage.id,
+        stage.lineId
+      );
+      const geometry = verifiedFeature
+        ? verifiedFeature.geometry.type === "LineString"
+          ? (verifiedFeature.geometry as { type: "LineString"; coordinates: number[][] })
+          : (verifiedFeature.geometry as { type: "MultiLineString"; coordinates: number[][][] })
+        : illustrativeLineGeometryForStage(stage);
+      if (!geometry) {
         // Kept apart from hover, so hovering another stage never changes it (and never pans the map).
         if (selectedStageId === stage.id) {
           selectedStageCenter = linelessStagePillCoordinate(stage, placesById, routeStopsById);
+          const includeAllCandidatesForNoLineStage = stage.travelMode !== "sea";
           const endpointCoordinates = uniqueCoordinates([
-            ...coordinatesForStopReference(stage.from),
-            ...coordinatesForStopReference(stage.to)
+            ...coordinatesForStopReference(stage.from, {
+              includeAllCandidates: includeAllCandidatesForNoLineStage
+            }),
+            ...coordinatesForStopReference(stage.to, {
+              includeAllCandidates: includeAllCandidatesForNoLineStage
+            })
           ]);
           selectedStageBounds = boundsFromCoordinates(endpointCoordinates);
         }
@@ -1648,16 +1699,14 @@ export function AppShell() {
 
       const mappedFeature = {
         type: "Feature" as const,
-        geometry:
-          feature.geometry.type === "LineString"
-            ? (feature.geometry as { type: "LineString"; coordinates: number[][] })
-            : (feature.geometry as { type: "MultiLineString"; coordinates: number[][][] }),
+        geometry,
         properties: {
           routeId: selectedRouteId,
           stageId: stage.id,
           stageIndex: index,
           stageLabel: `${index + 1}`,
           travelMode: stage.travelMode,
+          isIllustrative: verifiedFeature ? false : true,
           isInSelectedRoute: true as const,
           isSelectedStage: selectedStageId === stage.id,
           isHighlightedStage: highlightedStageId === stage.id,

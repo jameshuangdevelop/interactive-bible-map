@@ -13,7 +13,7 @@ The human wants a segment click to zoom to that segment's vicinity, instead of o
 
 ## Scope
 - Reuse the existing map fit/padding helpers and route selection path.
-- Fit a lined stage's geometry. For a line-less stage, use its existing mapped endpoints/candidates without inventing a line.
+- Fit each displayed stage line's geometry. For a disputed stage without verified geometry, draw an explicitly illustrative straight connection between its existing mapped stop references, with a concise disputed-site/not-verified-path disclaimer.
 - Support explicit list/keyboard activation and map stage selection, including refocusing the same stage after a manual pan.
 - Respect desktop panels and the phone sheet, with sensible zoom limits for short or point-like stages.
 - Keep hovering camera-free. Preserve place clicks (including route-stop dots that also select a stage), route-level fitting, tab changes, disputed-site handling, and reduced-motion behaviour. A segment-focus request comes from a list/keyboard activation or a stage line/number, not merely from a stage id changing.
@@ -22,8 +22,14 @@ The human wants a segment click to zoom to that segment's vicinity, instead of o
 
 ## Acceptance criteria
 - [ ] Clicking a visible stage zooms to its own vicinity, even when it was already on screen.
-- [ ] Lined and line-less stages fit the usable map area on desktop and phone.
+- [ ] Verified and illustrative stage lines fit the usable map area on desktop and phone.
 - [ ] Activating the same stage again refocuses it; hovering another stage never moves the camera.
 - [ ] Focused regression tests fail before the change and pass after it; existing route interactions remain intact.
 - [ ] Relevant unit/browser checks, lint, type-check and export pass; the PR's full CI supplies the broader suite.
 - [ ] The PR explains that this is a pre-M6 follow-up, links ADR-0052, and supplies its preview, status and honest budget row.
+
+## Review feedback (2026-11-05)
+- Segment rows and interactive stage lines/numbers use the pointer cursor on hover; camera-free hover and accurate place tooltips stay intact.
+- The two Gadarenes sea crossings frame their recorded stop references rather than the full set of widely separated alternative city sites. Candidate indices and historical records are unchanged.
+- **Updated by the human at 13:21 local:** show a line and a disclaimer for disputed segments. Jerusalem to Emmaus and the other disputed stages therefore get illustrative straight connections to their existing displayed candidates, not claimed historical paths.
+- Keep the canonical verified route data unchanged. Do not invent a coordinate, road or historical itinerary; the display-only connection must be visibly qualified and all alternative candidate records remain available.
