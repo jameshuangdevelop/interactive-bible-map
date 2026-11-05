@@ -868,6 +868,76 @@ test.describe.serial("sequential panel checks", () => {
     await verifyCandidateSelectionUpdatesUrl(page, baseUrl);
   });
 
+  test(
+    "reader sees Sychar's Askar proposal as not on the map, with no map candidate feature (CP2 decision 3)",
+    { tag: ["@panel"] },
+    async ({ page, baseUrl }) => {
+      await page.goto(`${baseUrl}/?place=sychar`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+      await waitForMapIdle(page);
+      await expect(page.getByRole("heading", { level: 1, name: "Sychar" })).toBeVisible();
+
+      const todayLine = page.locator(
+        "section[aria-label='Place details'] [data-modern-name-line='true']"
+      );
+      await expect(todayLine).toContainText("2 proposed sites · 1 on the map");
+
+      const askarCard = page
+        .locator(
+          "section[aria-label='Place details'] [data-panel-section='candidates'] [data-unmapped-candidate='true']"
+        )
+        .filter({ has: page.getByText("Askar", { exact: true }) });
+      await expect(askarCard).toHaveCount(1);
+      await expect(askarCard.locator("[data-unmapped-candidate-label='true']")).toHaveText("Askar");
+      await expect(askarCard.locator("[data-unmapped-candidate-status='true']")).toHaveText(
+        "Not on the map: no verified coordinate."
+      );
+      await expect(askarCard.locator("button[aria-label^='Candidate ']")).toHaveCount(0);
+      await expect(askarCard.locator("a[href^='#source-']")).toHaveCount(2);
+
+      const sourcesToggle = page.getByRole("button", { name: /^Sources · /u });
+      await sourcesToggle.click();
+      await expect(page.getByText("OpenBible sychar")).toBeVisible();
+      await expect(page.getByText("Wikidata Q7697383")).toBeVisible();
+
+      const mapState = await page.evaluate((testHookKey) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+
+        const toLower = (value) =>
+          typeof value === "string" ? value.trim().toLocaleLowerCase() : "";
+        const candidateFeatures = map.querySourceFeatures("ibm-candidate-pins");
+        const siteLikeFeatures = [
+          ...map.querySourceFeatures("ibm-major-city-pins"),
+          ...map.querySourceFeatures("ibm-clustered-city-pins"),
+          ...map.querySourceFeatures("ibm-site-pins")
+        ];
+
+        return {
+          hasAskarSiteFeature: siteLikeFeatures.some((feature) => {
+            const properties = feature.properties ?? {};
+            return (
+              toLower(properties.placeName) === "askar" ||
+              toLower(properties.labelText) === "askar"
+            );
+          }),
+          hasAskarCandidateFeature: candidateFeatures.some((feature) => {
+            const properties = feature.properties ?? {};
+            return toLower(properties.candidateLabel) === "askar";
+          }),
+          sycharCandidateCount: candidateFeatures.filter(
+            (feature) => String(feature.properties?.placeId ?? "") === "sychar"
+          ).length
+        };
+      }, mapTestHookKey);
+
+      expect(mapState.hasAskarSiteFeature).toBe(false);
+      expect(mapState.hasAskarCandidateFeature).toBe(false);
+      expect(mapState.sycharCandidateCount).toBe(0);
+    }
+  );
+
   test("keyboard disclosure controls expose correct aria state", { tag: ["@a11y"] }, async ({ page, baseUrl }) => {
     await verifyKeyboardDisclosureControls(page, baseUrl);
   });

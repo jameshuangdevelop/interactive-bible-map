@@ -12,6 +12,7 @@ import {
   isAiReconstructionImage,
   matchAboutPlaceMentions,
   nextImageIndex,
+  proposedSitesSummaryText,
   shouldRenderThumbnailRow
 } from "../src/features/place-panel/panel-model";
 import type { MediaImageRecord, PlaceIndexRecord, PlaceRecord } from "../src/features/map/types";
@@ -202,6 +203,15 @@ describe("place panel model helpers", () => {
           sources: ["wikidata:Q1", "openbible:example"]
         }
       ],
+      unmappedCandidates: [
+        {
+          label: "Unmapped proposal",
+          confidence: "low",
+          support: "Support text for unmapped proposal.",
+          reason: "No accepted coordinate can be cited.",
+          sources: ["openbible:example", "wikidata:Q2"]
+        }
+      ],
       summary: {
         text: "Summary",
         sources: ["openbible:example", "scripture:Mark 1:21"]
@@ -229,10 +239,26 @@ describe("place panel model helpers", () => {
     expect(collectSourceIdsInPanelOrder(record)).toEqual([
       "wikidata:Q1",
       "openbible:example",
+      "wikidata:Q2",
       "scripture:Mark 1:21",
       "bib:sample",
       "scripture:Isaiah 9:1"
     ]);
+  });
+
+  test("formats proposed-sites summary text with mapped and unmapped counts", () => {
+    expect(
+      proposedSitesSummaryText({
+        mappedCandidateCount: 1,
+        unmappedCandidateCount: 1
+      })
+    ).toBe("2 proposed sites · 1 on the map");
+    expect(
+      proposedSitesSummaryText({
+        mappedCandidateCount: 4,
+        unmappedCandidateCount: 0
+      })
+    ).toBe("4 proposed sites");
   });
 
   test("maps image kinds to labels and keeps missing kind unlabeled", () => {
