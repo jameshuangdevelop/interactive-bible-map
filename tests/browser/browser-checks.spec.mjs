@@ -880,6 +880,14 @@ test.describe.serial("sequential panel checks", () => {
         "section[aria-label='Place details'] [data-modern-name-line='true']"
       );
       await expect(todayLine).toContainText("2 proposed sites · 1 on the map");
+      const proposedEntries = page.locator(
+        "section[aria-label='Place details'] [data-panel-section='candidates'] [data-proposed-site-entry]"
+      );
+      await expect(proposedEntries).toHaveCount(2);
+      await expect(proposedEntries.nth(0)).toHaveAttribute("data-proposed-site-entry", "mapped");
+      await expect(proposedEntries.nth(0)).toContainText("Shechem (Tell Balata)");
+      await expect(proposedEntries.nth(0)).toContainText("Medium");
+      await expect(proposedEntries.nth(1)).toHaveAttribute("data-proposed-site-entry", "unmapped");
 
       const askarCard = page
         .locator(

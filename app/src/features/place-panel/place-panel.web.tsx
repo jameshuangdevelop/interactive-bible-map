@@ -1904,11 +1904,11 @@ export function PlacePanel({
           <section data-panel-section="candidates">
             <hr style={sectionDividerStyle} />
             <h2 style={sectionHeadingStyle}>
-              {hasMultipleCandidates
-                ? isDisputed
+              {hasUnmappedCandidates
+                ? "Proposed sites"
+                : isDisputed
                   ? "Proposed sites"
-                  : "Sites"
-                : "Other proposed sites"}
+                  : "Sites"}
             </h2>
             <div
               style={{
@@ -1917,18 +1917,58 @@ export function PlacePanel({
                 gap: `${tokens.spacing.sm}px`
               }}
             >
-              {hasMultipleCandidates
+              {hasMultipleCandidates || hasUnmappedCandidates
                 ? location.candidates.map((candidate, candidateIndex) => {
-                    const selected = selection.candidateIndex === candidateIndex;
+                    const selected =
+                      hasMultipleCandidates && selection.candidateIndex === candidateIndex;
                     const chip = typeChipStyle(candidate.confidence);
                     const expanded = Boolean(expandedCandidateSupport[candidateIndex]);
                     const support = candidate.support;
                     const supportCanExpand = support.length > 170;
                     const letter = candidateIndexToLetter(candidateIndex);
                     const supportTextId = `candidate-support-${selectedPlace.id}-${candidateIndex}`;
+                    const mappedCandidateLabel = hasMultipleCandidates
+                      ? `${letter}. ${candidate.label}`
+                      : candidate.label;
+
+                    const candidateHeader = (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: `${tokens.spacing.sm}px`
+                        }}
+                      >
+                        <strong
+                          style={{
+                            color: tokens.color.textPrimary,
+                            minWidth: 0,
+                            overflowWrap: "anywhere"
+                          }}
+                        >
+                          {mappedCandidateLabel}
+                        </strong>
+                        <span
+                          style={{
+                            borderRadius: "999px",
+                            padding: "2px 8px",
+                            fontSize: `${tokens.typography.captionSize}px`,
+                            lineHeight: `${tokens.typography.captionLineHeight}px`,
+                            fontWeight: 600,
+                            color: chip.color,
+                            backgroundColor: chip.backgroundColor
+                          }}
+                        >
+                          {confidenceLabel(candidate.confidence, false)}
+                        </span>
+                      </div>
+                    );
 
                     return (
                       <div
+                        data-mapped-candidate="true"
+                        data-proposed-site-entry="mapped"
                         key={`${candidate.label}:${candidateIndex}`}
                         style={{
                           border: selected
@@ -1939,51 +1979,32 @@ export function PlacePanel({
                           padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`
                         }}
                       >
-                        <button
-                          aria-label={`Candidate ${letter}: ${candidate.label}`}
-                          onClick={() => onSelectCandidate(candidateIndex)}
-                          style={{
-                            border: "none",
-                            background: "transparent",
-                            width: "100%",
-                            padding: 0,
-                            cursor: "pointer",
-                            textAlign: "left"
-                          }}
-                          type="button"
-                        >
+                        {hasMultipleCandidates ? (
+                          <button
+                            aria-label={`Candidate ${letter}: ${candidate.label}`}
+                            onClick={() => onSelectCandidate(candidateIndex)}
+                            style={{
+                              border: "none",
+                              background: "transparent",
+                              width: "100%",
+                              padding: 0,
+                              cursor: "pointer",
+                              textAlign: "left"
+                            }}
+                            type="button"
+                          >
+                            {candidateHeader}
+                          </button>
+                        ) : (
                           <div
                             style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              gap: `${tokens.spacing.sm}px`
+                              width: "100%",
+                              textAlign: "left"
                             }}
                           >
-                            <strong
-                              style={{
-                                color: tokens.color.textPrimary,
-                                minWidth: 0,
-                                overflowWrap: "anywhere"
-                              }}
-                            >
-                              {letter}. {candidate.label}
-                            </strong>
-                            <span
-                              style={{
-                                borderRadius: "999px",
-                                padding: "2px 8px",
-                                fontSize: `${tokens.typography.captionSize}px`,
-                                lineHeight: `${tokens.typography.captionLineHeight}px`,
-                                fontWeight: 600,
-                                color: chip.color,
-                                backgroundColor: chip.backgroundColor
-                              }}
-                            >
-                              {confidenceLabel(candidate.confidence, false)}
-                            </span>
+                            {candidateHeader}
                           </div>
-                        </button>
+                        )}
                         <p
                           id={supportTextId}
                           style={{
@@ -2057,6 +2078,7 @@ export function PlacePanel({
                 return (
                   <div
                     data-unmapped-candidate="true"
+                    data-proposed-site-entry="unmapped"
                     key={`unmapped:${candidate.label}:${candidateIndex}`}
                     style={{
                       border: `1px solid ${tokens.color.divider}`,
