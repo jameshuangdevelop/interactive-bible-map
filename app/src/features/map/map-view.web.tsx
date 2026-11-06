@@ -75,6 +75,7 @@ import {
   filterAreaLabelsForAncientMap,
   linkedTimelineLocationIds
 } from "./ancient-area-label-visibility";
+import { expandAncientStopPayloadFromCatalogue } from "./ancient-stop-catalogue";
 import {
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
@@ -87,6 +88,8 @@ import type {
   AncientHolderUnionsPayload,
   AncientEntityRecord,
   AncientShapesPayload,
+  AncientStopCataloguePayload,
+  AncientStopCompactPayload,
   AncientStopPayload,
   FeatureCollection,
   LineStringGeometry,
@@ -355,6 +358,36 @@ interface WebGlRendererInfo {
   unmaskedVendor: string | null;
   unmaskedRenderer: string | null;
   isSoftwareRenderer: boolean;
+}
+
+let ancientStopCataloguePayload: AncientStopCataloguePayload | null = null;
+let ancientStopCataloguePromise: Promise<AncientStopCataloguePayload> | null = null;
+
+async function loadAncientStopCatalogue(): Promise<AncientStopCataloguePayload> {
+  if (ancientStopCataloguePayload) {
+    return ancientStopCataloguePayload;
+  }
+
+  if (ancientStopCataloguePromise) {
+    return ancientStopCataloguePromise;
+  }
+
+  ancientStopCataloguePromise = fetch("/generated/ancient.stop-catalogue.json", { cache: "no-store" })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Could not load ancient stop catalogue (${response.status})`);
+      }
+      const payload = (await response.json()) as AncientStopCataloguePayload;
+      ancientStopCataloguePayload = payload;
+      return payload;
+    })
+    .finally(() => {
+      if (!ancientStopCataloguePayload) {
+        ancientStopCataloguePromise = null;
+      }
+    });
+
+  return ancientStopCataloguePromise;
 }
 
 function applyMapModeOverlayVisibility(
@@ -3353,7 +3386,9 @@ export function MapView({
         throw new Error(`Could not load ancient stop payload '${stopId}' (${response.status})`);
       }
 
-      const payload = (await response.json()) as AncientStopPayload;
+      const compactPayload = (await response.json()) as AncientStopCompactPayload;
+      const stopCatalogue = await loadAncientStopCatalogue();
+      const payload = expandAncientStopPayloadFromCatalogue(compactPayload, stopCatalogue);
       setAncientStopsById((previous) => {
         if (previous[payload.stopId]) {
           return previous;
