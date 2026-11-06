@@ -2,19 +2,37 @@
 
 Shared memory for all agents. Every session reads this first. Only the PO edits it, in a docs PR after each batch of merges (ADR-0051). Other PRs give their status in their description, and agents report open questions to the PO.
 
-**Current milestone:** M6 Expansion handoff. **M5/CP5 is approved and closed:** #99 and the M5-26 follow-up #100 are merged. The checked baseline is `main` at `fde21d1` (2026-11-05). The human has assigned a different agent to lead M6; the outgoing PO has not started M6 work.
+**Current milestone:** M6 Expansion, in progress, under the M6 lead the human assigned. #102 (M6-01) merged on 2026-11-06 at `9318990`. On 2026-11-06 the human approved the capacity plan (ADR-0053) and the first 47-place inventory (ADR-0054). M5/CP5 stays approved and closed (#99, #100, #101).
 
 ## Resume point
-1. **Incoming M6 lead: start from fresh `origin/main` after this handoff docs PR merges.** The repository root was still on the historical `docs/m5-playtest-notes` branch at verification; it is not the M6 baseline. Create an independent branch/worktree from updated `main` (ADR-0051), and preserve the existing root `test-results/`.
-2. **Budget gate before starting M6:** November usage is still unknown, not zero. Reconcile available session measurements with GitHub's authoritative Copilot usage/billing report, or obtain the human's confirmation. The shared monthly soft stop is 800,000 credits; the hard stop is 950,000 (`docs/BUDGET.md`). No usage figure has been invented.
-3. **Resolve pre-expansion schema and capacity work before batch records:**
-   - CP2 decision 3 accepted an explicit unmapped-candidate field before M6. It is still absent: `schema/location.schema.json` requires coordinates for every candidate. Carry that requirement into the M6 schema/validation/UI plan; do not guess coordinates for text-only proposals such as Sychar's Askar.
-   - The ancient startup layer is **327,882 / 330,000 bytes gzip: only 2,118 bytes remain**, measured in #100's CI build. Plan and measure capacity before growing the dataset; do not silently raise the budget or trim sourced geometry to force a batch through.
-   - `ancient.region-outlines.json` is 19,209 / 25,000 bytes gzip; Routes is 26,305 / 100,000. Moving the 13,682-byte merged-land file to the region-outline lazy load would make that combined load 32,891 bytes, so it needs an explicit budget/design decision, not just moving a fetch (`BACKLOG.md`).
-4. **Next deliverable belongs to the new lead:** propose and deduplicate the first roughly 50-location inventory against the existing 122 verified records, then obtain the human's approval before writing records and task cards for implementation. The outgoing PO recommended Gospel/Holy Land gaps; this is not an approved location list. No M6 cards or records were created in this handoff. All current route places are already full records; `data/routes/stops.json` and `kind: "route-stop"` references are empty.
-5. **Read before assigning cards:** `AGENT_TEAM_PROMPT.md`, CP2 decision 3 and CP5 in `CHECKPOINTS.md`, `BACKLOG.md`, `schema/README.md`, `docs/LICENSES.md`, `docs/TESTING.md`, and ADR-0051/0052 in `docs/decisions/`. The final verification reports govern older research notes. Keep the existing source, licensing, WEB-only scripture and independent data-verification rules.
+1. **Budget:**
+   - **Confirmed:** the human confirmed 2,388 / 1,000,000 credits for November from the Copilot usage page on 2026-11-05. That cleared the gate.
+   - **Measured:** the local Copilot CLI store on the PO's Mac measured 7,616 credits for all of November's sessions there by 2026-11-06 20:38 UTC. That isn't an account total.
+   - **Thresholds:** the soft stop is 800,000 and the hard stop 950,000 (`docs/BUDGET.md`).
+   - **Billing API:** `gh` still lacks the `user` scope this API needs; the human's refresh didn't take effect in the PO's shell. Re-check usage at CP6a.
+2. **Open now:**
+   - **M6-02 (ADR-0053):** the single open map-code PR. It stores the stops' repeated areas, borders and labels once, and caps `places.index.json` at 30,000 bytes.
+   - **M6-04 and M6-05 (ADR-0054):** the two batch 1A data PRs, 23 Holy Land places and 15 places from Acts, the letters and Revelation. Each runs research, then images, then the Fact-Checker, then review.
+   - Their cards are on their own branches (`docs/tasks/M6-0N-*.md`).
+3. **Next:**
+   - M6-03, one lazy outline file per region (map code), after M6-02 merges.
+   - M6-06, batch 1B's 9 regions with sourced outlines, after M6-03.
+   - CP6a, the checkpoint for batch 1, after M6-04 to M6-06 merge.
+4. **Capacity measured on `6924180`:**
+   - ancient startup 327,882 / 330,000 bytes gzip;
+   - region outlines 19,209 / 25,000;
+   - `places.index.json` 7,166, then 7,161 after #102;
+   - Routes 26,305 / 100,000.
+
+   Point places don't grow the ancient startup layer; region records grow the lazy region outlines (ADR-0053).
+5. **Unmapped candidates (M6-01, #102):**
+   - **What they are:** `unmappedCandidates` holds serious proposals without an accepted coordinate. Each entry has at least 2 sources and a reason. It is shown in the panel as "Not on the map: no verified coordinate." and never drawn.
+   - **Q1 (PO decision):** unmapped proposals don't count toward the rule that a `disputed` record needs two mapped candidates. Sychar stays medium/medium.
+   - Revisit Q1 if a batch needs a disputed record with only one mapped candidate.
+6. **Read before assigning cards:** `AGENT_TEAM_PROMPT.md`, `BACKLOG.md`, `schema/README.md` (including "Unmapped candidates"), `docs/LICENSES.md`, `docs/TESTING.md`, and ADR-0051 to ADR-0054 in `docs/decisions/`.
 
 ## Approved baseline
+- #102 (M6-01, candidate sites without a coordinate, CP2 decision 3) merged 2026-11-06 at `9318990`. Its final [CI run 42141779378](https://github.com/jameshuangdevelop/interactive-bible-map/actions/runs/42141779378) passed every required check and 6 browser shards with no flaky or failed tests. The Fact-Checker signed off Sychar (`docs/verification/M6-01-unmapped-candidates.md`).
 - #99 approved CP5 (merged 2026-11-05 UTC). #100 approved and merged M5-26 at `fde21d1` on 2026-11-05; there is no outstanding M5 merge or approval gate.
 - Segment activation fits its displayed vicinity, including repeated activation; hover shows the pointer without moving the camera. Ordinary place clicks and place-only history changes keep their existing camera behavior (ADR-0052).
 - The 12 disputed stages now show **illustrative connections with visible uncertainty disclaimers**, not hidden paths. Canonical geometry stays at 71 lines; the 83-stage UI includes those 12 annotations. Preserve the distinction: an illustration is not a verified historical path.
@@ -110,6 +128,13 @@ Shared memory for all agents. Every session reads this first. Only the PO edits 
 | M5-17 | Failing fast: time limits for actions and page loads, the flaky full-sheet test, and flaky and slow tests on each CI run's page (ADR-0045) | frontend-engineer | `chore/m5-17-fail-fast` | Merged | #82 |
 | M5-06 | Route text (summary, what the Bible says, notes last) and every place the passages name (ADR-0041) | gis-engineer → research-lead → fact-checker | `data/m5-route-text` | Merged; verified (`docs/verification/M5-route-text.md`) | #66 |
 | Fix | Fix: a place's title on phones without images | frontend-engineer | `fix/phone-panel-title` | Merged | #68 |
+| M6-01 | Candidate sites without a coordinate: `unmappedCandidates` in the schema, validator, build and panel, and Sychar's Askar (CP2 decision 3) | gis-engineer → research-lead → frontend-engineer → fact-checker; pr-reviewer | `feat/m6-01-unmapped-candidates` | Merged 2026-11-06; verified (`docs/verification/M6-01-unmapped-candidates.md`) | #102 |
+| M6-00 | Record the M6 plan: ADR-0053 (capacity) and ADR-0054 (the first 47 places), the ledgers after #102 | project-owner | `docs/m6-kickoff` | Open | this PR |
+| M6-02 | Store the ancient stops' repeated areas, borders and labels once; cap `places.index.json` (ADR-0053) | gis-engineer → frontend-engineer; pr-reviewer | `feat/m6-02-ancient-stop-catalogue` | In progress (the open map-code PR) | — |
+| M6-03 | One lazy outline file per region, each capped at 8,000 bytes (ADR-0053) | gis-engineer → frontend-engineer | — | After M6-02 merges | — |
+| M6-04 | Batch 1A: 23 Holy Land places (ADR-0054) | research-lead → media-curator → fact-checker; pr-reviewer | `data/m6-04-holy-land-places` | In progress | — |
+| M6-05 | Batch 1A: 15 places from Acts, the letters and Revelation (ADR-0054) | research-lead → media-curator → fact-checker; pr-reviewer | `data/m6-05-acts-letters-places` | In progress | — |
+| M6-06 | Batch 1B: 9 regions with sourced outlines (ADR-0054) | research-lead → fact-checker → gis-engineer | — | After M6-03 merges | — |
 
 ## Historical questions and deferred follow-ups
 These entries preserve earlier handoffs, including questions from phases that have since merged. Use the final verification reports and `BACKLOG.md` when a new card touches them; do not treat every old question as a current CP5 approval gate. The resume point above defines the M6 prerequisites.
