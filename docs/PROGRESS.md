@@ -129,7 +129,7 @@ Shared memory for all agents. Every session reads this first. Only the PO edits 
 | M5-06 | Route text (summary, what the Bible says, notes last) and every place the passages name (ADR-0041) | gis-engineer → research-lead → fact-checker | `data/m5-route-text` | Merged; verified (`docs/verification/M5-route-text.md`) | #66 |
 | Fix | Fix: a place's title on phones without images | frontend-engineer | `fix/phone-panel-title` | Merged | #68 |
 | M6-01 | Candidate sites without a coordinate: `unmappedCandidates` in the schema, validator, build and panel, and Sychar's Askar (CP2 decision 3) | gis-engineer → research-lead → frontend-engineer → fact-checker; pr-reviewer | `feat/m6-01-unmapped-candidates` | Merged 2026-11-06; verified (`docs/verification/M6-01-unmapped-candidates.md`) | #102 |
-| M6-00 | Record the M6 plan: ADR-0053 (capacity) and ADR-0054 (the first 47 places), the ledgers after #102 | project-owner | `docs/m6-kickoff` | Open | this PR |
+| M6-00 | Record the M6 plan: ADR-0053 (capacity) and ADR-0054 (the first 47 places), the ledgers after #102 | project-owner | `docs/m6-kickoff` | Open | #103 |
 | M6-02 | Store the ancient stops' repeated areas, borders and labels once; cap `places.index.json` (ADR-0053) | gis-engineer → frontend-engineer; pr-reviewer | `feat/m6-02-ancient-stop-catalogue` | In progress (the open map-code PR) | — |
 | M6-03 | One lazy outline file per region, each capped at 8,000 bytes (ADR-0053) | gis-engineer → frontend-engineer | — | After M6-02 merges | — |
 | M6-04 | Batch 1A: 23 Holy Land places (ADR-0054) | research-lead → media-curator → fact-checker; pr-reviewer | `data/m6-04-holy-land-places` | In progress | — |
