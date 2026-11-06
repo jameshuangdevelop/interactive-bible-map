@@ -978,6 +978,137 @@ function registerUnionGeometry({
   return nextId;
 }
 
+function createStopCatalogueState() {
+  return {
+    catalogue: {
+      areas: [],
+      holderBorders: [],
+      holderLabels: []
+    },
+    areaIndexByKey: new Map(),
+    holderBorderIndexByKey: new Map(),
+    holderLabelIndexByKey: new Map()
+  };
+}
+
+function indexStopCatalogueEntry({
+  value,
+  entries,
+  indexByKey
+}) {
+  const key = JSON.stringify(value);
+  const existingIndex = indexByKey.get(key);
+  if (existingIndex !== undefined) {
+    return existingIndex;
+  }
+
+  const nextIndex = entries.length;
+  entries.push(value);
+  indexByKey.set(key, nextIndex);
+  return nextIndex;
+}
+
+function toStopCatalogueIndexes(values, {
+  entries,
+  indexByKey
+}) {
+  return values.map((value) => indexStopCatalogueEntry({
+    value,
+    entries,
+    indexByKey
+  }));
+}
+
+function buildLegacyStopPayload({
+  stop,
+  assignments,
+  borderCollections,
+  holderUnionIds,
+  romanSideUnionId,
+  holderLabels
+}) {
+  return {
+    stopId: stop.id,
+    year: stop.year,
+    areas: [...assignments].sort((left, right) => left.areaId.localeCompare(right.areaId)),
+    holderBorders: borderCollections.holderBorders,
+    romanEmpireEdge: borderCollections.romanEmpireEdge,
+    holderUnions: holderUnionIds,
+    romanSideUnion: romanSideUnionId,
+    holderLabels
+  };
+}
+
+function compactStopPayloadWithCatalogue({
+  stopPayload,
+  stopCatalogueState
+}) {
+  return {
+    ...stopPayload,
+    areas: toStopCatalogueIndexes(stopPayload.areas, {
+      entries: stopCatalogueState.catalogue.areas,
+      indexByKey: stopCatalogueState.areaIndexByKey
+    }),
+    holderBorders: toStopCatalogueIndexes(stopPayload.holderBorders.features ?? [], {
+      entries: stopCatalogueState.catalogue.holderBorders,
+      indexByKey: stopCatalogueState.holderBorderIndexByKey
+    }),
+    holderLabels: toStopCatalogueIndexes(stopPayload.holderLabels, {
+      entries: stopCatalogueState.catalogue.holderLabels,
+      indexByKey: stopCatalogueState.holderLabelIndexByKey
+    })
+  };
+}
+
+function stopCatalogueEntryAt({
+  entries,
+  index,
+  entryType,
+  stopId
+}) {
+  if (!Number.isInteger(index) || index < 0 || index >= entries.length) {
+    throw new Error(
+      `Stop '${stopId}' has invalid ${entryType} catalogue index '${index}'.`
+    );
+  }
+  return entries[index];
+}
+
+function expandStopPayloadFromCatalogue(stopPayload, stopCatalogue) {
+  const stopId =
+    typeof stopPayload?.stopId === "string" && stopPayload.stopId.length > 0
+      ? stopPayload.stopId
+      : "unknown-stop";
+  const areas = (stopPayload.areas ?? []).map((index) => stopCatalogueEntryAt({
+    entries: stopCatalogue?.areas ?? [],
+    index,
+    entryType: "areas",
+    stopId
+  }));
+  const holderBorderFeatures = (stopPayload.holderBorders ?? []).map((index) => stopCatalogueEntryAt({
+    entries: stopCatalogue?.holderBorders ?? [],
+    index,
+    entryType: "holderBorders",
+    stopId
+  }));
+  const holderLabels = (stopPayload.holderLabels ?? []).map((index) => stopCatalogueEntryAt({
+    entries: stopCatalogue?.holderLabels ?? [],
+    index,
+    entryType: "holderLabels",
+    stopId
+  }));
+
+  return {
+    ...stopPayload,
+    areas,
+    holderBorders: {
+      type: "FeatureCollection",
+      features: holderBorderFeatures
+    },
+    holderLabels
+  };
+}
+
 async function writeJsonWithSize(outputDirectory, relativePath, payload) {
   const destinationPath = path.join(outputDirectory, relativePath);
   await fs.mkdir(path.dirname(destinationPath), { recursive: true });
@@ -1334,7 +1465,8 @@ export async function buildAncientAppData({
   majorPlacePinCoordinates = [],
   outputDirectory,
   simplifyThreshold = 0.00002,
-  roadSimplifyTolerance = 0.0015
+  roadSimplifyTolerance = 0.0015,
+  includeLegacyStopPayloadsInResult = false
 }) {
   const entitiesById = toMapById(timelineData.entities ?? []);
   const areasById = toMapById(timelineData.areas ?? []);
@@ -1365,6 +1497,10 @@ export async function buildAncientAppData({
   const writtenFiles = [];
   const holderUnionGeometryIdByKey = new Map();
   const holderUnionGeometryById = new Map();
+  const stopCatalogueState = createStopCatalogueState();
+  const legacyStopPayloadsById = includeLegacyStopPayloadsInResult
+    ? new Map()
+    : null;
   // Provenance (sources, confidence, note) stays in data/geo/; the app uses outlines only for the
   // selection highlight (ADR-0050 item 1), so its copy carries each region's id and shape.
   const regionOutlineFeatures = (regionOutlinesData?.features ?? []).map((feature) => ({
@@ -1568,19 +1704,34 @@ export async function buildAncientAppData({
       geometryById: holderUnionGeometryById
     });
 
+    const legacyStopPayload = buildLegacyStopPayload({
+      stop,
+      assignments,
+      borderCollections,
+      holderUnionIds,
+      romanSideUnionId,
+      holderLabels
+    });
+    if (legacyStopPayloadsById) {
+      legacyStopPayloadsById.set(stop.id, legacyStopPayload);
+    }
+    const compactStopPayload = compactStopPayloadWithCatalogue({
+      stopPayload: legacyStopPayload,
+      stopCatalogueState
+    });
+
     writtenFiles.push(
-      await writeJsonWithSize(outputDirectory, `ancient.stop.${stop.id}.json`, {
-        stopId: stop.id,
-        year: stop.year,
-        areas: assignments.sort((left, right) => left.areaId.localeCompare(right.areaId)),
-        holderBorders: borderCollections.holderBorders,
-        romanEmpireEdge: borderCollections.romanEmpireEdge,
-        holderUnions: holderUnionIds,
-        romanSideUnion: romanSideUnionId,
-        holderLabels
-      })
+      await writeJsonWithSize(outputDirectory, `ancient.stop.${stop.id}.json`, compactStopPayload)
     );
   }
+
+  writtenFiles.push(
+    await writeJsonWithSize(
+      outputDirectory,
+      "ancient.stop-catalogue.json",
+      stopCatalogueState.catalogue
+    )
+  );
 
   writtenFiles.push(
     await writeJsonWithSize(outputDirectory, "ancient.holder-unions.json", {
@@ -1599,11 +1750,17 @@ export async function buildAncientAppData({
     totalGzipBytes,
     roadJoinCount: roadJoinResult.joinCount,
     roadJoinTotalLengthKm: roadJoinResult.totalJoinLengthKm,
-    roadJoinMaxLengthKm: roadJoinResult.maxJoinLengthKm
+    roadJoinMaxLengthKm: roadJoinResult.maxJoinLengthKm,
+    ...(legacyStopPayloadsById
+      ? {
+          legacyStopPayloadsById
+        }
+      : {})
   };
 }
 
 export const __testOnly = {
   projectLngLatToPixels,
-  estimateHolderLabelLineWidthPx
+  estimateHolderLabelLineWidthPx,
+  expandStopPayloadFromCatalogue
 };
