@@ -30,6 +30,14 @@ export interface PlaceLocationCandidate extends PlaceCandidate {
   sources: SourceId[];
 }
 
+export interface PlaceUnmappedCandidate {
+  label: string;
+  confidence: Confidence;
+  support: string;
+  reason: string;
+  sources: SourceId[];
+}
+
 export interface PlaceNames {
   ancient: string[];
   modern?: string;
@@ -106,6 +114,7 @@ export interface PoliticalHistoryOverrideEntry {
 
 export interface PlaceRecord extends PlaceIndexRecord {
   candidates: PlaceLocationCandidate[];
+  unmappedCandidates?: PlaceUnmappedCandidate[];
   summary: SourcedTextEntry;
   history: SourcedTextEntry[];
   scripture: ScriptureEntry[];

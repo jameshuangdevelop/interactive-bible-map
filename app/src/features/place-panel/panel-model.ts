@@ -923,6 +923,32 @@ export function isDisputedRecord(place: Pick<PlaceIndexRecord, "candidates">) {
   return place.candidates.some((candidate) => candidate.confidence === "disputed");
 }
 
+export function proposedSitesSummaryText({
+  mappedCandidateCount,
+  unmappedCandidateCount
+}: {
+  mappedCandidateCount: number;
+  unmappedCandidateCount: number;
+}) {
+  const safeMappedCandidateCount = Number.isFinite(mappedCandidateCount)
+    ? Math.max(0, Math.trunc(mappedCandidateCount))
+    : 0;
+  const safeUnmappedCandidateCount = Number.isFinite(unmappedCandidateCount)
+    ? Math.max(0, Math.trunc(unmappedCandidateCount))
+    : 0;
+  const totalProposedSiteCount = safeMappedCandidateCount + safeUnmappedCandidateCount;
+  if (totalProposedSiteCount === 0) {
+    return "0 proposed sites";
+  }
+
+  const siteLabel = totalProposedSiteCount === 1 ? "site" : "sites";
+  if (safeUnmappedCandidateCount === 0) {
+    return `${safeMappedCandidateCount} proposed ${siteLabel}`;
+  }
+
+  return `${totalProposedSiteCount} proposed ${siteLabel} · ${safeMappedCandidateCount} on the map`;
+}
+
 export function confidenceLabel(confidence: Confidence, includeSuffix: boolean) {
   const base =
     confidence === "high"
@@ -1019,6 +1045,9 @@ export function collectSourceIdsInPanelOrder(location: PlaceRecord) {
   };
 
   for (const candidate of location.candidates) {
+    ingest(candidate.sources);
+  }
+  for (const candidate of location.unmappedCandidates ?? []) {
     ingest(candidate.sources);
   }
   ingest(location.summary?.sources);

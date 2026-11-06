@@ -81,6 +81,12 @@ function collectBibSourceIds(locationRecord) {
     }
   }
 
+  if (Array.isArray(locationRecord.unmappedCandidates)) {
+    for (const candidate of locationRecord.unmappedCandidates) {
+      ingestSources(candidate?.sources);
+    }
+  }
+
   if (Array.isArray(locationRecord.history)) {
     for (const historyEntry of locationRecord.history) {
       ingestSources(historyEntry?.sources);

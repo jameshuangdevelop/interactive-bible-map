@@ -2766,6 +2766,19 @@
       "accessed": "2026-10-13"
     },
     {
+      "id": "isbe-sychar",
+      "type": "chapter",
+      "title": "Sychar",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/sychar.html",
+      "accessed": "2026-11-05"
+    },
+    {
       "id": "isbe-ephron-2",
       "type": "chapter",
       "title": "Ephron (2)",

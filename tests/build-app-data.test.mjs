@@ -16,6 +16,11 @@ const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, "..");
 const fixturesDirectory = path.join(testDirectory, "fixtures");
 const validCaseDirectory = path.join(fixturesDirectory, "cases", "valid");
+const validUnmappedCaseDirectory = path.join(
+  fixturesDirectory,
+  "cases",
+  "valid-unmapped-candidates"
+);
 const invalidCaseDirectory = path.join(fixturesDirectory, "cases", "invalid-missing-bib");
 const bibliographyFixturePath = path.join(fixturesDirectory, "bibliography.json");
 const webFixturePath = path.join(fixturesDirectory, "web", "engwebp-mini.vpl.txt");
@@ -232,6 +237,43 @@ test("buildAppData writes one place file per location and resolves bibliography"
     assert.equal(galileePayload.location.id, "galilee");
     assert.equal(galileePayload.media, null);
     assert.deepEqual(galileePayload.bibliography, []);
+  });
+});
+
+test("buildAppData keeps unmapped candidates in place payloads but not places.index records", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await buildAppData({
+      locationsDirectory: path.join(validUnmappedCaseDirectory, "locations"),
+      mediaDirectory: path.join(validUnmappedCaseDirectory, "media"),
+      bibliographyPath: bibliographyFixturePath,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      requireModernCountries: false,
+      outputDirectory
+    });
+
+    const sourceRecord = JSON.parse(
+      await fs.readFile(
+        path.join(validUnmappedCaseDirectory, "locations", "capernaum.json"),
+        "utf8"
+      )
+    );
+    const placePayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "places", "capernaum.json"), "utf8")
+    );
+    assert.deepEqual(
+      placePayload.location.unmappedCandidates,
+      sourceRecord.unmappedCandidates
+    );
+
+    const indexRecords = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "places.index.json"), "utf8")
+    );
+    assert.equal(
+      indexRecords.some((record) => Object.hasOwn(record, "unmappedCandidates")),
+      false
+    );
   });
 });
 

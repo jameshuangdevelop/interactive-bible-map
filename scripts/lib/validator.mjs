@@ -485,6 +485,10 @@ function normalizeNameForDuplicateCheck(value) {
   return value.normalize("NFC").toLowerCase();
 }
 
+function normalizeCandidateLabelForDuplicateCheck(value) {
+  return value.trim().normalize("NFC").toLowerCase();
+}
+
 function splitModernNameVariants(modernName) {
   if (typeof modernName !== "string") {
     return [];
@@ -762,6 +766,15 @@ function locationHasScriptureSources(locationData) {
   if (
     Array.isArray(locationData.candidates) &&
     locationData.candidates.some((candidate) =>
+      sourceArrayHasScriptureSource(candidate?.sources)
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    Array.isArray(locationData.unmappedCandidates) &&
+    locationData.unmappedCandidates.some((candidate) =>
       sourceArrayHasScriptureSource(candidate?.sources)
     )
   ) {
@@ -4065,6 +4078,25 @@ export async function validateData(options = {}) {
       }
     }
 
+    const candidateLabelsByNormalizedValue = new Map();
+    function ingestCandidateLabel(label, pathValue) {
+      if (typeof label !== "string") {
+        return;
+      }
+
+      const normalizedLabel = normalizeCandidateLabelForDuplicateCheck(label);
+      if (normalizedLabel.length === 0) {
+        return;
+      }
+
+      const entries = candidateLabelsByNormalizedValue.get(normalizedLabel) ?? [];
+      entries.push({
+        path: pathValue,
+        value: label.trim()
+      });
+      candidateLabelsByNormalizedValue.set(normalizedLabel, entries);
+    }
+
     if (Array.isArray(data.candidates)) {
       if (hasDisputedCandidate && data.candidates.length < 2) {
         recordError(
@@ -4079,6 +4111,8 @@ export async function validateData(options = {}) {
         if (!candidate || typeof candidate !== "object") {
           return;
         }
+
+        ingestCandidateLabel(candidate.label, `$.candidates[${candidateIndex}].label`);
 
         validateCandidateCoordinateSource({
           candidate,
@@ -4107,6 +4141,44 @@ export async function validateData(options = {}) {
           }
         }
       });
+    }
+
+    if (Array.isArray(data.unmappedCandidates)) {
+      data.unmappedCandidates.forEach((candidate, candidateIndex) => {
+        if (!candidate || typeof candidate !== "object") {
+          return;
+        }
+
+        ingestCandidateLabel(
+          candidate.label,
+          `$.unmappedCandidates[${candidateIndex}].label`
+        );
+
+        validateSourceArray({
+          sourceIds: candidate.sources,
+          file: locationRecord.relativePath,
+          pathValue: `$.unmappedCandidates[${candidateIndex}].sources`,
+          bibliographyIds,
+          webVerseIndex,
+          errors
+        });
+      });
+    }
+
+    for (const duplicateLabelEntries of candidateLabelsByNormalizedValue.values()) {
+      if (duplicateLabelEntries.length < 2) {
+        continue;
+      }
+
+      const duplicateLocations = duplicateLabelEntries
+        .map((entry) => `${entry.path} ('${entry.value}')`)
+        .join(", ");
+      recordError(
+        errors,
+        locationRecord.relativePath,
+        "$.candidates",
+        `Duplicate candidate label '${duplicateLabelEntries[0].value}' within this record's candidates and unmappedCandidates: ${duplicateLocations}`
+      );
     }
 
     const locationId = typeof data.id === "string" ? data.id : undefined;
