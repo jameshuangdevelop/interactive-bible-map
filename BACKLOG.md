@@ -13,7 +13,6 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - Native iOS/Android app build (React Native Web keeps this path open)
 
 ## Data
-- **Unmapped candidates before M6 (CP2 decision 3).** CP2 accepted an explicit schema field for candidate sites without usable coordinates, such as Sychar's text-only Askar proposal. This is still unimplemented: `schema/location.schema.json` requires coordinates for every candidate. The incoming M6 lead must carry the requirement into the schema/validation/UI plan before expansion, rather than invent coordinates or silently drop a proposal.
 - **Elam ("Elamites", Acts 2:9).** M3-13 removed the Elam record because no source gave its status in about AD 50. Strabo 16.1.18 even says the Elymaean king refused to be subject to the Parthian king. Add it back when a first-century source gives the status of Susiana and Elymais, and decide whether its parent is the Parthian Empire or whether it was a semi-independent kingdom (`docs/verification/M3-well-known-areas.md`).
 - **Records for the areas the timeline draws that the New Testament names,** such as the Decapolis, Idumea, Iturea, Trachonitis, Abilene, Phoenicia and Lycia. In M4 they are areas on the map without a record; M4-02's research note lists them for an M6 batch (ADR-0037).
 

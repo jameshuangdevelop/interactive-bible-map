@@ -892,7 +892,14 @@ test.describe.serial("sequential panel checks", () => {
         "Not on the map: no verified coordinate."
       );
       await expect(askarCard.locator("button[aria-label^='Candidate ']")).toHaveCount(0);
-      await expect(askarCard.locator("a[href^='#source-']")).toHaveCount(2);
+      const sycharPayload = await page.evaluate(() =>
+        fetch("/generated/places/sychar.json").then((response) => response.json())
+      );
+      const askarEntry = (sycharPayload.location?.unmappedCandidates ?? []).find(
+        (candidate) => candidate.label === "Askar"
+      );
+      expect(askarEntry?.sources.length ?? 0).toBeGreaterThanOrEqual(2);
+      await expect(askarCard.locator("a[href^='#source-']")).toHaveCount(askarEntry.sources.length);
 
       const sourcesToggle = page.getByRole("button", { name: /^Sources · /u });
       await sourcesToggle.click();
