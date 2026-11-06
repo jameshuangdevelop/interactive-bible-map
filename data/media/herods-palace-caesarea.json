@@ -1,0 +1,31 @@
+{
+  "locationId": "herods-palace-caesarea",
+  "images": [
+    {
+      "id": "herods-palace-caesarea-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/CAESAREA%27_KING_HEROD%27S_SEA_PALACE_AERIAL.jpg",
+      "width": 3055,
+      "height": 1932,
+      "author": "Abraham Graicer",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:CAESAREA%27_KING_HEROD%27S_SEA_PALACE_AERIAL.jpg",
+      "caption": "Aerial view of Herod's Promontory Palace and the coastline of Caesarea Maritima.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "herods-palace-caesarea-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Herod_palace_Caesarea_2014.JPG",
+      "width": 3620,
+      "height": 1254,
+      "author": "Athanasius Soter",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Herod_palace_Caesarea_2014.JPG",
+      "caption": "A ground-level panorama of the excavated remains of Herod's Promontory Palace at Caesarea.",
+      "kind": "site",
+      "aiGenerated": false
+    }
+  ]
+}

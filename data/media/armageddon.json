@@ -1,0 +1,31 @@
+{
+  "locationId": "armageddon",
+  "images": [
+    {
+      "id": "armageddon-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Megido_City_Gate1.jpg",
+      "width": 3070,
+      "height": 2303,
+      "author": "Golf Bravo",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Megido_City_Gate1.jpg",
+      "caption": "The excavated Canaanite city gate at Tel Megiddo, widely read as the \"Har-Magedon\" of Revelation 16:16.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "armageddon-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Caiobadner_-_mount_carmel.JPG",
+      "width": 2048,
+      "height": 1536,
+      "author": "Chadner",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Caiobadner_-_mount_carmel.JPG",
+      "caption": "Mount Carmel, seen from the Jezreel Valley; some scholars propose it as the mountain behind the name \"Har-Magedon.\"",
+      "kind": "modern",
+      "aiGenerated": false
+    }
+  ]
+}

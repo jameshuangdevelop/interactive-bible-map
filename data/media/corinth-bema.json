@@ -1,0 +1,31 @@
+{
+  "locationId": "corinth-bema",
+  "images": [
+    {
+      "id": "corinth-bema-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/96/The_rostra_%28Bema%29_in_the_Roman_forum_of_the_Ancient_Corinth_on_6_April_2019.jpg",
+      "width": 6000,
+      "height": 4000,
+      "author": "George E. Koronaios",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_rostra_(Bema)_in_the_Roman_forum_of_the_Ancient_Corinth_on_6_April_2019.jpg",
+      "caption": "The Bema, a marble-faced speaker's platform in the Roman forum of Corinth, traditionally linked to Acts 18:12-17.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "corinth-bema-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Bema_01.jpg",
+      "width": 6000,
+      "height": 4000,
+      "author": "Davide Mauro",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Bema_01.jpg",
+      "caption": "Another view of the Bema at Corinth's Roman forum.",
+      "kind": "site",
+      "aiGenerated": false
+    }
+  ]
+}
