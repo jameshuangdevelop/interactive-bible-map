@@ -1,0 +1,31 @@
+{
+  "locationId": "antipatris",
+  "images": [
+    {
+      "id": "antipatris-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Antipatris_aerial_view_Feb_2014.JPG",
+      "width": 1740,
+      "height": 1153,
+      "author": "Dvirraz, Neukoln (retouch)",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Antipatris_aerial_view_Feb_2014.JPG",
+      "caption": "Aerial view of Tel Afek (Ras el-Ain), the mound identified with ancient Antipatris, at the source of the Yarkon River.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "antipatris-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Aerial_view_of_Aphek%2C_also_known_as_Antipatris%2C_caravansary_where_Paul_stopped_LOC_matpc.14389.jpg",
+      "width": 4500,
+      "height": 3666,
+      "author": "Matson Collection",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Aerial_view_of_Aphek,_also_known_as_Antipatris,_caravansary_where_Paul_stopped_LOC_matpc.14389.jpg",
+      "caption": "A 1925 aerial photograph of the Antipatris site, labeled by its photographer as the caravansary where Paul stopped.",
+      "kind": "historical",
+      "aiGenerated": false
+    }
+  ]
+}

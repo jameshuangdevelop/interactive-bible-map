@@ -1,0 +1,31 @@
+{
+  "locationId": "azotus",
+  "images": [
+    {
+      "id": "azotus-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/112058_tel_ashdod_PikiWiki_Israel.jpg",
+      "width": 5184,
+      "height": 3456,
+      "author": "סתיו קונשטיק",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:112058_tel_ashdod_PikiWiki_Israel.jpg",
+      "caption": "Tel Ashdod, the mound identified with ancient Azotus (Ashdod), inland from the modern coastal city.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "azotus-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Ashdod_Marina_Aerial_View.jpg",
+      "width": 4627,
+      "height": 3470,
+      "author": "Amos Meron",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ashdod_Marina_Aerial_View.jpg",
+      "caption": "Aerial view of the modern city of Ashdod on Israel's coast.",
+      "kind": "modern",
+      "aiGenerated": false
+    }
+  ]
+}

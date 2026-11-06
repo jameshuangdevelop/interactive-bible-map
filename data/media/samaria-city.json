@@ -1,0 +1,31 @@
+{
+  "locationId": "samaria-city",
+  "images": [
+    {
+      "id": "samaria-city-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/58/Columned_street_-_panoramio.jpg",
+      "width": 3648,
+      "height": 2432,
+      "author": "Mujaddara",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Columned_street_-_panoramio.jpg",
+      "caption": "The colonnaded street of the ancient city of Samaria, part of Herod the Great's building program at the site.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "samaria-city-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Panorama_from_Sabastiya_-_panoramio.jpg",
+      "width": 4912,
+      "height": 1080,
+      "author": "Mujaddara",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Panorama_from_Sabastiya_-_panoramio.jpg",
+      "caption": "Panorama of the archaeological site of Samaria (Sebaste), at the modern village of Sebastia.",
+      "kind": "site",
+      "aiGenerated": false
+    }
+  ]
+}

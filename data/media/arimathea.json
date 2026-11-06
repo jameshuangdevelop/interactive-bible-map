@@ -1,0 +1,18 @@
+{
+  "locationId": "arimathea",
+  "images": [
+    {
+      "id": "arimathea-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/43/Rantis9935.JPG",
+      "width": 4608,
+      "height": 3072,
+      "author": "יעקב",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Rantis9935.JPG",
+      "caption": "The village of Rantis, in the hill country northwest of Jerusalem, one proposed site of Arimathea.",
+      "kind": "modern",
+      "aiGenerated": false
+    }
+  ]
+}

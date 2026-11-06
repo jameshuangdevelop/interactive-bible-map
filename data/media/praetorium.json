@@ -1,0 +1,31 @@
+{
+  "locationId": "praetorium",
+  "images": [
+    {
+      "id": "praetorium-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b8/%D7%9E%D7%92%D7%93%D7%9C_-%D7%93%D7%95%D7%93.jpg",
+      "width": 4600,
+      "height": 2584,
+      "author": "אורי אלוני",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:מגדל_-דוד.jpg",
+      "caption": "Aerial view of the Citadel, also called the Tower of David, near the site of Herod the Great's former palace — one proposed site of the Praetorium.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "praetorium-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/The_Antonia_Fortress.jpg",
+      "width": 1580,
+      "height": 1114,
+      "author": "Ariely",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_Antonia_Fortress.jpg",
+      "caption": "A scale model of the Antonia Fortress, the other proposed site of the Praetorium, at the Temple Mount's northwest corner.",
+      "kind": "reconstruction",
+      "aiGenerated": false
+    }
+  ]
+}

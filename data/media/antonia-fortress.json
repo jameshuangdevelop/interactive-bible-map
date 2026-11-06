@@ -1,0 +1,31 @@
+{
+  "locationId": "antonia-fortress",
+  "images": [
+    {
+      "id": "antonia-fortress-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/The_Antonia_Fortress.jpg",
+      "width": 1580,
+      "height": 1114,
+      "author": "Ariely",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_Antonia_Fortress.jpg",
+      "caption": "A scale model of the Antonia Fortress at the Israel Museum, Jerusalem. No part of the fortress survives above ground today.",
+      "kind": "reconstruction",
+      "aiGenerated": false
+    },
+    {
+      "id": "antonia-fortress-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/02/PikiWiki_Israel_68677_fortress_of_antonia.jpg",
+      "width": 2791,
+      "height": 1881,
+      "author": "Unknown",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_68677_fortress_of_antonia.jpg",
+      "caption": "An 1869 photograph of the Temple Mount's northwest corner, the area some historians identify with the Antonia Fortress.",
+      "kind": "historical",
+      "aiGenerated": false
+    }
+  ]
+}

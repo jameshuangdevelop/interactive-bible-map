@@ -1,0 +1,31 @@
+{
+  "locationId": "plain-of-sharon",
+  "images": [
+    {
+      "id": "plain-of-sharon-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/09/PikiWiki_Israel_19114_Agriculture_in_the_Sharon_district_-_2012.jpg",
+      "width": 3264,
+      "height": 2448,
+      "author": "חדוה שנדרוביץ",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_19114_Agriculture_in_the_Sharon_district_-_2012.jpg",
+      "caption": "Agricultural fields in the Sharon district, the coastal plain between the hill country and the Mediterranean.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "plain-of-sharon-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Jaffa_%28Joppa%29_and_environs._Plain_of_Sharon_LOC_matpc.07471.jpg",
+      "width": 5335,
+      "height": 3991,
+      "author": "Matson Collection",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jaffa_(Joppa)_and_environs._Plain_of_Sharon_LOC_matpc.07471.jpg",
+      "caption": "An early twentieth-century photograph of Jaffa and the Plain of Sharon.",
+      "kind": "historical",
+      "aiGenerated": false
+    }
+  ]
+}
