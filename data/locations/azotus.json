@@ -1,0 +1,140 @@
+{
+  "id": "azotus",
+  "names": {
+    "ancient": [
+      "Azotus",
+      "Ashdod"
+    ],
+    "modern": "Ashdod",
+    "modernCountries": [
+      "Israel"
+    ],
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "judea-province",
+  "candidates": [
+    {
+      "label": "Tel Ashdod",
+      "coordinates": [
+        34.656061,
+        31.756038
+      ],
+      "coordinateSource": "dare:21687",
+      "confidence": "high",
+      "support": "The Digital Atlas of the Roman Empire's point for ancient Ashdod, inland from the coast, is corroborated by Pleiades' independently recorded point for the same city, about 250 meters away. A separate ancient settlement nearer the shore, Azotus Paralios (\"Ashdod-by-the-Sea\"), is attested at this period as a distinct, smaller place.",
+      "sources": [
+        "dare:21687",
+        "pleiades:687838",
+        "bib:isbe-ashdod"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Azotus is the Greek name, used in Acts, for the Old Testament Philistine city of Ashdod, one of the five chief Philistine towns. Acts describes Philip the evangelist appearing at Azotus after baptizing an Ethiopian official on the road from Jerusalem to Gaza, and preaching in every town on his way north to Caesarea.",
+    "sources": [
+      "bib:isbe-ashdod",
+      "scripture:Acts 8:40"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that Ashdod was restored, in Herod the Great's time, by the Roman governor Gabinius, and that the emperor Augustus later presented the city to Salome, Herod's sister, rather than to any of Herod's own sons.",
+      "sources": [
+        "bib:isbe-ashdod"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 8:40",
+      "book": "Acts",
+      "textWEB": "But Philip was found at Azotus. Passing through, he preached the Good News to all the cities until he came to Caesarea."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "1 Samuel 5:1",
+      "note": "After capturing the Ark of the Covenant from Israel, the Philistines brought it to Ashdod and set it in the temple of their god Dagon.",
+      "sources": [
+        "bib:isbe-ashdod",
+        "scripture:1 Samuel 5:1"
+      ]
+    },
+    {
+      "ref": "Amos 1:8",
+      "note": "The prophet Amos pronounces judgment on Ashdod among the Philistine cities.",
+      "sources": [
+        "scripture:Amos 1:8"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "judea-samaria-idumea"
+}
