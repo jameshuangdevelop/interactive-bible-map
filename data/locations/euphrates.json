@@ -1,0 +1,96 @@
+{
+  "id": "euphrates",
+  "names": {
+    "ancient": [
+      "Euphrates"
+    ],
+    "modern": "Euphrates River",
+    "modernCountries": [
+      "Iraq",
+      "Syria",
+      "Türkiye"
+    ],
+    "alternate": [],
+    "otherLanguages": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "region",
+  "prominence": "standard",
+  "naturalFeatureKind": "water",
+  "parentId": "mesopotamia",
+  "candidates": [
+    {
+      "label": "Euphrates River (label point, southern Iraq)",
+      "coordinates": [
+        47.442,
+        31.0043
+      ],
+      "coordinateSource": "openbible:euphrates",
+      "confidence": "high",
+      "support": "The Euphrates is a single, undisputed river running about 2,800 km from eastern Türkiye through Syria and Iraq to the Persian Gulf; as a long line feature it has no single natural point, so this label point, OpenBible.info's representative point, falls along its lower course in Iraq. Wikidata's own point for the river instead marks its source near Erzurum in eastern Türkiye, about 1,900 km upstream; both points lie on the same river.",
+      "sources": [
+        "openbible:euphrates",
+        "wikidata:Q34589"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Euphrates is the longest river of Southwest Asia, rising in eastern Türkiye and flowing through Syria and Iraq to join the Tigris before reaching the Persian Gulf. In the first century it marked much of the frontier between the Roman Empire and the Parthian Empire. Revelation pictures four angels \"bound at the great river Euphrates\" released in judgment, and later a vision in which the river's water is dried up \"that the way might be prepared for the kings that come from the sunrise.\"",
+    "sources": [
+      "openbible:euphrates",
+      "wikidata:Q34589",
+      "scripture:Revelation 9:14",
+      "scripture:Revelation 16:12",
+      "bib:isbe-parthians"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia describes the Parthian Empire, Rome's rival power to the east, as reaching from the Euphrates to the borders of India; the river therefore served much of the time as the practical boundary between Roman and Parthian territory, though its precise course meant Rome also held land east of parts of it, such as northern Mesopotamia under the emperor Trajan decades later.",
+      "sources": [
+        "bib:isbe-parthians"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Revelation 9:14",
+      "book": "Revelation",
+      "textWEB": "saying to the sixth angel who had the trumpet, “Free the four angels who are bound at the great river Euphrates!”"
+    },
+    {
+      "ref": "Revelation 16:12",
+      "book": "Revelation",
+      "textWEB": "The sixth poured out his bowl on the great river, the Euphrates. Its water was dried up, that the way might be prepared for the kings that come from the sunrise."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Genesis 2:14",
+      "note": "Genesis names the Euphrates as one of the four rivers flowing out of Eden.",
+      "sources": [
+        "scripture:Genesis 2:14"
+      ]
+    },
+    {
+      "ref": "Genesis 15:18",
+      "note": "In God's covenant with Abram, the Euphrates marks the eastern extent of the land promised to his descendants.",
+      "sources": [
+        "scripture:Genesis 15:18"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 101,
+      "entity": "A frontier river between the Roman Empire (west bank, for most of its length) and the Parthian Empire; no single political area of its own on this map",
+      "sources": [
+        "bib:isbe-parthians",
+        "bib:livius-parthia"
+      ],
+      "note": "The river's own political status varied by stretch and period rather than following one single border; this map does not draw a boundary line along it."
+    }
+  ],
+  "status": "draft"
+}
