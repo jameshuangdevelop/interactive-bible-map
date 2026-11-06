@@ -1,0 +1,133 @@
+{
+  "id": "athens-agora",
+  "names": {
+    "ancient": [
+      "The marketplace of Athens"
+    ],
+    "modern": "Ancient Agora of Athens",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [
+      "The Agora"
+    ],
+    "otherLanguages": [
+      "Agora"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "athens",
+  "candidates": [
+    {
+      "label": "Ancient Agora of Athens",
+      "coordinates": [
+        23.7225,
+        37.975
+      ],
+      "coordinateSource": "wikidata:Q395367",
+      "confidence": "high",
+      "support": "The excavated civic square just north of the Acropolis is identified as Athens's ancient marketplace (agora), where the International Standard Bible Encyclopedia places Paul's daily reasoning with Jews, devout Gentiles, and Epicurean and Stoic philosophers, including at the Painted Portico that stood in and around this square.",
+      "sources": [
+        "wikidata:Q395367",
+        "bib:isbe-athens",
+        "scripture:Acts 17:17"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Agora was the civic and commercial square of ancient Athens, lying just north of the Acropolis and ringed by porticoes (stoas), law courts, and public offices. According to Acts, Paul reasoned there every day with whoever happened to meet him, drawing the attention of Epicurean and Stoic philosophers who then brought him to the nearby Areopagus.",
+    "sources": [
+      "wikidata:Q395367",
+      "bib:isbe-athens",
+      "scripture:Acts 17:17"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia describes Paul passing the Agora on his way to the Acropolis, noting that porticoes (stoas) stood in and around it, among them the Painted Portico (Stoa Poecile) where Paul met the successors of the philosopher Zeno, the Stoics, and disputed with them daily.",
+      "sources": [
+        "bib:isbe-athens",
+        "scripture:Acts 17:18"
+      ]
+    },
+    {
+      "text": "Today the site of the Agora, excavated since the 1930s, lies just north of the Acropolis, as the International Standard Bible Encyclopedia's own description of the ancient city already placed it.",
+      "sources": [
+        "wikidata:Q395367",
+        "bib:isbe-athens"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 17:17",
+      "book": "Acts",
+      "textWEB": "So he reasoned in the synagogue with the Jews and the devout persons, and in the marketplace every day with those who met him."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:isbe-macedonia"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Imperial legate of Moesia (governed with Macedonia))",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:isbe-macedonia"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 67,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul (restored by the emperor Claudius))",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "fromYear": 67,
+      "toYear": 70,
+      "holderId": "achaia-free",
+      "entity": "Free Achaia",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius: on his departure from Greece, the emperor Nero \"presented the entire province with freedom.\""
+    },
+    {
+      "fromYear": 70,
+      "toYear": 79,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius records that the emperor Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor until his death in 79, when it is a province again."
+    },
+    {
+      "fromYear": 79,
+      "toYear": 101,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "achaia"
+}

@@ -1,0 +1,109 @@
+{
+  "id": "temple-of-artemis",
+  "names": {
+    "ancient": [
+      "The Temple of Artemis"
+    ],
+    "modern": "Near Selçuk (Artemision ruins)",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [
+      "Temple of Diana"
+    ],
+    "otherLanguages": [
+      "Artemision"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "ephesus",
+  "candidates": [
+    {
+      "label": "Temple of Artemis site, near Selçuk",
+      "coordinates": [
+        27.363889,
+        37.949722
+      ],
+      "coordinateSource": "wikidata:Q43018",
+      "confidence": "high",
+      "support": "The temple's foundations were located in 1869-1870 by the British Museum excavator J. T. Wood after years of searching, in a valley outside the old city walls, some feet below the surface, and the site is undisputed as that of the Temple of Artemis Acts describes the Ephesians guarding. Wikidata and Pleiades' coordinates for the site agree closely.",
+      "sources": [
+        "wikidata:Q43018",
+        "pleiades:873985034",
+        "bib:isbe-ephesus"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Temple of Artemis at Ephesus, one of the Seven Wonders of the ancient world, was a marble temple about 425 feet long, open to the sky and ringed by 127 columns 60 feet high. Acts records a riot in which Ephesian craftsmen who made silver shrines of the goddess, fearing their trade was threatened by Paul's preaching, filled the city with the cry \"Great is Artemis of the Ephesians!\"",
+    "sources": [
+      "wikidata:Q43018",
+      "pleiades:873985034",
+      "bib:isbe-ephesus",
+      "scripture:Acts 19:28",
+      "scripture:Acts 19:35"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that the temple was destroyed and rebuilt several times over its long history; after one burning, the wealthy citizens of Ephesus itself funded its final, grandest reconstruction, a project that by the encyclopedia's account took 220 years to complete. The same article describes the completed temple as a place of worship, a treasury so trusted that people stored their money there, and a sanctuary of refuge where no one could be arrested for any crime within a bowshot of its walls.",
+      "sources": [
+        "bib:isbe-ephesus"
+      ]
+    },
+    {
+      "text": "Acts records that when Demetrius, a silversmith who made silver shrines of Artemis, saw his trade threatened by Paul's preaching that \"gods made with hands are no gods,\" he stirred up the craftsmen of the city, and a crowd filled with anger dragged two of Paul's companions into the theater, crying out for about two hours, \"Great is Artemis of the Ephesians!\"",
+      "sources": [
+        "scripture:Acts 19:24",
+        "scripture:Acts 19:26",
+        "scripture:Acts 19:28",
+        "scripture:Acts 19:29",
+        "scripture:Acts 19:34"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia reports that the temple burned for a final time in AD 262 and was never rebuilt, and that the site was eventually buried under silt from the Cayster river and forgotten, until the British Museum excavator J. T. Wood located its foundations on January 1, 1870, after eleven years of searching.",
+      "sources": [
+        "bib:isbe-ephesus"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 19:24",
+      "book": "Acts",
+      "textWEB": "For a certain man named Demetrius, a silversmith who made silver shrines of Artemis, brought no little business to the craftsmen,"
+    },
+    {
+      "ref": "Acts 19:27",
+      "book": "Acts",
+      "textWEB": "Not only is there danger that this our trade come into disrepute, but also that the temple of the great goddess Artemis will be counted as nothing and her majesty destroyed, whom all Asia and the world worships.”"
+    },
+    {
+      "ref": "Acts 19:28",
+      "book": "Acts",
+      "textWEB": "When they heard this they were filled with anger, and cried out, saying, “Great is Artemis of the Ephesians!”"
+    },
+    {
+      "ref": "Acts 19:35",
+      "book": "Acts",
+      "textWEB": "When the town clerk had quieted the multitude, he said, “You men of Ephesus, what man is there who doesn’t know that the city of the Ephesians is temple keeper of the great goddess Artemis, and of the image which fell down from Zeus?"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -129,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "asia"
+}

@@ -1,0 +1,136 @@
+{
+  "id": "herods-palace-caesarea",
+  "names": {
+    "ancient": [
+      "Herod's palace"
+    ],
+    "modern": "Promontory Palace, Caesarea",
+    "modernCountries": [
+      "Israel"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Promontory Palace"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "caesarea-maritima",
+  "candidates": [
+    {
+      "label": "Promontory Palace, Caesarea Maritima",
+      "coordinates": [
+        34.891767,
+        32.502506
+      ],
+      "coordinateSource": "wikidata:Q2527367",
+      "confidence": "high",
+      "support": "Excavations in the 1970s and 1990s (Universities of Pennsylvania and Hebrew University teams, later the Cornell University archaeology program) uncovered a palace extending about 100 meters into the sea on a rocky promontory, identified in the resulting peer-reviewed publication as Herod the Great's palace at Caesarea and, after Rome took direct control of Judea, the Roman governor's headquarters (praetorium); the identification with the \"Herod's palace\" of Acts 23:35 is widely accepted, though Acts gives no architectural description to confirm which rooms held which events.",
+      "sources": [
+        "wikidata:Q2527367",
+        "bib:gleason-burrell-netzer-promontory-palace",
+        "bib:cornell-caesarea-maritima",
+        "scripture:Acts 23:35"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Herod's palace at Caesarea was a seaside palace that Herod the Great built on a rocky promontory jutting into the Mediterranean, later excavated and identified as the \"Promontory Palace.\" According to Acts, after Paul was brought to Caesarea under guard, the governor Felix ordered him kept in custody in Herod's palace to await his accusers.",
+    "sources": [
+      "wikidata:Q2527367",
+      "bib:cornell-caesarea-maritima",
+      "scripture:Acts 23:35"
+    ]
+  },
+  "history": [
+    {
+      "text": "The Cornell University archaeology program, which excavated the site, describes the Promontory Palace in two parts: a Lower Palace near sea level, with a colonnade framing a great rock-cut pool, and an Upper Palace on higher ground centered on a large paved courtyard. The program dates the Lower Palace to Herod the Great's reign and records that the palace and the nearby stadium described by the first-century Jewish historian Josephus had both been lost to memory until their rediscovery in the last quarter of the twentieth century.",
+      "sources": [
+        "bib:cornell-caesarea-maritima"
+      ]
+    },
+    {
+      "text": "Acts records that when the Roman governor Felix learned Paul was from Cilicia, he said, \"I will hear you fully when your accusers also arrive,\" and ordered him kept under guard in Herod's palace; Paul remained in custody there for two years, until Felix was succeeded by Porcius Festus.",
+      "sources": [
+        "scripture:Acts 23:34",
+        "scripture:Acts 23:35",
+        "scripture:Acts 24:27"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 23:35",
+      "book": "Acts",
+      "textWEB": "“I will hear you fully when your accusers also arrive.” He commanded that he be kept in Herod’s palace."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "judea-samaria-idumea"
+}

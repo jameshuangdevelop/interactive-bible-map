@@ -1,0 +1,124 @@
+{
+  "id": "philippi-place-of-prayer",
+  "names": {
+    "ancient": [
+      "The place of prayer by the river"
+    ],
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [
+      "Lydia's river"
+    ],
+    "otherLanguages": [
+      "Proseuche"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "philippi",
+  "candidates": [
+    {
+      "label": "Gangites River (near Lydia village)",
+      "coordinates": [
+        24.276826,
+        41.020832
+      ],
+      "coordinateSource": "bib:religiousgreece-lydia-baptistery",
+      "confidence": "medium",
+      "support": "A small river west of Philippi, called the Gangites or Zygaktis in ancient sources (the modern Anghista), identified by the International Standard Bible Encyclopedia as the stream flowing through the plain around the city; the Greek Orthodox Church marks a traditional baptism site here with a 1974 open-air baptistery and chapel dedicated to Lydia. Commentators differ on the river's exact distance from the city gate, and Acts does not itself name the river.",
+      "sources": [
+        "bib:religiousgreece-lydia-baptistery",
+        "bib:isbe-philippi",
+        "scripture:Acts 16:13"
+      ]
+    }
+  ],
+  "unmappedCandidates": [
+    {
+      "label": "The Krenides springs, at the foot of the city's acropolis",
+      "confidence": "low",
+      "support": "The International Standard Bible Encyclopedia records that Philippi's own earlier name, Crenides (Krenides), meant \"springs,\" after the springs that fed the river and the surrounding marsh; the Greek Ministry of Culture and Sports likewise traces the name to abundant springs at the foot of the hill where the first settlement was made. Some readers propose that the \"river\" of Acts 16:13 is better identified with this nearer watercourse, closer to the city gate, rather than with the traditional site further away.",
+      "reason": "No coordinate distinct from Philippi's own site, which this project already maps under its own record, was found in an accepted source for these springs specifically.",
+      "sources": [
+        "bib:isbe-philippi",
+        "bib:odysseus-philippi-history"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The place of prayer by the river is where, according to Acts, Paul and his companions met a group of women outside the gate of Philippi on the Sabbath, and where Lydia, a dealer in purple cloth, believed and was baptized. Since Philippi had too few Jewish men to require a synagogue, this open-air riverside gathering served in its place. Its exact location is debated: a small river west of the city, traditionally called the Gangites, is marked by a modern Greek Orthodox shrine, while others point instead to the springs at the city's own original site.",
+    "sources": [
+      "scripture:Acts 16:13",
+      "bib:isbe-philippi",
+      "bib:religiousgreece-lydia-baptistery"
+    ]
+  },
+  "history": [
+    {
+      "text": "Acts records that on the Sabbath, Paul and his companions went outside the city gate to a riverside where they supposed there was a place of prayer, and sat down to speak with the women who had gathered there; Lydia, a dealer in purple cloth from Thyatira who already worshiped God, listened, and she and her household were baptized.",
+      "sources": [
+        "scripture:Acts 16:13",
+        "scripture:Acts 16:14",
+        "scripture:Acts 16:15"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia describes the plain around Philippi as watered by the river system of the Angites (also called the Gangas or Gangites, today's Anghista), fed by springs near the city for which Philippi's earlier name, Crenides, was given.",
+      "sources": [
+        "bib:isbe-philippi"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 16:13",
+      "book": "Acts",
+      "textWEB": "On the Sabbath day we went outside of the city by a riverside, where we supposed there was a place of prayer, and we sat down and spoke to the women who had come together."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -148,
+      "toYear": -27,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Governed with Achaia)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Imperial legate of Moesia (governed with Achaia))",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 101,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul (restored by the emperor Claudius))",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "macedonia"
+}
