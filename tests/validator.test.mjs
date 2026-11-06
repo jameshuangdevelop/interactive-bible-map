@@ -1555,7 +1555,27 @@ test("candidate labels stay unique across candidates and unmappedCandidates afte
       result,
       (error) =>
         error.path === "$.candidates" &&
-        error.message.includes("across candidates and unmappedCandidates")
+        error.message.includes("within this record's candidates and unmappedCandidates")
+    ),
+    true
+  );
+});
+
+test("two mapped candidates in one record cannot share a label, so readers can tell proposals apart", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.candidates.push({
+      ...structuredClone(capernaumData.candidates[0]),
+      label: ` ${capernaumData.candidates[0].label.toUpperCase()} `
+    });
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.candidates" &&
+        error.message.includes("Duplicate candidate label") &&
+        !error.message.includes("$.unmappedCandidates[")
     ),
     true
   );

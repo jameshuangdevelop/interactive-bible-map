@@ -4177,7 +4177,7 @@ export async function validateData(options = {}) {
         errors,
         locationRecord.relativePath,
         "$.candidates",
-        `Duplicate candidate label '${duplicateLabelEntries[0].value}' appears across candidates and unmappedCandidates: ${duplicateLocations}`
+        `Duplicate candidate label '${duplicateLabelEntries[0].value}' within this record's candidates and unmappedCandidates: ${duplicateLocations}`
       );
     }
 

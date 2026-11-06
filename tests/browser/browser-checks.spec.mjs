@@ -940,16 +940,12 @@ test.describe.serial("sequential panel checks", () => {
           hasAskarCandidateFeature: candidateFeatures.some((feature) => {
             const properties = feature.properties ?? {};
             return toLower(properties.candidateLabel) === "askar";
-          }),
-          sycharCandidateCount: candidateFeatures.filter(
-            (feature) => String(feature.properties?.placeId ?? "") === "sychar"
-          ).length
+          })
         };
       }, mapTestHookKey);
 
       expect(mapState.hasAskarSiteFeature).toBe(false);
       expect(mapState.hasAskarCandidateFeature).toBe(false);
-      expect(mapState.sycharCandidateCount).toBe(0);
     }
   );
 

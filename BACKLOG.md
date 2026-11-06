@@ -73,6 +73,8 @@ PR Reviewer findings that were not addressed in their PR, each with a reason.
 
 | Date | PR | Finding | Label | Why deferred |
 |---|---|---|---|---|
+| 2026-11-05 | #102 (M6-01) | The build-leakage test checks only the place payload and `places.index.json`, not the ancient and routes outputs | suggestion | Declined: the ancient and routes builders never receive `unmappedCandidates` (the ancient build takes only major places' pin coordinates from location records), and the `@panel` Sychar test asserts the reader-visible fact that no map feature exists for Askar |
+| 2026-11-05 | #102 (M6-01) | Before a place's payload loads, a record with one mapped candidate briefly shows that candidate's confidence chip, then switches to "N proposed sites · M on the map" | nit | Low impact and short-lived; add an unmapped count to `places.index.json` only if play-testing shows the switch is noticeable (also the Fact-Checker's note N4) |
 | 2026-10-23 | #90 (M5-21) | No test selects a kingdom by clicking its name; the holder-label click tests cover that kind of click | suggestion | Low risk: the click itself is tested, and kingdoms aren't part of M5-21 |
 | 2026-10-23 | #90 (M5-21) | The outlines fetch has no `AbortController` | nit | Declined: `MapView` lives for the whole session, and the outline is looked up again from the current selection, so a late answer can't draw on the wrong region |
 | 2026-10-23 | #91 (M5-22) | Fail the run when basemap-fixture misses pass a threshold | suggestion | Declined: failing on misses would bring back the timing flakes M5-22 removed; misses go to the CI job summary instead |
