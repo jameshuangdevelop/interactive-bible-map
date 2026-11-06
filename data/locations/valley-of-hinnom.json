@@ -1,0 +1,219 @@
+{
+  "id": "valley-of-hinnom",
+  "names": {
+    "ancient": [
+      "Valley of Hinnom",
+      "Gehenna"
+    ],
+    "modern": "Hinnom Valley",
+    "alternate": [
+      "Valley of the Son of Hinnom",
+      "Valley of the Children of Hinnom"
+    ],
+    "otherLanguages": [
+      "Wadi er-Rababi",
+      "Ge Hinnom"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Wadi er-Rababi",
+      "coordinates": [
+        35.228056,
+        31.769167
+      ],
+      "coordinateSource": "wikidata:Q558093",
+      "confidence": "high",
+      "support": "The International Standard Bible Encyclopedia identifies the valley of Hinnom with the Wadi er-Rababi, which begins west of Jaffa Gate, runs south, then curves east to join the Kidron Valley south of the Old City; it reports this as the clearest-supported of three proposed identifications among older writers (the others being the Kidron Valley itself and the Tyropoeon Valley inside the walls), based on the valley's role as the boundary between the tribes of Judah and Benjamin. OpenBible.info's ancient-place catalog independently records the same coordinate.",
+      "sources": [
+        "wikidata:Q558093",
+        "openbible:valley-of-hinnom",
+        "bib:isbe-hinnom-valley-of"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Valley of Hinnom runs along the west and south sides of Jerusalem's Old City before joining the Kidron Valley. In the Old Testament it was the site of idolatrous child sacrifice to Molech under kings Ahaz and Manasseh, a practice King Josiah ended by defiling the valley's altar site, Topheth; the prophet Jeremiah renamed it the \"valley of slaughter\" and predicted it would be filled with the dead. The New Testament's Greek word \"Gehenna,\" used for the place of final judgment, is a transliteration of the valley's Hebrew name, \"Ge Hinnom.\" The precise course of the ancient valley has been debated, but the International Standard Bible Encyclopedia identifies it with the Wadi er-Rababi.",
+    "sources": [
+      "bib:isbe-hinnom-valley-of",
+      "bib:isbe-gehenna",
+      "scripture:2 Chronicles 28:3",
+      "scripture:2 Chronicles 33:6",
+      "scripture:2 Kings 23:10",
+      "scripture:Jeremiah 7:31",
+      "scripture:Jeremiah 7:32"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia's article on Gehenna takes no theological position on the nature of the punishment the New Testament's twelve Gehenna passages describe, noting only that in them the term designates a place of final judgment associated with fire, for both body and soul, generally connected to the resurrection.",
+      "sources": [
+        "bib:isbe-gehenna"
+      ]
+    },
+    {
+      "text": "The same encyclopedia reports that the valley's continuing use for burning the city's refuse, on top of its earlier idolatrous associations, likely reinforced its later use as a byword for defilement and punishment.",
+      "sources": [
+        "bib:isbe-gehenna"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 5:22",
+      "book": "Matthew",
+      "textWEB": "But I tell you that everyone who is angry with his brother without a cause will be in danger of the judgment. Whoever says to his brother, ‘Raca!’ will be in danger of the council. Whoever says, ‘You fool!’ will be in danger of the fire of Gehenna."
+    },
+    {
+      "ref": "Matthew 5:29",
+      "book": "Matthew",
+      "textWEB": "If your right eye causes you to stumble, pluck it out and throw it away from you. For it is more profitable for you that one of your members should perish than for your whole body to be cast into Gehenna."
+    },
+    {
+      "ref": "Matthew 5:30",
+      "book": "Matthew",
+      "textWEB": "If your right hand causes you to stumble, cut it off, and throw it away from you. For it is more profitable for you that one of your members should perish, than for your whole body to be cast into Gehenna."
+    },
+    {
+      "ref": "Matthew 10:28",
+      "book": "Matthew",
+      "textWEB": "Don’t be afraid of those who kill the body, but are not able to kill the soul. Rather, fear him who is able to destroy both soul and body in Gehenna."
+    },
+    {
+      "ref": "Matthew 18:9",
+      "book": "Matthew",
+      "textWEB": "If your eye causes you to stumble, pluck it out and cast it from you. It is better for you to enter into life with one eye, rather than having two eyes to be cast into the Gehenna of fire."
+    },
+    {
+      "ref": "Matthew 23:15",
+      "book": "Matthew",
+      "textWEB": "Woe to you, scribes and Pharisees, hypocrites! For you travel around by sea and land to make one proselyte; and when he becomes one, you make him twice as much a son of Gehenna as yourselves."
+    },
+    {
+      "ref": "Matthew 23:33",
+      "book": "Matthew",
+      "textWEB": "You serpents, you offspring of vipers, how will you escape the judgment of Gehenna?"
+    },
+    {
+      "ref": "Mark 9:43",
+      "book": "Mark",
+      "textWEB": "If your hand causes you to stumble, cut it off. It is better for you to enter into life maimed, rather than having your two hands to go into Gehenna, into the unquenchable fire,"
+    },
+    {
+      "ref": "Mark 9:45",
+      "book": "Mark",
+      "textWEB": "If your foot causes you to stumble, cut it off. It is better for you to enter into life lame, rather than having your two feet to be cast into Gehenna, into the fire that will never be quenched—"
+    },
+    {
+      "ref": "Mark 9:47",
+      "book": "Mark",
+      "textWEB": "If your eye causes you to stumble, throw it out. It is better for you to enter into God’s Kingdom with one eye, rather than having two eyes to be cast into the Gehenna of fire,"
+    },
+    {
+      "ref": "Luke 12:5",
+      "book": "Luke",
+      "textWEB": "But I will warn you whom you should fear. Fear him who after he has killed, has power to cast into Gehenna. Yes, I tell you, fear him."
+    },
+    {
+      "ref": "James 3:6",
+      "book": "James",
+      "textWEB": "And the tongue is a fire. The world of iniquity among our members is the tongue, which defiles the whole body, and sets on fire the course of nature, and is set on fire by Gehenna."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "2 Chronicles 33:6",
+      "note": "King Manasseh is said to have made his sons \"pass through the fire in the valley of the son of Hinnom,\" one of the practices of child sacrifice to Molech the Old Testament associates with the valley.",
+      "sources": [
+        "bib:isbe-hinnom-valley-of",
+        "scripture:2 Chronicles 33:6"
+      ]
+    },
+    {
+      "ref": "2 Kings 23:10",
+      "note": "King Josiah defiled Topheth, in the valley of the son of Hinnom, so that it could no longer be used for child sacrifice, part of his broader religious reforms.",
+      "sources": [
+        "bib:isbe-hinnom-valley-of",
+        "scripture:2 Kings 23:10"
+      ]
+    },
+    {
+      "ref": "Jeremiah 7:32",
+      "note": "Jeremiah announces that the valley will be called the \"valley of Slaughter\" instead of Topheth or the valley of the son of Hinnom, because of the judgment coming on it for these practices.",
+      "sources": [
+        "bib:isbe-hinnom-valley-of",
+        "scripture:Jeremiah 7:32"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "judea-samaria-idumea"
+}

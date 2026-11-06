@@ -1,0 +1,183 @@
+{
+  "id": "praetorium",
+  "names": {
+    "ancient": [
+      "The Praetorium",
+      "Gabbatha",
+      "The Pavement"
+    ],
+    "alternate": [
+      "The Judgment Hall",
+      "The Common Hall"
+    ],
+    "otherLanguages": [
+      "Lithostrotos"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Herod's Palace (traditional Citadel/Tower of David area)",
+      "coordinates": [
+        35.228036,
+        31.776083
+      ],
+      "coordinateSource": "wikidata:Q3661432",
+      "confidence": "disputed",
+      "support": "The International Standard Bible Encyclopedia argues, on the strength of the first-century Jewish historian Josephus, that the Roman governor's headquarters in Jerusalem was Herod the Great's former palace, on the high part of the city's southwest hill near its northwest corner, rather than the Antonia; it cites Josephus recording the procurator Florus holding court before this palace and later withdrawing to the Antonia only when his position there became untenable. Wikidata's coordinate for \"Herod's Palace at Jerusalem\" matches the area of the traditional Citadel, also called the Tower of David, which Wikidata records at a closely corresponding point about 80 meters away.",
+      "sources": [
+        "wikidata:Q3661432",
+        "wikidata:Q1177765",
+        "bib:isbe-praetorium",
+        "bib:josephus-jewish-war"
+      ]
+    },
+    {
+      "label": "Antonia Fortress, northwest corner of the Temple Mount",
+      "coordinates": [
+        35.234303,
+        31.780094
+      ],
+      "coordinateSource": "wikidata:Q570515",
+      "confidence": "disputed",
+      "support": "Church tradition, reflected in the route of the Via Dolorosa, locates the Praetorium at the Antonia fortress beside the Temple, and an extensive Roman-period pavement uncovered near the \"Ecce Homo\" arch there has often been identified as Gabbatha, the Pavement of John 19:13. The International Standard Bible Encyclopedia itself favors Herod's palace instead, judging this tradition less likely on the evidence of Josephus, and it further doubts that the pavement found near the Antonia is the Gabbatha of John's Gospel at all, since the Greek term there more probably describes a mosaic floor of a kind common at the time, whose location it considers unrecoverable.",
+      "sources": [
+        "wikidata:Q570515",
+        "bib:isbe-praetorium",
+        "bib:isbe-gabbatha"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Praetorium was the residence of the Roman governor in a provincial city, and in Jerusalem it was the scene of Jesus' trial before Pontius Pilate. Outside it stood a special pavement, named in Aramaic \"Gabbatha,\" where Pilate sat to pronounce judgment. Two sites are proposed for the Praetorium in the Gospels: Herod the Great's former palace, near today's Citadel, and the Antonia fortress beside the Temple, which later church tradition and the route of the Via Dolorosa favor. Both proposals have scholarly support, and neither pavement nor palace survives to settle the question archaeologically.",
+    "sources": [
+      "bib:isbe-praetorium",
+      "bib:isbe-gabbatha",
+      "scripture:John 18:28",
+      "scripture:John 18:33",
+      "scripture:John 19:9",
+      "scripture:John 19:13"
+    ]
+  },
+  "history": [
+    {
+      "text": "Mark's Gospel places the Roman soldiers' mocking of Jesus, with a purple robe and a crown of thorns, \"inside the court, which is the Praetorium\"; Matthew's parallel account uses the same word, translated \"Governor's palace.\"",
+      "sources": [
+        "scripture:Mark 15:16",
+        "scripture:Matthew 27:27"
+      ]
+    },
+    {
+      "text": "John's Gospel says that the Jewish leaders who brought Jesus did not themselves enter the Praetorium, \"that they might not be defiled, but might eat the Passover,\" so Pilate came out to them instead; the same Gospel reports that after further questioning inside, Pilate brought Jesus out and sat down at Gabbatha to render judgment.",
+      "sources": [
+        "scripture:John 18:28",
+        "scripture:John 18:33",
+        "scripture:John 19:9",
+        "scripture:John 19:13"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia notes that if the Praetorium was indeed Herod's palace rather than the Antonia, as it argues, then the traditional course of the Via Dolorosa, which starts from the Antonia, would need substantial revision.",
+      "sources": [
+        "bib:isbe-praetorium"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Mark 15:16",
+      "book": "Mark",
+      "textWEB": "The soldiers led him away within the court, which is the Praetorium; and they called together the whole cohort."
+    },
+    {
+      "ref": "John 18:28",
+      "book": "John",
+      "textWEB": "They led Jesus therefore from Caiaphas into the Praetorium. It was early, and they themselves didn’t enter into the Praetorium, that they might not be defiled, but might eat the Passover."
+    },
+    {
+      "ref": "John 18:33",
+      "book": "John",
+      "textWEB": "Pilate therefore entered again into the Praetorium, called Jesus, and said to him, “Are you the King of the Jews?”"
+    },
+    {
+      "ref": "John 19:9",
+      "book": "John",
+      "textWEB": "He entered into the Praetorium again, and said to Jesus, “Where are you from?” But Jesus gave him no answer."
+    },
+    {
+      "ref": "John 19:13",
+      "book": "John",
+      "textWEB": "When Pilate therefore heard these words, he brought Jesus out and sat down on the judgment seat at a place called “The Pavement”, but in Hebrew, “Gabbatha.”"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "judea-samaria-idumea"
+}
