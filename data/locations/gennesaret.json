@@ -1,0 +1,123 @@
+{
+  "id": "gennesaret",
+  "names": {
+    "ancient": [
+      "Land of Gennesaret"
+    ],
+    "modern": "Ginosar Valley",
+    "modernCountries": [
+      "Israel"
+    ],
+    "alternate": [
+      "Plain of Gennesaret",
+      "Gennesaret"
+    ],
+    "otherLanguages": [
+      "El-Ghuweir"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "El-Ghuweir plain, near Ginosar",
+      "coordinates": [
+        35.507222,
+        32.860556
+      ],
+      "coordinateSource": "wikidata:Q5533392",
+      "confidence": "medium",
+      "support": "The International Standard Bible Encyclopedia identifies the land of Gennesaret with the crescent-shaped plain on the Sea of Galilee's northwest shore known in Arabic as el-Ghuweir, running from Tell Hum in the north to Mejdel in the south. The Digital Atlas of the Roman Empire independently records a closely corresponding point, about 2.4 kilometers away, for an ancient town called Gennesar on the mound of Khirbet 'Ureime at the plain's northern edge, used here as the nearest confirmed point to the plain the Gospels name.",
+      "sources": [
+        "wikidata:Q5533392",
+        "dare:33302",
+        "bib:isbe-gennesaret-land-of"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The land of Gennesaret is a fertile, crescent-shaped plain on the northwest shore of the Sea of Galilee. Matthew and Mark both describe Jesus and his disciples landing there by boat, after which people throughout the surrounding region brought their sick to him.",
+    "sources": [
+      "bib:isbe-gennesaret-land-of",
+      "scripture:Matthew 14:34",
+      "scripture:Mark 6:53"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia quotes the first-century Jewish historian Josephus praising the plain's fertility and year-round fruit, noting that walnuts, palms, olives and figs, which usually need different climates, all flourished there together.",
+      "sources": [
+        "bib:isbe-gennesaret-land-of"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 14:34",
+      "book": "Matthew",
+      "textWEB": "When they had crossed over, they came to the land of Gennesaret."
+    },
+    {
+      "ref": "Mark 6:53",
+      "book": "Mark",
+      "textWEB": "When they had crossed over, they came to land at Gennesaret and moored to the shore."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "holderId": "antipas-tetrarchy",
+      "entity": "Tetrarchy of Galilee and Perea (ruler: Herod Antipas)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:jewish-encyclopedia-agrippa-ii",
+        "bib:iaa-magdala-excavation"
+      ],
+      "note": "The emperor Nero later added the Galilean towns of Tiberias and Taricheae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; the Jewish historian Josephus dates this to AD 54, but the Jewish Encyclopedia (1906) reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change."
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "galilee-perea"
+}

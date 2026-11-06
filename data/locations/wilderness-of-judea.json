@@ -1,0 +1,117 @@
+{
+  "id": "wilderness-of-judea",
+  "names": {
+    "ancient": [
+      "Wilderness of Judea"
+    ],
+    "modern": "Judean Desert",
+    "modernCountries": [
+      "West Bank",
+      "Israel"
+    ],
+    "alternate": [
+      "Judean Wilderness"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "region",
+  "prominence": "standard",
+  "parentId": "judea",
+  "candidates": [
+    {
+      "label": "Judean Desert",
+      "coordinates": [
+        35.3,
+        31.7
+      ],
+      "coordinateSource": "wikidata:Q2046004",
+      "confidence": "high",
+      "support": "Wikidata's point for the Judaean Desert, the arid region between Jerusalem's hill country and the Dead Sea, is corroborated by the International Standard Bible Encyclopedia's cross-reference of Matthew 3:1's \"wilderness of Judea\" to this same region.",
+      "sources": [
+        "wikidata:Q2046004",
+        "bib:isbe-judaea-wilderness-of"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The wilderness of Judea is the arid, rugged region east of Jerusalem's hill country, descending toward the Dead Sea. Matthew's Gospel places the start of John the Baptist's ministry there: \"In those days, John the Baptizer came, preaching in the wilderness of Judea.\"",
+    "sources": [
+      "scripture:Matthew 3:1"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Matthew 3:1",
+      "book": "Matthew",
+      "textWEB": "In those days, John the Baptizer came, preaching in the wilderness of Judea, saying,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "judea-samaria-idumea"
+}

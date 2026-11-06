@@ -1,0 +1,162 @@
+{
+  "id": "aenon",
+  "names": {
+    "ancient": [
+      "Enon near Salim"
+    ],
+    "modernCountries": [
+      "West Bank",
+      "Israel"
+    ],
+    "alternate": [
+      "Aenon"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "judea-province",
+  "candidates": [
+    {
+      "label": "Near Tel Shalem, south of Beth-shean (Scythopolis)",
+      "coordinates": [
+        35.526389,
+        32.399167
+      ],
+      "coordinateSource": "wikidata:Q12058546",
+      "confidence": "disputed",
+      "support": "The fourth-century Christian writer Eusebius, in his Onomasticon, places Aenon eight Roman miles south of Scythopolis (modern Beit She'an), near a place he calls Salumias; the International Standard Bible Encyclopedia judges this \"the most probable\" identification and points to copious springs at the ruin of Umm el-'Amdan in this district, which it reads as matching Eusebius's description of a place of abundant water. No independently confirmed coordinate exists for that exact ruin, so this candidate uses the nearby, well-documented site of Tel Shalem, a few kilometers away in the same district south of Beit She'an, as the nearest point an accepted source records.",
+      "sources": [
+        "wikidata:Q12058546",
+        "bib:isbe-aenon",
+        "bib:isbe-salim"
+      ]
+    },
+    {
+      "label": "Near the village of Salim, east of Nablus",
+      "coordinates": [
+        35.333333,
+        32.216667
+      ],
+      "coordinateSource": "wikidata:Q20395636",
+      "confidence": "disputed",
+      "support": "Some nineteenth-century explorers, including Edward Robinson and Claude Conder, proposed a Salim village east of Nablus together with a nearby spring called Ainun as the site of Aenon and Salim; OpenBible.info's ancient-place catalog records this identification among its candidates. The International Standard Bible Encyclopedia argues against it, reasoning that this location lies \"in the very heart of Samaria,\" which it judges incompatible with John's Gospel keeping John the Baptist's activity and Jesus' own separate journey through Samaria as distinct episodes.",
+      "sources": [
+        "wikidata:Q20395636",
+        "openbible:aenon",
+        "bib:isbe-salim"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Aenon near Salim is the place where, according to John's Gospel, John the Baptist was baptizing \"because there was much water there,\" at a time that briefly overlapped with Jesus' own ministry nearby. The World English Bible spells the name \"Enon\"; most other English translations use \"Aenon.\" Its location is disputed: the International Standard Bible Encyclopedia favors a district south of Beth-shean (Scythopolis), following the fourth-century writer Eusebius, while other scholars have proposed a village called Salim east of Nablus, in Samaria.",
+    "sources": [
+      "scripture:John 3:23",
+      "bib:isbe-aenon",
+      "bib:isbe-salim"
+    ]
+  },
+  "history": [
+    {
+      "text": "John's Gospel immediately adds that \"John was not yet thrown into prison,\" and records a dispute arising between John's disciples and a Jew over ceremonial washing, after which John's disciples tell him that Jesus, whom John had earlier pointed to, \"baptizes, and everyone is coming to him\"; John answers that he must decrease while Jesus increases.",
+      "sources": [
+        "scripture:John 3:24",
+        "scripture:John 3:25",
+        "scripture:John 3:26"
+      ]
+    },
+    {
+      "text": "A separate tradition, recorded on the sixth-century Madaba mosaic map, names a place \"Ainon, where now is Sapsaphas\" near the Jordan River, east of Jericho; the International Standard Bible Encyclopedia's own discussion of Salim places Aenon on the Jordan's west side, so this project treats the Madaba map's Jordan-side tradition as a separate question from Aenon near Salim, rather than as a third candidate for this verse.",
+      "sources": [
+        "bib:isbe-aenon",
+        "bib:piccirillo-ainon-sapsaphas"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "John 3:23",
+      "book": "John",
+      "textWEB": "John also was baptizing in Enon near Salim, because there was much water there. They came and were baptized;"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -63,
+      "toYear": 101,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria (Scythopolis, a Decapolis city, answerable to the governor of Syria)",
+      "sources": [
+        "bib:isbe-decapolis"
+      ],
+      "note": "The International Standard Bible Encyclopedia's article on the Decapolis describes Scythopolis, the only one of its ten cities west of the Jordan, as independent of the local tetrarchy and answerable directly to the governor of Syria, dating the league's constitution to about the time of the Roman general Pompey's campaign in the region, 65 BC. This map starts the entry in 63 BC to match other Decapolis-area entries.",
+      "candidate": 0
+    },
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "candidate": 1
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "candidate": 1
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "candidate": 1
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "candidate": 1
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "candidate": 1
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change.",
+      "candidate": 1
+    }
+  ],
+  "status": "draft"
+}

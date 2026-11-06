@@ -1,0 +1,147 @@
+{
+  "id": "jacobs-well",
+  "names": {
+    "ancient": [
+      "Jacob's Well"
+    ],
+    "modern": "Bir Ya'qub",
+    "modernCountries": [
+      "West Bank"
+    ],
+    "alternate": []
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "samaria",
+  "candidates": [
+    {
+      "label": "Bir Ya'qub, near Nablus",
+      "coordinates": [
+        35.28543,
+        32.209447
+      ],
+      "coordinateSource": "wikidata:Q1679519",
+      "confidence": "high",
+      "support": "The International Standard Bible Encyclopedia reports that Jewish, Samaritan, Muslim and Christian tradition agree in identifying this well, near the foot of Mount Gerizim at the mouth of the pass leading to Shechem/Nablus, still known locally as Bir Ya'qub (\"the well of Jacob\"), with no serious rival site proposed; Wikidata's coordinate for the well matches this traditional site.",
+      "sources": [
+        "wikidata:Q1679519",
+        "bib:isbe-jacobs-well"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Jacob's Well is a deep well near Sychar, at the foot of Mount Gerizim, where John's Gospel sets Jesus' conversation with a Samaritan woman. The International Standard Bible Encyclopedia notes that the well is not fed by a spring, but depends on rainfall and seepage, matching the woman's own observation in the Gospel that \"the well is deep.\"",
+    "sources": [
+      "bib:isbe-jacobs-well",
+      "scripture:John 4:6"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia connects the well's traditional digging by the patriarch Jacob to the plot of ground near Shechem that Jacob is said to have bought, on his return from Paddan-aram, and later given to his son Joseph; it notes that nearby springs would have made a dug well unnecessary for ordinary household use, suggesting Jacob may have dug it instead to secure independent water rights for his own flocks.",
+      "sources": [
+        "bib:isbe-jacobs-well",
+        "scripture:Genesis 33:18",
+        "scripture:Genesis 48:22"
+      ]
+    },
+    {
+      "text": "Churches have been built over the well at different periods; the encyclopedia records a vaulted chamber around its opening and a stone, found in 1881, that may have served as the well's original cover. Today a Greek Orthodox church stands over the site.",
+      "sources": [
+        "bib:isbe-jacobs-well"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "John 4:6",
+      "book": "John",
+      "textWEB": "Jacob’s well was there. Jesus therefore, being tired from his journey, sat down by the well. It was about the sixth hour."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Genesis 33:18",
+      "note": "Jacob camps before the city of Shechem and buys the plot of ground there, the traditional origin of the land near which the well was later dug.",
+      "sources": [
+        "bib:isbe-jacobs-well",
+        "scripture:Genesis 33:18"
+      ]
+    },
+    {
+      "ref": "Genesis 48:22",
+      "note": "Jacob gives Joseph an extra portion of land, \"which I took out of the hand of the Amorite with my sword and with my bow,\" identified with the ground near the well.",
+      "sources": [
+        "bib:isbe-jacobs-well",
+        "scripture:Genesis 48:22"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "judea-samaria-idumea"
+}
