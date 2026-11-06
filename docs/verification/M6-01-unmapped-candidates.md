@@ -4,7 +4,9 @@
 - **Checked:** `data/locations/sychar.json` (the new `unmappedCandidates[0]` "Askar", the edited Tell Balata `support`, the edited `summary`, the removed `history` entry); the new `bib:isbe-sychar` in `data/bibliography.json`; the panel's new strings in `app/src/features/place-panel/place-panel.web.tsx` and `panel-model.ts`; the build output after `npm run build:data`. Against ADR-0017, `schema/README.md` ("Confidence meanings", "Unmapped candidates", "Modern names", "Sources quality floor", "Status workflow"), `docs/LICENSES.md`, `ATTRIBUTION.md` and the precedent in `docs/verification/M2-batch-2.md`.
 - **Verifier:** fact-checker (Claude, Copilot CLI) · **Date:** 2026-11-05
 
-**Result: fix required. Sychar stays `status: "draft"`.** Seven fixes: five in the record's wording or citations (F1–F5), one in `names.modern` (F6) and one in the panel (F7). No coordinate was invented, the sources and licenses pass, and the new strings "Not on the map: no verified coordinate.", "Reason:" and "2 proposed sites · 1 on the map" pass.
+**Re-check on 2026-11-05 (section 7): F1–F7 pass, and Sychar is signed off.**
+
+**First-round result: fix required. Sychar stays `status: "draft"`.** Seven fixes: five in the record's wording or citations (F1–F5), one in `names.modern` (F6) and one in the panel (F7). No coordinate was invented, the sources and licenses pass, and the new strings "Not on the map: no verified coordinate.", "Reason:" and "2 proposed sites · 1 on the map" pass.
 
 ## 1. Sources opened (all read 2026-11-05)
 
@@ -105,5 +107,35 @@ The deletion is clean: only the Askar sentence went, and the coordinate, confide
 - `npm run validate:data`: pass, 207 warnings, none for `sychar`.
 - `npm test`: 322 passed, 0 failed.
 
-## Sign-off
+## Sign-off (first round)
 **Not signed off.** `sychar` stays `status: "draft"` until F1–F7 are fixed and re-checked. Checked by fact-checker, 2026-11-05.
+
+## 7. Re-check of the fix round (2026-11-05, at `6fd1d8c`)
+- **Scope:** `git diff 6018703..HEAD -- data/ app/src/features/place-panel/`: `f22e620` (Research Lead, F1–F6) and `ae19808` (Frontend, F7). I also checked how omitting `names.modern` changes the panel and search, using the rebuilt `app/public/generated/`, the exported app in `app/dist/` (current with `6fd1d8c`; its Sychar payload and index match the rebuild byte for byte) at `?place=sychar`, and `npx playwright test --grep @panel --retries=0`.
+- **PO decision on Q1:** in this PR, unmapped candidates don't count toward the rule that a `disputed` record needs at least two candidates. Confidences stay `medium`/`medium`. Recorded; this needs no change.
+
+| Finding | Re-check | Verdict |
+|---|---|---|
+| F1 | "on the strength of the similarity between the two names" is removed. What remains ("is proposed in Bible-geography scholarship as Sychar's modern equivalent") is stated by ISBE ("Many have sought to find Sychar in the modern \`Askar") and OpenBible ("Askar (modern): 65% confidence") | Pass |
+| F2 | Now "the initial ʿain in the modern name, a change from 'Sychar' the encyclopedia calls unusual but not impossible". ISBE: "the initial letter \`ain in the modern name … such a change as this, although unusual, is not impossible" | Pass |
+| F3 | Added: "a difficulty the encyclopedia judges would probably by itself be fatal to Askar's claim". ISBE: "This difficulty would probably in any case be fatal to the claim of the village at \`Ain \`Askar to represent the ancient Sychar" ("in any case" here means apart from Macalister's evidence, which ISBE gives next, so "by itself" is fair). ISBE's assessments of both difficulties are now given | Pass |
+| F4 | "long raised" is removed ("notes two difficulties:"). ISBE: "There are two difficulties." | Pass |
+| F5 | Tell Balata `support` now reads "Some scholarship treats Sychar as a variant name for the ancient city of Shechem, whose remains lie at Tell Balata". OpenBible: "another name for Shechem (ancient)", resolved to "Tell Balatah". Q7697383 is "Tell Balata", "site of an ancient Canaanite/Israelite city", alias "Shechem". The coordinate, confidence and sources are unchanged | Pass |
+| F6 | `names.modern` is omitted, and `names.modernCountries` (`West Bank`) stays and covers both sites. The panel's line now reads "Today: the West Bank" beside "2 proposed sites · 1 on the map". The search subtitle is "the West Bank · Village" (it was "Tell Balata, the West Bank · Village"). Search matches only `names.ancient` and `names.alternate` (`uniqueSearchNames` in `place-search.ts`), so no search term is lost: "Sychar" still finds the place, and "Tell Balata" found nothing before or after. The record follows `schema/README.md` "Modern names", and Derbe (two candidates, no `names.modern`) is the precedent | Pass |
+| F7 | Under one heading, "Proposed sites", the mapped "Shechem (Tell Balata)" comes first, with a "Medium" chip, its support and markers [1][2][3], and no letter or button because the place has a single map pin. "Askar" follows with a "Medium" chip, "Not on the map: no verified coordinate.", its support and "Reason:". Both proposals now appear on equal terms, and nothing ranks the unmapped one lower. The `@panel` test now checks the order and Tell Balata's chip | Pass |
+
+- **Unchanged and still passing:** the `reason`, the `summary`, the sources, `bib:isbe-sychar` and the licensing; WEB John 4:5 and `politicalHistory`, which this round doesn't touch.
+- **No coordinate invented:** after the rebuild, "askar" appears only in `app/public/generated/places/sychar.json`. The entry has no `coordinates`, and Sychar's index entry still has one candidate, at Tell Balata.
+- **Notes still open (optional, no change required):**
+  - N1: Askar's markers [3][4][5] still sit after its support, and none after `Reason:`.
+  - N2: the wording of "nearest confirmed independent point".
+  - N4: the header shows the "Medium confidence" chip until the payload loads.
+- **New note, N7 (layout, older than this PR):** the Today line's flex layout puts "Today: the West Bank" and "2 proposed sites · 1 on the map" on one line with only a small gap, so it can read as "the West Bank 2 proposed sites". Derbe's "Today: Türkiye" beside "2 sites" has the same layout. A separator would help, but this is not a factual issue.
+- **Commands (Node 24, at `6fd1d8c` plus the sign-off edit):**
+  - `npm run build:data`: pass.
+  - `npm run validate:data`: pass, 207 warnings, none for `sychar`.
+  - `npm test`: 322 passed, 0 failed.
+  - `npx playwright test --grep @panel --retries=0`: 16 passed.
+
+## Sign-off
+**F1–F7 pass. `sychar` is signed off:** `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-11-05"`. Checked by fact-checker, 2026-11-05.
