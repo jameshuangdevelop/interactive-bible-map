@@ -2,7 +2,31 @@ import type {
   AncientStopCataloguePayload,
   AncientStopCompactPayload
 } from "../src/features/map/ancient-layer.types";
-import { expandAncientStopPayloadFromCatalogue } from "../src/features/map/ancient-stop-catalogue";
+import {
+  createAncientStopCatalogueLoader,
+  expandAncientStopPayloadFromCatalogue
+} from "../src/features/map/ancient-stop-catalogue";
+
+function createCatalogueResponse(
+  payload: AncientStopCataloguePayload,
+  status = 200
+): Response {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    json: async () => payload
+  } as Response;
+}
+
+function createDeferred<Value>() {
+  let resolve: (value: Value | PromiseLike<Value>) => void = () => {};
+  let reject: (reason?: unknown) => void = () => {};
+  const promise = new Promise<Value>((promiseResolve, promiseReject) => {
+    resolve = promiseResolve;
+    reject = promiseReject;
+  });
+  return { promise, resolve, reject };
+}
 
 describe("ancient stop catalogue expansion", () => {
   const catalogue: AncientStopCataloguePayload = {
@@ -133,5 +157,34 @@ describe("ancient stop catalogue expansion", () => {
     expect(() => expandAncientStopPayloadFromCatalogue(compactStop, missingCatalogueArray)).toThrow(
       "Ancient stop catalogue is missing 'holderLabels' array."
     );
+  });
+
+  test("concurrent catalogue callers share one in-flight request", async () => {
+    const deferredResponse = createDeferred<Response>();
+    const fetchCatalogue = jest.fn(() => deferredResponse.promise);
+    const loadCatalogue = createAncientStopCatalogueLoader(fetchCatalogue);
+
+    const firstCall = loadCatalogue();
+    const secondCall = loadCatalogue();
+
+    expect(fetchCatalogue).toHaveBeenCalledTimes(1);
+    deferredResponse.resolve(createCatalogueResponse(catalogue));
+
+    await expect(firstCall).resolves.toEqual(catalogue);
+    await expect(secondCall).resolves.toEqual(catalogue);
+    await expect(loadCatalogue()).resolves.toEqual(catalogue);
+    expect(fetchCatalogue).toHaveBeenCalledTimes(1);
+  });
+
+  test("catalogue loader retries after a rejected request", async () => {
+    const fetchCatalogue = jest.fn();
+    fetchCatalogue
+      .mockRejectedValueOnce(new Error("catalogue unavailable"))
+      .mockResolvedValueOnce(createCatalogueResponse(catalogue));
+    const loadCatalogue = createAncientStopCatalogueLoader(fetchCatalogue);
+
+    await expect(loadCatalogue()).rejects.toThrow("catalogue unavailable");
+    await expect(loadCatalogue()).resolves.toEqual(catalogue);
+    expect(fetchCatalogue).toHaveBeenCalledTimes(2);
   });
 });

@@ -8,6 +8,7 @@ import type {
 } from "./ancient-layer.types";
 
 type CatalogueEntryType = "areas" | "holderBorders" | "holderLabels";
+type AncientStopCatalogueFetch = (url: string, init?: RequestInit) => Promise<Response>;
 
 function requireCatalogueArray<Entry>(
   value: Entry[] | undefined,
@@ -51,6 +52,7 @@ export function expandAncientStopPayloadFromCatalogue(
   stopPayload: AncientStopCompactPayload,
   stopCatalogue: AncientStopCataloguePayload
 ): AncientStopPayload {
+  // Keep this in sync with scripts/lib/ancient-app-data-builder.mjs:expandStopPayloadFromCatalogue.
   const stopId = typeof stopPayload.stopId === "string" && stopPayload.stopId.length > 0
     ? stopPayload.stopId
     : "unknown-stop";
@@ -96,3 +98,36 @@ export function expandAncientStopPayloadFromCatalogue(
     holderLabels
   };
 }
+
+export function createAncientStopCatalogueLoader(fetchCatalogue: AncientStopCatalogueFetch) {
+  let stopCataloguePayload: AncientStopCataloguePayload | null = null;
+  let stopCataloguePromise: Promise<AncientStopCataloguePayload> | null = null;
+
+  return async function loadAncientStopCatalogue(): Promise<AncientStopCataloguePayload> {
+    if (stopCataloguePayload) {
+      return stopCataloguePayload;
+    }
+
+    if (stopCataloguePromise) {
+      return stopCataloguePromise;
+    }
+
+    stopCataloguePromise = fetchCatalogue("/generated/ancient.stop-catalogue.json", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient stop catalogue (${response.status})`);
+        }
+        const payload = (await response.json()) as AncientStopCataloguePayload;
+        stopCataloguePayload = payload;
+        return payload;
+      })
+      .catch((error) => {
+        stopCataloguePromise = null;
+        throw error;
+      });
+
+    return stopCataloguePromise;
+  };
+}
+
+export const loadAncientStopCatalogue = createAncientStopCatalogueLoader((url, init) => fetch(url, init));

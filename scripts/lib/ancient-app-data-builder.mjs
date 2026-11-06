@@ -996,6 +996,7 @@ function indexStopCatalogueEntry({
   entries,
   indexByKey
 }) {
+  // This dedupe key depends on deterministic property order in the payload objects we build.
   const key = JSON.stringify(value);
   const existingIndex = indexByKey.get(key);
   if (existingIndex !== undefined) {
@@ -1030,6 +1031,7 @@ function buildLegacyStopPayload({
   return {
     stopId: stop.id,
     year: stop.year,
+    // Copy before sorting so we don't mutate the loop-scoped assignments array.
     areas: [...assignments].sort((left, right) => left.areaId.localeCompare(right.areaId)),
     holderBorders: borderCollections.holderBorders,
     romanEmpireEdge: borderCollections.romanEmpireEdge,
@@ -1074,6 +1076,7 @@ function stopCatalogueEntryAt({
   return entries[index];
 }
 
+// Keep this in sync with app/src/features/map/ancient-stop-catalogue.ts:expandAncientStopPayloadFromCatalogue.
 function expandStopPayloadFromCatalogue(stopPayload, stopCatalogue) {
   const stopId =
     typeof stopPayload?.stopId === "string" && stopPayload.stopId.length > 0
