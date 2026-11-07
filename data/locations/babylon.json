@@ -26,7 +26,7 @@
       ],
       "coordinateSource": "wikidata:Q5684",
       "confidence": "high",
-      "support": "The ruins of the Mesopotamian capital, on the Euphrates near modern Hillah, Iraq, are the undisputed site of the ancient city Matthew and Acts recall as the place of Judah's exile; some scholars also read this as the literal place meant by \"Babylon\" in 1 Peter 5:13, though the International Standard Bible Encyclopedia notes there is no tradition connecting the apostle Peter with this city, and that Josephus records most of its Jewish population had already been driven out to neighboring towns by this period. Wikidata and Pleiades's coordinates for the site agree closely.",
+      "support": "The ruins of the Mesopotamian capital are the undisputed site of ancient Babylon, the city Matthew and Acts recall as the place of Judah's exile; Wikidata and Pleiades's coordinates for the site agree closely. Many good scholars have also read this as the literal place meant by \"Babylon\" in 1 Peter 5:13, though the International Standard Bible Encyclopedia notes there is no evidence that Peter was ever in Babylon, and that Josephus records most of its Jewish population had already been driven out to neighboring towns by this period.",
       "sources": [
         "wikidata:Q5684",
         "pleiades:893951",
@@ -37,16 +37,18 @@
       ]
     },
     {
-      "label": "Babylon Fortress, Old Cairo",
+      "label": "Babylon Fortress, Old Cairo, Egypt",
       "coordinates": [
         31.2297,
         30.0061
       ],
       "coordinateSource": "wikidata:Q2421968",
       "confidence": "low",
-      "support": "A Roman fortress in what is now Old Cairo, Egypt, which the first-century geographer Strabo says was founded by refugees from the Mesopotamian Babylon; the International Standard Bible Encyclopedia records this as one of three historic proposals for the \"Babylon\" of 1 Peter 5:13, but judges it improbable, since in the first century the fortress was little more than a military post, and no tradition connects the apostle Peter with Egypt.",
+      "politicalAreaId": "egypt",
+      "support": "A Roman fortress at what is now Old Cairo, Egypt, which the International Standard Bible Encyclopedia equates with the \"Egyptian Babylon\"; its surviving walls date to the late third or early fourth century AD, well after the New Testament period, though tradition holds the Roman emperor Diocletian built it to defend a canal linking the Nile to the Red Sea, and the first-century geographer Strabo says the Egyptian Babylon was founded by refugees from the Mesopotamian Babylon. The encyclopedia records this site as one of three historic proposals for the \"Babylon\" of 1 Peter 5:13, but judges it improbable, since in the first century the site was little more than a military post, and no tradition connects the apostle Peter with Egypt.",
       "sources": [
         "wikidata:Q2421968",
+        "pleiades:758514868",
         "bib:isbe-babylon-new-testament",
         "scripture:1 Peter 5:13"
       ]
@@ -56,12 +58,13 @@
     {
       "label": "Rome (figurative name, in 1 Peter and Revelation)",
       "confidence": "high",
-      "support": "The International Standard Bible Encyclopedia reports that most scholars, from at least the time of the early Christian writer Tertullian onward, have read \"Babylon\" in Revelation as a figurative name for Rome, citing features of the \"Babylon\" Revelation describes, such as ruling over \"the kings of the earth\" and sitting on \"seven mountains,\" that fit Rome rather than any other city of that age; the same encyclopedia reports that most interpreters before the Reformation likewise read 1 Peter 5:13's \"Babylon\" as Rome, partly because Peter's letter also sends greetings from Mark, who other New Testament letters place with Paul in Rome.",
+      "support": "The International Standard Bible Encyclopedia reports that most scholars, from at least the time of the early Christian writer Tertullian onward, have read \"Babylon\" in Revelation as a figurative name for Rome, citing features of the \"Babylon\" Revelation describes, such as ruling over \"the kings of the earth\" and sitting on \"seven mountains,\" that fit Rome rather than any other city of that age; the same encyclopedia reports that most interpreters before the Reformation likewise read 1 Peter 5:13's \"Babylon\" as Rome, and cites as supporting internal evidence that Peter's letter also sends greetings from Mark, whom 2 Timothy describes as having been summoned to Rome by Paul.",
       "reason": "A figurative reading of Rome, a place that has its own record in this project; no separate coordinate is needed here.",
       "sources": [
         "bib:isbe-babylon-new-testament",
         "scripture:Revelation 17:5",
-        "scripture:1 Peter 5:13"
+        "scripture:1 Peter 5:13",
+        "scripture:2 Timothy 4:11"
       ]
     },
     {
@@ -76,8 +79,11 @@
     }
   ],
   "summary": {
-    "text": "Babylon was the capital of ancient Mesopotamia, on the Euphrates south of modern Baghdad, and the city to which the kingdom of Judah was exiled in the sixth century BC; Matthew's genealogy and Stephen's speech in Acts both recall this exile by name. Revelation names \"Babylon\" repeatedly as a doomed city, in terms most scholars read as a figurative name for Rome rather than a reference to the Mesopotamian city itself. Where Peter wrote that \"she who is in Babylon\" sends greetings, in 1 Peter 5:13, is disputed: proposals include Rome (read figuratively, the traditional and most widely held view), the Mesopotamian city itself, and a Roman fortress in Egypt called Babylon, near modern Cairo.",
+    "text": "Babylon was the capital of ancient Babylonia, the seat of the Neo-Babylonian Empire from the late seventh century BC until 539 BC and, per UNESCO, located 85 km south of Baghdad; it was the city to which the kingdom of Judah was exiled in the sixth century BC, and Matthew's genealogy and Stephen's speech in Acts both recall this exile by name. Revelation names \"Babylon\" repeatedly as a doomed city, in terms most scholars read as a figurative name for Rome rather than a reference to the Mesopotamian city itself. Where Peter wrote that \"she who is in Babylon\" sends greetings, in 1 Peter 5:13, is disputed: proposals include Rome (read figuratively, the traditional view), the Mesopotamian city itself, and a Roman fortress in Egypt called Babylon, near modern Cairo.",
     "sources": [
+      "wikidata:Q5684",
+      "pleiades:893951",
+      "bib:unesco-babylon",
       "bib:isbe-babylon-new-testament",
       "scripture:Matthew 1:17",
       "scripture:Acts 7:43",
@@ -86,6 +92,12 @@
     ]
   },
   "history": [
+    {
+      "text": "By the first century AD, the Mesopotamian city lay within the Parthian Empire, Rome's rival power to the east; this project's timeline, which tracks Roman-administered areas, does not assign Parthian lands a dated political-history entry of their own.",
+      "sources": [
+        "bib:isbe-parthians"
+      ]
+    },
     {
       "text": "Matthew's genealogy of Jesus marks \"the exile to Babylon\" as a hinge point, counting fourteen generations from Abraham to the exile and fourteen more from the exile to Jesus; in Stephen's speech in Acts, he tells the Jewish council that because Israel worshiped false gods, God said he would \"carry you away beyond Babylon.\"",
       "sources": [
@@ -96,7 +108,7 @@
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia sets out three historic proposals for the \"Babylon\" from which 1 Peter was written: the Mesopotamian city, the Egyptian fortress near Old Cairo, and Rome read figuratively. It judges the Egyptian option improbable, since Babylon in Egypt was by then little more than a military station with no tradition of a visit by Peter; it notes that some reputable scholars have held the Mesopotamian reading, but that Josephus records most of that city's Jewish community had already been driven out to neighboring towns by this period, with no evidence of a church there or of any visit by Peter. The encyclopedia concludes that internal evidence, including the letter's greeting from Mark, favors Rome, and that this figurative reading was the common view of the church before the Reformation.",
+      "text": "The International Standard Bible Encyclopedia sets out three historic proposals for the \"Babylon\" from which 1 Peter was written: the Mesopotamian city, the Egyptian fortress near Old Cairo, and Rome read figuratively. It judges the Egyptian option improbable, since Babylon in Egypt was by then little more than a military station with no tradition of a visit by Peter; it notes that many good scholars have held the Mesopotamian reading, but that Josephus records most of that city's Jewish community had already been driven out to neighboring towns by this period, with no evidence of a church there or of any visit by Peter. The encyclopedia concludes that internal evidence, including the letter's greeting from Mark, favors Rome, and that this figurative reading was the common view of the church before the Reformation.",
       "sources": [
         "bib:isbe-babylon-new-testament",
         "bib:josephus-antiquities",
@@ -160,33 +172,22 @@
   ],
   "otConnections": [
     {
-      "ref": "2 Kings 25:1",
-      "note": "2 Kings records King Nebuchadnezzar of Babylon's siege and eventual destruction of Jerusalem, the exile Matthew's genealogy and Stephen's speech both recall.",
+      "ref": "2 Kings 25:1-11",
+      "note": "2 Kings records King Nebuchadnezzar of Babylon's siege of Jerusalem, its fall, and the city's destruction and exile, the events Matthew's genealogy and Stephen's speech both recall.",
       "sources": [
-        "scripture:2 Kings 25:1",
+        "scripture:2 Kings 25:1-11",
         "scripture:Matthew 1:17"
       ]
     },
     {
       "ref": "Daniel 4:30",
-      "note": "Daniel records King Nebuchadnezzar surveying his capital and asking, \"Is not this great Babylon, which I have built?\"; the International Standard Bible Encyclopedia cites this verse as a fitting summary of Nebuchadnezzar's own building work at the city.",
+      "note": "Daniel records King Nebuchadnezzar surveying his capital and asking, \"Is not this great Babylon, which I have built?\"",
       "sources": [
-        "scripture:Daniel 4:30",
-        "bib:isbe-babylon-new-testament"
+        "scripture:Daniel 4:30"
       ]
     }
   ],
   "politicalHistory": [
-    {
-      "fromYear": -4,
-      "toYear": 101,
-      "entity": "Part of the Parthian Empire; no internal succession tracked",
-      "sources": [
-        "bib:isbe-parthians",
-        "bib:livius-parthia"
-      ],
-      "candidate": 0
-    },
     {
       "fromYear": -30,
       "toYear": 101,

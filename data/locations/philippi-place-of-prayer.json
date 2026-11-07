@@ -22,35 +22,28 @@
     {
       "label": "Gangites River (near Lydia village)",
       "coordinates": [
-        24.276826,
-        41.020832
+        24.276917,
+        41.020889
       ],
-      "coordinateSource": "bib:religiousgreece-lydia-baptistery",
+      "coordinateSource": "wikidata:Q91742263",
       "confidence": "medium",
-      "support": "A small river west of Philippi, called the Gangites or Zygaktis in ancient sources (the modern Anghista), identified by the International Standard Bible Encyclopedia as the stream flowing through the plain around the city; the Greek Orthodox Church marks a traditional baptism site here with a 1974 open-air baptistery and chapel dedicated to Lydia. Commentators differ on the river's exact distance from the city gate, and Acts does not itself name the river.",
+      "support": "A small river west of Philippi: the International Standard Bible Encyclopedia reports the Greek historian Herodotus calls it the Angites, while the Roman-era historian Appian also records the names Gangas or Gangites, today's Anghista. Pleiades records this ancient river as formally unlocated, and separately identifies a different river, the \"Zygaktes?,\" with the modern Xiropotamos. The Greek Orthodox Church marks a traditional baptism site at this stream, near the modern village of Lydia, with a 1974 open-air baptistery and chapel dedicated to Lydia. Acts does not itself name the river.",
       "sources": [
-        "bib:religiousgreece-lydia-baptistery",
+        "wikidata:Q91742263",
         "bib:isbe-philippi",
+        "bib:religiousgreece-lydia-baptistery",
+        "pleiades:507402",
+        "pleiades:501669",
         "scripture:Acts 16:13"
       ]
     }
   ],
-  "unmappedCandidates": [
-    {
-      "label": "The Krenides springs, at the foot of the city's acropolis",
-      "confidence": "low",
-      "support": "The International Standard Bible Encyclopedia records that Philippi's own earlier name, Crenides (Krenides), meant \"springs,\" after the springs that fed the river and the surrounding marsh; the Greek Ministry of Culture and Sports likewise traces the name to abundant springs at the foot of the hill where the first settlement was made. Some readers propose that the \"river\" of Acts 16:13 is better identified with this nearer watercourse, closer to the city gate, rather than with the traditional site further away.",
-      "reason": "No coordinate distinct from Philippi's own site, which this project already maps under its own record, was found in an accepted source for these springs specifically.",
-      "sources": [
-        "bib:isbe-philippi",
-        "bib:odysseus-philippi-history"
-      ]
-    }
-  ],
   "summary": {
-    "text": "The place of prayer by the river is where, according to Acts, Paul and his companions met a group of women outside the gate of Philippi on the Sabbath, and where Lydia, a dealer in purple cloth, believed and was baptized. Since Philippi had too few Jewish men to require a synagogue, this open-air riverside gathering served in its place. Its exact location is debated: a small river west of the city, traditionally called the Gangites, is marked by a modern Greek Orthodox shrine, while others point instead to the springs at the city's own original site.",
+    "text": "The place of prayer by the river is where, according to Acts, Paul and his companions met a group of women outside the gate of Philippi on the Sabbath, and where Lydia, a dealer in purple cloth, believed and was baptized. The International Standard Bible Encyclopedia states that Philippi had no synagogue, since its resident Jewish population was small, and that their meetings for prayer took place on a river's bank instead. A small river west of the city, traditionally identified with the ancient Gangites and marked today by a Greek Orthodox shrine, is the traditional site, though Acts itself does not name the river.",
     "sources": [
       "scripture:Acts 16:13",
+      "scripture:Acts 16:14",
+      "scripture:Acts 16:15",
       "bib:isbe-philippi",
       "bib:religiousgreece-lydia-baptistery"
     ]
@@ -65,7 +58,7 @@
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia describes the plain around Philippi as watered by the river system of the Angites (also called the Gangas or Gangites, today's Anghista), fed by springs near the city for which Philippi's earlier name, Crenides, was given.",
+      "text": "The International Standard Bible Encyclopedia records that there was no synagogue at Philippi, since the number of resident Jews was small, and that their meetings for prayer took place on the river's bank.",
       "sources": [
         "bib:isbe-philippi"
       ]
