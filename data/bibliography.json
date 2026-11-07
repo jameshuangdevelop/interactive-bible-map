@@ -52,6 +52,18 @@
       "url": "https://www.cambridge.org/core/journals/journal-of-roman-archaeology/article/abs/promontory-palace-at-caesarea-maritima-preliminary-evidence-for-herods-praetorium/9C523B410171B3C2EE6F93B798AD835A"
     },
     {
+      "id": "hmdb-promontory-palace-marker",
+      "type": "web",
+      "title": "The Promontory Palace Historical Marker",
+      "authors": [
+        "Dale K. Benington"
+      ],
+      "year": 2013,
+      "publisher": "The Historical Marker Database (HMdb.org)",
+      "url": "https://www.hmdb.org/m.asp?m=64517",
+      "accessed": "2026-11-06"
+    },
+    {
       "id": "isbe-babylon-new-testament",
       "type": "chapter",
       "title": "Babylon in the New Testament",
@@ -233,6 +245,18 @@
       "year": 2026,
       "publisher": "ToposText",
       "url": "https://topostext.org/place/379229ABem",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "unesco-babylon",
+      "type": "web",
+      "title": "Babylon",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2019,
+      "publisher": "UNESCO World Heritage Centre",
+      "url": "https://whc.unesco.org/en/list/278",
       "accessed": "2026-11-06"
     },
     {

@@ -28,21 +28,25 @@
       ],
       "coordinateSource": "wikidata:Q202487",
       "confidence": "high",
-      "support": "A rocky outcrop northwest of the Acropolis, named for a mythical trial of the god Ares; the International Standard Bible Encyclopedia places the Court of the Areopagus in this same neighborhood, next to the Painted Portico where Paul had been disputing with Stoic philosophers, and the hill is traditionally identified as the setting of Paul's speech in Acts 17. Wikidata's coordinate for the hill is corroborated by an independently maintained gazetteer of ancient places, which likewise marks it northwest of the Acropolis.",
+      "support": "A rocky outcrop northwest of the Acropolis, named after a mythical trial of the god Ares and identified as a meeting place for the Council of the Areopagus (Pleiades); the International Standard Bible Encyclopedia places the Court of the Areopagus in this same neighborhood, and the hill is traditionally identified as the setting of Paul's speech in Acts 17. Pleiades' point for the hill, based on an OpenStreetMap outline, lies about 30 m from Wikidata's.",
       "sources": [
         "wikidata:Q202487",
+        "pleiades:969121823",
         "bib:isbe-athens",
         "scripture:Acts 17:19"
       ]
     }
   ],
   "summary": {
-    "text": "The Areopagus (\"Hill of Ares\") is a rocky outcrop in Athens, northwest of the Acropolis, which gave its name to an ancient council that met there and that also sat in judgment on serious cases. According to Acts, the Athenians brought Paul to the Areopagus to explain his teaching about Jesus and the resurrection, and there he preached about an altar he had seen inscribed \"TO AN UNKNOWN GOD.\"",
+    "text": "The Areopagus is a rocky outcrop in Athens, northwest of the Acropolis, which gave its name to an ancient council associated with legislative and judicial functions. According to Acts, the Athenians brought Paul to the Areopagus to explain his teaching about Jesus and the resurrection, and there he preached about an altar he had seen inscribed \"TO AN UNKNOWN GOD.\"",
     "sources": [
       "wikidata:Q202487",
+      "pleiades:969121823",
       "bib:isbe-athens",
+      "scripture:Acts 17:18",
       "scripture:Acts 17:19",
-      "scripture:Acts 17:22"
+      "scripture:Acts 17:22",
+      "scripture:Acts 17:23"
     ]
   },
   "history": [
@@ -55,7 +59,7 @@
       ]
     },
     {
-      "text": "Acts records that when Paul spoke of the resurrection of the dead, some of his hearers mocked him, but others wanted to hear more, and a few believed, including a member of the council named Dionysius the Areopagite and a woman named Damaris.",
+      "text": "Acts records that when Paul spoke of the resurrection of the dead, some of his hearers mocked him, but others wanted to hear more, and a few believed, including Dionysius the Areopagite and a woman named Damaris.",
       "sources": [
         "scripture:Acts 17:32",
         "scripture:Acts 17:34"

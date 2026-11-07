@@ -35,29 +35,33 @@
     }
   ],
   "summary": {
-    "text": "Cyrene was a major Greek city on the coast of North Africa, in the region the New Testament calls \"Libya around Cyrene,\" and the leading city of the district later organized with Crete as a single Roman province. Its large Jewish community is named several times in the New Testament: Simon, the man compelled to carry Jesus' cross, was \"a man of Cyrene,\" and men of Cyrene are later named among the early Jerusalem church and its first missionaries to Gentiles.",
+    "text": "Cyrene was a major Greek city on the coast of North Africa, in the region the New Testament calls \"Libya around Cyrene,\" and was later organized, with Crete, into a single Roman province. Its large Jewish community is named several times in the New Testament: Simon, the man compelled to carry Jesus' cross, was \"a man of Cyrene,\" and men of Cyrene who had been scattered from Jerusalem were later among those who preached to the Hellenists at Antioch.",
     "sources": [
       "openbible:cyrene",
       "wikidata:Q44112",
       "bib:isbe-cyrene",
+      "bib:isbe-crete",
       "scripture:Matthew 27:32",
+      "scripture:Acts 2:10",
+      "scripture:Acts 11:19",
       "scripture:Acts 11:20"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia records that Cyrene was founded by Greek colonists from the island of Thera in the seventh century BC, and that Jews were settled there in large numbers from the time of Egypt's first Ptolemaic king onward, forming one of the city's four main population groups by the first century BC.",
+      "text": "The International Standard Bible Encyclopedia records that Cyrene was a Greek colony founded by Battus in 630 BC, and that the Ptolemaic king Ptolemy I transported Jews there, after which Jews were very numerous in the city.",
       "sources": [
         "bib:isbe-cyrene"
       ]
     },
     {
-      "text": "All three Synoptic Gospels record that the soldiers leading Jesus to his crucifixion compelled Simon of Cyrene to carry his cross. Acts names Cyrenian Jews among those who disputed with Stephen, records that men of Cyprus and Cyrene were among the first to preach to Gentiles at Antioch, and lists Lucius of Cyrene among the prophets and teachers of the church there.",
+      "text": "All three Synoptic Gospels record that the soldiers leading Jesus to his crucifixion compelled Simon of Cyrene to carry his cross. Acts records that some of the believers scattered from Jerusalem, men of Cyprus and Cyrene, preached to the Hellenists at Antioch, names Cyrenian Jews among those who disputed with Stephen, and lists Lucius of Cyrene among the prophets and teachers of the church at Antioch.",
       "sources": [
         "scripture:Matthew 27:32",
         "scripture:Mark 15:21",
         "scripture:Luke 23:26",
         "scripture:Acts 6:9",
+        "scripture:Acts 11:19",
         "scripture:Acts 11:20",
         "scripture:Acts 13:1"
       ]

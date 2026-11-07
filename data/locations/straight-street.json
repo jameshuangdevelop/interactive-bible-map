@@ -28,7 +28,7 @@
       ],
       "coordinateSource": "wikidata:Q3399016",
       "confidence": "medium",
-      "support": "A colonnaded street running east-west through the Old City of Damascus, on the line of the city's main Roman-era street, is traditionally identified with the street called Straight in Acts. Part of it is still known locally as Derb el-Mustakim (\"Straight Street\"), though it is uncertain whether the name has been used continuously since antiquity; today the street is called Souk Medhat Pasha along part of its course.",
+      "support": "A colonnaded street running east-west through the Old City of Damascus, on the line of the city's main Roman-era street, is traditionally identified with the street called Straight in Acts. Part of it is still known locally as Derb el-Mustakim (\"Straight Street\"), and today the street is called Souk Medhat Pasha along part of its course, though it is uncertain whether the Derb el-Mustakim name has been used continuously since antiquity.",
       "sources": [
         "wikidata:Q3399016",
         "bib:isbe-damascus",
@@ -41,7 +41,9 @@
     "sources": [
       "wikidata:Q3399016",
       "bib:isbe-damascus",
-      "scripture:Acts 9:11"
+      "scripture:Acts 9:11",
+      "scripture:Acts 9:17",
+      "scripture:Acts 9:18"
     ]
   },
   "history": [
@@ -54,7 +56,7 @@
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia notes that the old city of Damascus still follows its Roman-era street plan, and that part of its ancient colonnaded east-west street is still known as Derb el-Mustakim, \"the straight street,\" though the encyclopedia does not claim this name has been used without interruption since antiquity.",
+      "text": "The International Standard Bible Encyclopedia says that in the Greek period a long, colonnaded street ran through Damascus, \"doubtless the 'street which is called Straight,'\" running westward from the city's East Gate; part of it is still called Derb el-Mustakim (\"Straight Street\"), though the encyclopedia does not claim this name has been used without interruption since antiquity.",
       "sources": [
         "bib:isbe-damascus"
       ]
@@ -80,6 +82,31 @@
     },
     {
       "fromYear": -27,
+      "toYear": 37,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria (ruler: Imperial legates, governed from Antioch)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:livius-cilicia",
+        "bib:josephus-antiquities"
+      ],
+      "note": "Administers the Cilician plain throughout, and administered Philip's former tetrarchy directly for a few years after his death (34-37; Antiquities 18.4.6)."
+    },
+    {
+      "fromYear": 37,
+      "toYear": 40,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "scripture:2 Corinthians 11:32",
+        "bib:isbe-aretas",
+        "bib:livius-damascus",
+        "bib:livius-nabataeans"
+      ],
+      "note": "Paul writes that \"the governor under King Aretas guarded the Damascenes' city\" around the time of his escape (2 Corinthians 11:32). How far the Nabataean king Aretas IV actually controlled Damascus is uncertain; the International Standard Bible Encyclopedia (1915) cites \"a Damascus coin, with the image of King Aretas and the date 101,\" which, read as the Pompeian era, equals AD 37. One proposal is that the Roman emperor Caligula gave him the city about that year. Aretas IV's reign ended in AD 40."
+    },
+    {
+      "fromYear": 40,
       "toYear": 101,
       "holderId": "roman-province-syria",
       "entity": "Roman province of Syria (ruler: Imperial legates, governed from Antioch)",
@@ -92,5 +119,19 @@
     }
   ],
   "status": "draft",
-  "politicalAreaId": "syria"
+  "politicalAreaId": "syria",
+  "politicalHistoryOverrides": [
+    {
+      "fromYear": 37,
+      "toYear": 40,
+      "holderId": "uncertain-roman-side",
+      "note": "Paul writes that \"the governor under King Aretas guarded the Damascenes' city\" around the time of his escape (2 Corinthians 11:32). How far the Nabataean king Aretas IV actually controlled Damascus is uncertain; the International Standard Bible Encyclopedia (1915) cites \"a Damascus coin, with the image of King Aretas and the date 101,\" which, read as the Pompeian era, equals AD 37. One proposal is that the Roman emperor Caligula gave him the city about that year. Aretas IV's reign ended in AD 40.",
+      "sources": [
+        "scripture:2 Corinthians 11:32",
+        "bib:isbe-aretas",
+        "bib:livius-damascus",
+        "bib:livius-nabataeans"
+      ]
+    }
+  ]
 }

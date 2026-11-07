@@ -24,16 +24,17 @@
       ],
       "coordinateSource": "pleiades:818256726",
       "confidence": "high",
-      "support": "The large excavated theater cut into the western slope of Mount Pion (Panayir Dagi), seating up to about 25,000 people, is the undisputed site of the riot Acts describes during Paul's time in Ephesus. Pleiades and Wikidata's coordinates for the theater agree closely.",
+      "support": "The large excavated theater, set into the hillside of Mount Pion (Panayirdag) and able to host up to about 25,000 spectators, is identified, per the International Standard Bible Encyclopedia, as the scene of the riot Acts describes during Paul's time in Ephesus. Pleiades and Wikidata's coordinates for the theater agree closely.",
       "sources": [
         "pleiades:818256726",
         "wikidata:Q15723477",
+        "bib:isbe-ephesus",
         "scripture:Acts 19:29"
       ]
     }
   ],
   "summary": {
-    "text": "The theater at Ephesus is a large Hellenistic and Roman theater built into the western slope of Mount Pion, overlooking the city's processional way. According to Acts, a crowd dragged two of Paul's traveling companions into this theater and shouted for about two hours, \"Great is Artemis of the Ephesians!\"",
+    "text": "The theater at Ephesus is a large ancient theater set into the hillside of Mount Pion (Panayirdag), able to host up to about 25,000 spectators. According to Acts, a crowd dragged two of Paul's traveling companions into this theater and shouted for about two hours, \"Great is Artemis of the Ephesians!\"",
     "sources": [
       "pleiades:818256726",
       "wikidata:Q15723477",
@@ -43,7 +44,7 @@
   },
   "history": [
     {
-      "text": "Acts describes a riot started by the silversmith Demetrius, whose trade in silver shrines of Artemis was threatened by Paul's preaching; a crowd rushed into the theater with Paul's companions Gaius and Aristarchus, and Paul's friends among the city's officials (Asiarchs) sent word begging him not to risk entering the theater himself. The disturbance ended only when the city clerk quieted the crowd and dismissed the assembly.",
+      "text": "Acts describes a riot started by the silversmith Demetrius, whose trade in silver shrines of Artemis was threatened by Paul's preaching; a crowd rushed into the theater with Paul's companions Gaius and Aristarchus, and some of the Asiarchs, who were his friends, sent word begging him not to risk entering the theater himself. The disturbance ended only when the city clerk quieted the crowd and dismissed the assembly.",
       "sources": [
         "scripture:Acts 19:24",
         "scripture:Acts 19:28",

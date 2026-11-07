@@ -28,7 +28,7 @@
       ],
       "coordinateSource": "wikidata:Q43018",
       "confidence": "high",
-      "support": "The temple's foundations were located in 1869-1870 by the British Museum excavator J. T. Wood after years of searching, in a valley outside the old city walls, some feet below the surface, and the site is undisputed as that of the Temple of Artemis Acts describes the Ephesians guarding. Wikidata and Pleiades' coordinates for the site agree closely.",
+      "support": "The temple's foundations were located by the British Museum excavator J. T. Wood on January 1, 1870, after six years of searching within his eleven-year excavation of Ephesus, in a valley outside the old city walls, some feet below the surface; the site is undisputed as that of the Temple of Artemis Acts describes the Ephesians guarding. Wikidata and Pleiades' coordinates for the site agree closely.",
       "sources": [
         "wikidata:Q43018",
         "pleiades:873985034",
@@ -37,24 +37,26 @@
     }
   ],
   "summary": {
-    "text": "The Temple of Artemis at Ephesus, one of the Seven Wonders of the ancient world, was a marble temple about 425 feet long, open to the sky and ringed by 127 columns 60 feet high. Acts records a riot in which Ephesian craftsmen who made silver shrines of the goddess, fearing their trade was threatened by Paul's preaching, filled the city with the cry \"Great is Artemis of the Ephesians!\"",
+    "text": "The Temple of Artemis at Ephesus, one of the Seven Wonders of the ancient world, was a temple about 425 feet long, open to the sky and ringed by 127 columns 60 feet high. Acts records that Ephesian craftsmen who made silver shrines of the goddess, fearing their trade was threatened by Paul's preaching, stirred up a riot in which the city was filled with the cry \"Great is Artemis of the Ephesians!\"",
     "sources": [
       "wikidata:Q43018",
       "pleiades:873985034",
       "bib:isbe-ephesus",
+      "scripture:Acts 19:24",
+      "scripture:Acts 19:27",
       "scripture:Acts 19:28",
       "scripture:Acts 19:35"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia records that the temple was destroyed and rebuilt several times over its long history; after one burning, the wealthy citizens of Ephesus itself funded its final, grandest reconstruction, a project that by the encyclopedia's account took 220 years to complete. The same article describes the completed temple as a place of worship, a treasury so trusted that people stored their money there, and a sanctuary of refuge where no one could be arrested for any crime within a bowshot of its walls.",
+      "text": "The International Standard Bible Encyclopedia records that the temple was destroyed and rebuilt several times over its long history; after one burning, the wealthy citizens of Ephesus itself funded its final, grandest reconstruction, a project that by the encyclopedia's account took 220 years to complete. The same article describes the completed temple as a place of worship, a treasure-house, and a sanctuary of refuge where no one could be arrested for any crime within a bowshot of its walls.",
       "sources": [
         "bib:isbe-ephesus"
       ]
     },
     {
-      "text": "Acts records that when Demetrius, a silversmith who made silver shrines of Artemis, saw his trade threatened by Paul's preaching that \"gods made with hands are no gods,\" he stirred up the craftsmen of the city, and a crowd filled with anger dragged two of Paul's companions into the theater, crying out for about two hours, \"Great is Artemis of the Ephesians!\"",
+      "text": "Acts records that when Demetrius, a silversmith who made silver shrines of Artemis, saw his trade threatened by Paul's preaching that \"they are no gods that are made with hands,\" he stirred up the craftsmen of the city, and a crowd filled with anger dragged two of Paul's companions into the theater, crying out for about two hours, \"Great is Artemis of the Ephesians!\"",
       "sources": [
         "scripture:Acts 19:24",
         "scripture:Acts 19:26",
@@ -64,7 +66,7 @@
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia reports that the temple burned for a final time in AD 262 and was never rebuilt, and that the site was eventually buried under silt from the Cayster river and forgotten, until the British Museum excavator J. T. Wood located its foundations on January 1, 1870, after eleven years of searching.",
+      "text": "The International Standard Bible Encyclopedia reports that the temple burned for a final time in AD 262 and was never rebuilt, and that the site was eventually buried under silt from the Cayster river and forgotten, until the British Museum excavator J. T. Wood located its foundations on January 1, 1870, after six years of faithful work within his eleven-year excavation of Ephesus.",
       "sources": [
         "bib:isbe-ephesus"
       ]

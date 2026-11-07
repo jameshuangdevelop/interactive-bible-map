@@ -27,7 +27,7 @@
       ],
       "coordinateSource": "openbible:euphrates",
       "confidence": "high",
-      "support": "The Euphrates is a single, undisputed river running about 2,800 km from eastern Türkiye through Syria and Iraq to the Persian Gulf; as a long line feature it has no single natural point, so this label point, OpenBible.info's representative point, falls along its lower course in Iraq. Wikidata's own point for the river instead marks its source near Erzurum in eastern Türkiye, about 1,900 km upstream; both points lie on the same river.",
+      "support": "The Euphrates is a single, undisputed river running about 2,800 km from eastern Türkiye through Syria and Iraq to the Persian Gulf; as a long line feature it has no single natural point, so this label point, OpenBible.info's representative point on its lower course in Iraq, is used; it matches one of Wikidata's two recorded points for the river exactly, the other being a separate point on its upper course.",
       "sources": [
         "openbible:euphrates",
         "wikidata:Q34589"
@@ -35,18 +35,18 @@
     }
   ],
   "summary": {
-    "text": "The Euphrates is the longest river of Southwest Asia, rising in eastern Türkiye and flowing through Syria and Iraq to join the Tigris before reaching the Persian Gulf. In the first century it marked much of the frontier between the Roman Empire and the Parthian Empire. Revelation pictures four angels \"bound at the great river Euphrates\" released in judgment, and later a vision in which the river's water is dried up \"that the way might be prepared for the kings that come from the sunrise.\"",
+    "text": "The Euphrates, in Pleiades' words, is \"the longest river of Western Asia,\" flowing from the Kara Su and the Murat Su to its confluence with the Tigris before reaching the Persian Gulf. Revelation pictures four angels \"bound at the great river Euphrates\" released in judgment, and later a vision in which the river's water is dried up \"that the way might be prepared for the kings that come from the sunrise.\"",
     "sources": [
       "openbible:euphrates",
       "wikidata:Q34589",
+      "pleiades:912849",
       "scripture:Revelation 9:14",
-      "scripture:Revelation 16:12",
-      "bib:isbe-parthians"
+      "scripture:Revelation 16:12"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia describes the Parthian Empire, Rome's rival power to the east, as reaching from the Euphrates to the borders of India; the river therefore served much of the time as the practical boundary between Roman and Parthian territory, though its precise course meant Rome also held land east of parts of it, such as northern Mesopotamia under the emperor Trajan decades later.",
+      "text": "The International Standard Bible Encyclopedia describes the Parthian Empire, Rome's rival power to the east, as stretching \"from the Euphrates to the confines of India and the Oxus\"; the river therefore served for long stretches as the practical frontier between Roman and Parthian territory.",
       "sources": [
         "bib:isbe-parthians"
       ]
@@ -84,12 +84,11 @@
     {
       "fromYear": -4,
       "toYear": 101,
-      "entity": "A frontier river between the Roman Empire (west bank, for most of its length) and the Parthian Empire; no single political area of its own on this map",
+      "entity": "Part of the Parthian Empire at this label point; upstream, the river also served for long stretches as the Rome/Parthia frontier",
       "sources": [
-        "bib:isbe-parthians",
-        "bib:livius-parthia"
+        "bib:isbe-parthians"
       ],
-      "note": "The river's own political status varied by stretch and period rather than following one single border; this map does not draw a boundary line along it."
+      "note": "The International Standard Bible Encyclopedia describes the Parthian Empire as stretching \"from the Euphrates to the confines of India and the Oxus.\" This label point, in southern Iraq, lay within Parthian territory on both banks; this map does not draw a boundary line along the river."
     }
   ],
   "status": "draft"

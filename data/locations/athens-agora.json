@@ -28,7 +28,7 @@
       ],
       "coordinateSource": "wikidata:Q395367",
       "confidence": "high",
-      "support": "The excavated civic square just north of the Acropolis is identified as Athens's ancient marketplace (agora), where the International Standard Bible Encyclopedia places Paul's daily reasoning with Jews, devout Gentiles, and Epicurean and Stoic philosophers, including at the Painted Portico that stood in and around this square.",
+      "support": "The excavated civic square just north of the Acropolis is identified as Athens's ancient marketplace (agora); the International Standard Bible Encyclopedia places Paul's daily reasoning with those who met him there, including Epicurean and Stoic philosophers, in this marketplace, distinct from his reasoning with the Jews and devout persons in the synagogue, and locates the Painted Portico in and around this square.",
       "sources": [
         "wikidata:Q395367",
         "bib:isbe-athens",
@@ -37,26 +37,27 @@
     }
   ],
   "summary": {
-    "text": "The Agora was the civic and commercial square of ancient Athens, lying just north of the Acropolis and ringed by porticoes (stoas), law courts, and public offices. According to Acts, Paul reasoned there every day with whoever happened to meet him, drawing the attention of Epicurean and Stoic philosophers who then brought him to the nearby Areopagus.",
+    "text": "The Agora was the civic and commercial square of ancient Athens, lying just north of the Acropolis and ringed by porticoes (stoas). According to Acts, Paul reasoned there every day with whoever happened to meet him, drawing the attention of Epicurean and Stoic philosophers who then brought him to the nearby Areopagus.",
     "sources": [
       "wikidata:Q395367",
       "bib:isbe-athens",
-      "scripture:Acts 17:17"
+      "scripture:Acts 17:17",
+      "scripture:Acts 17:18",
+      "scripture:Acts 17:19"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia describes Paul passing the Agora on his way to the Acropolis, noting that porticoes (stoas) stood in and around it, among them the Painted Portico (Stoa Poecile) where Paul met the successors of the philosopher Zeno, the Stoics, and disputed with them daily.",
+      "text": "The International Standard Bible Encyclopedia describes Paul passing the Ceramicus and the \"Theseum\" on his way to the Agora (Market-Place), just north of the Acropolis, noting that porticoes (stoas) stood in and around it, among them the Painted Portico (Stoa Poecile) where Paul met the successors of the philosopher Zeno, the Stoics, and disputed with them daily.",
       "sources": [
         "bib:isbe-athens",
         "scripture:Acts 17:18"
       ]
     },
     {
-      "text": "Today the site of the Agora, excavated since the 1930s, lies just north of the Acropolis, as the International Standard Bible Encyclopedia's own description of the ancient city already placed it.",
+      "text": "Today the excavated site of the Agora lies north-west of the Acropolis.",
       "sources": [
-        "wikidata:Q395367",
-        "bib:isbe-athens"
+        "wikidata:Q395367"
       ]
     }
   ],
