@@ -460,3 +460,56 @@ After my sign-off edits I re-ran `validate:data` (pass, 212 warnings) and `npm t
 **The other 15 stay `draft`** with the fixes in 9.3. Thirteen of them need about one sentence each. `arimathea`, `jordan-river` and `aenon` need a few clauses each, and `aenon`'s Piccirillo quotation is a licence item.
 
 My only data edit apart from the status fields is the missing full stop in `samaria-city-01`'s caption (a typo). — fact-checker, 2026-11-06
+
+## 10. Re-check 2 (2026-11-06, at `e4ca8a3`; diff `1934a7c..e4ca8a3`)
+
+The Research Lead's `e4ca8a3` touched the 14 draft records' data and `akeldama-01`'s caption. I re-checked each changed clause against the same sources. One new source: Wikidata Q1346870 (Madaba Map, "6th-century mosaic map of Palestine", P571 = 600, century precision).
+
+### 10.1 Results
+
+| Record | 9.3 item | Result |
+|---|---|---|
+| kidron-valley | Joel source | **Pass:** `bib:isbe-hinnom-valley-of` added to history 2 |
+| akeldama | MC caption | **Pass:** "on the slope below Mount Zion" removed |
+| valley-of-hinnom | "ended" | **Pass:** "sought to end" |
+| antonia-fortress | ISBE misattribution | **Pass:** it now quotes ISBE's "has been traditionally located … (compare Ac 21:32-35)" and adds that ISBE itself argues for Herod's palace |
+| praetorium | Florus | **Pass:** "bringing his own men out of it and trying, but failing, to compel them" matches ISBE's quotation |
+| gaza | "of which" | **Pass:** "and the text adds" |
+| zarephath | Obadiah source | **Pass:** "among the Canaanites", with ISBE's "probably meaning Phoenicia" attributed and `bib:isbe-zarephath` restored |
+| samaria-city | Acts 21:8; "Hasmonean" | **Pass:** both done |
+| gennesaret | distance and edge | **Pass:** "about 1.7 kilometers to the north-east" (computed 1.74 km); "on the plain" |
+| plain-of-sharon | ADR-0033 | **Pass:** the database name is out of the summary |
+| wilderness-of-judea | pastoral attribution | **Pass:** "the hill country's eastern slopes … invade in the spring even the desert itself"; "English Versions of the Bible" |
+| mount-gerizim | John 4:21 gloss | **Pass:** John 4:21 and 4:23 are quoted exactly from the WEB. Note: John 4:23 was also added to `scripture[]`, which gives the one new validator warning (213, up from 212). I accept it: 4:20–23 is one exchange about worship on "this mountain" |
+| arimathea | 5 items | (1), (2), (4), (5) **Pass.** (3) is fixed in the history (1 Samuel 1:1 cited), but **still Fix required** in the Rantis candidate: its support now says Ramathaim-zophim was the "home of the Old Testament prophet Samuel's father Elkanah", and that candidate's `sources` (`wikidata:Q7293548`, `dare:28373`, `openbible:arimathea`) don't state it. **Required:** add `scripture:1 Samuel 1:1` to `candidates[0].sources` |
+| jordan-river | course; "dividing" | (2) **Pass.** (1) The Josephus quotations are exact (*War* 3.10.7), and Luke 3:3 is cited. **Still Fix required:** the summary now names a database in the text ("a separate record, Wikidata's entry for the river, gives …"). That is the ADR-0033 issue just fixed in `plain-of-sharon`. **Required:** state the course plainly ("its source lies near the Golan Heights and Sde Nehemia, it flows through the Sea of Galilee, and it empties into the Dead Sea") and keep `wikidata:Q40059` in `summary.sources` |
+| aenon | 6 items | (1) **Pass:** the Piccirillo sentences are paraphrased; the short gloss "the place of Willows" (the meaning of a place name) is a fact, not a quotation of his prose. (2) **Pass:** Q1346870 is cited. (3), (4), (6) **Pass.** (5) Partly fixed: "near"/"nearby" and "since" are fixed, but **still Fix required:** "the spring 'Ainun" (unmapped `support`) and "a spring called 'Ainun" (`summary`). ISBE says only "Aenon being `Ainun in Wady Far`ah", and OpenBible lists the site as the ruin Khirbet Einun. **Required:** drop "spring" in both places (for example "proposed 'Ainun in Wady Far'ah" and "a site called 'Ainun") |
+
+**Political history:** unchanged for the 20 records, so it still passes.
+
+### 10.2 Commands (on `e4ca8a3` plus my status edits)
+
+| Command | Result |
+|---|---|
+| `npm run validate:data` | **Pass**, 0 errors, 213 warnings. The one new warning is `mount-gerizim` John 4:23 (explained above) |
+| `npm test` | **Pass**, 323/323 |
+| `npm run build:data` | **Pass**; no tracked file changed |
+
+`check:images` was not re-run, because the only media change since its last pass is a caption.
+
+### 10.3 Sign-off
+
+**12 more records are signed off** (`status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-11-06"`):
+- `kidron-valley`, `akeldama`, `valley-of-hinnom`
+- `antonia-fortress`, `praetorium`, `gaza`
+- `zarephath`, `samaria-city`, `gennesaret`
+- `plain-of-sharon`, `wilderness-of-judea`, `mount-gerizim`
+
+With the 5 from section 9, that makes **17 of 20 verified**.
+
+**3 stay `draft`**, each with one small fix (Research Lead):
+- **`arimathea`:** add `scripture:1 Samuel 1:1` to the Rantis candidate's sources.
+- **`jordan-river`:** take the database's name out of the summary text.
+- **`aenon`:** drop "spring" from 'Ainun in the unmapped support and the summary.
+
+— fact-checker, 2026-11-06
