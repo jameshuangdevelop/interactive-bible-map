@@ -9,7 +9,8 @@
       "Israel"
     ],
     "alternate": [
-      "Plain of Sharon"
+      "Plain of Sharon",
+      "Saron"
     ]
   },
   "type": "natural-feature",
@@ -25,7 +26,7 @@
       ],
       "coordinateSource": "pleiades:465843763",
       "confidence": "high",
-      "support": "Pleiades' point for the Sharon Plain is corroborated by Wikidata's independently recorded point for the same feature, and matches the International Standard Bible Encyclopedia's description of a coastal strip running between the mountains and the Mediterranean, from south of Jaffa north to Mount Carmel.",
+      "support": "Pleiades' point for the Sharon Plain exactly matches Wikidata's value, so this is not an independent cross-check; both match the International Standard Bible Encyclopedia's description of a coastal strip running between the mountains and the Mediterranean, from south of Jaffa north to Mount Carmel.",
       "sources": [
         "pleiades:465843763",
         "wikidata:Q218907",
@@ -34,9 +35,12 @@
     }
   ],
   "summary": {
-    "text": "The Sharon is the coastal plain of central Israel, running between the central hill country and the Mediterranean Sea from near Jaffa in the south to Mount Carmel in the north. Acts describes \"all who lived at Lydda and in Sharon\" turning to the Lord after the apostle Peter healed a paralyzed man there.",
+    "text": "The Sharon is a coastal plain, described by Wikidata as the northern half of the coastal plain of Israel, running between the central hill country and the Mediterranean Sea from near Jaffa in the south to Mount Carmel in the north. Acts describes the apostle Peter healing a paralyzed man named Aeneas at Lydda, after which \"all who lived at Lydda and in Sharon saw him, and they turned to the Lord.\"",
     "sources": [
       "bib:isbe-sharon",
+      "wikidata:Q218907",
+      "scripture:Acts 9:33",
+      "scripture:Acts 9:34",
       "scripture:Acts 9:35"
     ]
   },
@@ -67,7 +71,7 @@
     },
     {
       "ref": "Isaiah 35:2",
-      "note": "Isaiah names \"the excellency of Carmel and Sharon\" among signs of future restoration and glory.",
+      "note": "Isaiah names \"the excellence of Carmel and Sharon\" among signs of future restoration and glory.",
       "sources": [
         "bib:isbe-sharon",
         "scripture:Isaiah 35:2"

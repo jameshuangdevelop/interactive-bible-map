@@ -23,7 +23,7 @@
       ],
       "coordinateSource": "wikidata:Q1679519",
       "confidence": "high",
-      "support": "The International Standard Bible Encyclopedia reports that Jewish, Samaritan, Muslim and Christian tradition agree in identifying this well, near the foot of Mount Gerizim at the mouth of the pass leading to Shechem/Nablus, still known locally as Bir Ya'qub (\"the well of Jacob\"), with no serious rival site proposed; Wikidata's coordinate for the well matches this traditional site.",
+      "support": "The International Standard Bible Encyclopedia reports that Jewish, Samaritan, Muslim and Christian tradition agree in identifying this well, near the foot of Mount Gerizim at the mouth of the pass leading to Shechem/Nablus, still known locally as Bir Ya'qub (\"the well of Jacob\"); it finds \"no good reason to doubt\" the truth of this consensus. Wikidata's coordinate for the well matches this traditional site.",
       "sources": [
         "wikidata:Q1679519",
         "bib:isbe-jacobs-well"
@@ -39,15 +39,15 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia connects the well's traditional digging by the patriarch Jacob to the plot of ground near Shechem that Jacob is said to have bought, on his return from Paddan-aram, and later given to his son Joseph; it notes that nearby springs would have made a dug well unnecessary for ordinary household use, suggesting Jacob may have dug it instead to secure independent water rights for his own flocks.",
+      "text": "The International Standard Bible Encyclopedia connects the well's traditional digging by the patriarch Jacob to the plot of ground near Shechem that Jacob is said to have bought, on his return from Paddan-aram, and later given to his son Joseph; it notes that nearby springs were already available, suggesting Jacob may have dug the well to secure independent water rights for his own flocks.",
       "sources": [
         "bib:isbe-jacobs-well",
-        "scripture:Genesis 33:18",
+        "scripture:Genesis 33:18-19",
         "scripture:Genesis 48:22"
       ]
     },
     {
-      "text": "Churches have been built over the well at different periods; the encyclopedia records a vaulted chamber around its opening and a stone, found in 1881, that may have served as the well's original cover. Today a Greek Orthodox church stands over the site.",
+      "text": "Churches have been built over the well at different periods; the encyclopedia records a vaulted chamber around its opening and a stone, found in 1881, that may have served as the well's original cover. Writing in 1915, it reports that the plot had recently been bought by the Greek church, which had built a chapel over the well.",
       "sources": [
         "bib:isbe-jacobs-well"
       ]
@@ -62,11 +62,11 @@
   ],
   "otConnections": [
     {
-      "ref": "Genesis 33:18",
+      "ref": "Genesis 33:18-19",
       "note": "Jacob camps before the city of Shechem and buys the plot of ground there, the traditional origin of the land near which the well was later dug.",
       "sources": [
         "bib:isbe-jacobs-well",
-        "scripture:Genesis 33:18"
+        "scripture:Genesis 33:18-19"
       ]
     },
     {

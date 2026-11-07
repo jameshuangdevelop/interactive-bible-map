@@ -7,7 +7,8 @@
     "modern": "Kidron Valley",
     "alternate": [
       "Brook Kidron",
-      "Valley of Jehoshaphat"
+      "Valley of Jehoshaphat",
+      "Cedron"
     ],
     "otherLanguages": [
       "Wadi Sitti Miriam",
@@ -37,10 +38,12 @@
     }
   ],
   "summary": {
-    "text": "The Kidron Valley runs between the eastern wall of Jerusalem's Old City, below the Temple Mount, and the Mount of Olives. The International Standard Bible Encyclopedia describes it beginning on the plateau north of the city, sweeping southeast, and then running south until, below the Temple's southeastern corner, it is joined by the Tyropoeon valley and then the Valley of Hinnom; from there it continues as the Wadi en-Nar through the wilderness of Judea to the Dead Sea. The valley usually carries water only after heavy rain. John's Gospel names it as the brook Jesus and his disciples crossed on the night of his arrest, on their way to a garden across the valley.",
+    "text": "The Kidron Valley runs between the eastern wall of Jerusalem's Old City, below the Temple Mount, and the Mount of Olives. The International Standard Bible Encyclopedia describes it beginning on the plateau north of the city, sweeping southeast, and then running south until, below the Temple's southeastern corner, it is joined by the Tyropoeon valley and then the Valley of Hinnom; from there it continues as the Wadi en-Nar through the wilderness of Judea to the Dead Sea. The valley usually carries water only after heavy rain. John's Gospel names it as the brook Jesus and his disciples crossed, going out to a garden, on the night Judas came there with soldiers to arrest him.",
     "sources": [
       "bib:isbe-kidron-the-brook",
-      "scripture:John 18:1"
+      "scripture:John 18:1",
+      "scripture:John 18:3",
+      "scripture:John 18:12"
     ]
   },
   "history": [
@@ -53,9 +56,10 @@
       ]
     },
     {
-      "text": "Since the fourth century AD the valley has also been called the Valley of Jehoshaphat, after the prophet Joel's vision of a coming judgment there, and Jewish and Muslim tradition alike have identified it as the site of the last judgment.",
+      "text": "Since the fourth century AD the valley has also been called the Valley of Jehoshaphat; Jewish and Muslim tradition alike have identified it as the site of the last judgment, an association the International Standard Bible Encyclopedia connects to the prophet Joel's vision of a coming judgment in \"the valley of Jehoshaphat.\"",
       "sources": [
-        "bib:isbe-kidron-the-brook"
+        "bib:isbe-kidron-the-brook",
+        "scripture:Joel 3:2"
       ]
     }
   ],
@@ -77,9 +81,8 @@
     },
     {
       "ref": "Jeremiah 31:40",
-      "note": "Jeremiah prophesies that the valley associated with graves and ashes, widely identified with the Kidron, will become \"holy to Yahweh\" and never again be uprooted.",
+      "note": "Jeremiah prophesies that the valley associated with graves and ashes, reaching to the brook Kidron, will be \"holy to the LORD\" and never again be uprooted.",
       "sources": [
-        "bib:isbe-kidron-the-brook",
         "scripture:Jeremiah 31:40"
       ]
     }

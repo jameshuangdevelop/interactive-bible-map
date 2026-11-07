@@ -27,16 +27,16 @@
       ],
       "coordinateSource": "wikidata:Q886458",
       "confidence": "medium",
-      "support": "A tradition the International Standard Bible Encyclopedia traces to the fourth century AD locates the field on a platform partway up the southern slope of the Valley of Hinnom, just before it joins the Kidron Valley; a remarkable ruin there, long used as a charnel house, gave the site its reputation, and a monastery and cave tombs nearby are still associated with the name today. OpenBible.info's ancient-place catalog records the same site, corroborating Wikidata's coordinate.",
+      "support": "A tradition the International Standard Bible Encyclopedia says \"appears to go back to the 4th century\" locates the field on a platform partway up the southern slope of the Valley of Hinnom, just before it joins the Kidron Valley; a remarkable ruin there, long used as a charnel house, gave the site its reputation. Wikidata's coordinate is corroborated by a separate Wikidata item for St. Onuphrius Monastery, built near the traditional site, about 49 meters away.",
       "sources": [
         "wikidata:Q886458",
-        "openbible:akeldama",
+        "wikidata:Q3320224",
         "bib:isbe-akeldama"
       ]
     }
   ],
   "summary": {
-    "text": "Akeldama, meaning \"field of blood,\" is the traditional site of a field near Jerusalem associated with the death of Judas Iscariot. Matthew's Gospel says the chief priests used the thirty pieces of silver Judas returned to buy \"the potter's field, to bury strangers in,\" which was therefore called the field of blood; Acts gives a different account of how Judas himself obtained a field and died there. A long-standing tradition, going back at least to the fourth century, places the field on the slope where the Valley of Hinnom meets the Kidron Valley.",
+    "text": "Akeldama, meaning \"field of blood,\" is the traditional site of a field near Jerusalem associated with the death of Judas Iscariot. Matthew's Gospel says the chief priests used the thirty pieces of silver Judas returned to buy \"the potter's field with them to bury strangers in,\" which was therefore called the field of blood; Acts says Judas himself obtained a field with the reward of his wrongdoing, and separately describes his death. A tradition that, per the International Standard Bible Encyclopedia, \"appears to go back to the 4th century\" places the field on the slope where the Valley of Hinnom meets the Kidron Valley.",
     "sources": [
       "scripture:Matthew 27:7",
       "scripture:Matthew 27:8",
@@ -55,7 +55,7 @@
       ]
     },
     {
-      "text": "A large ruined structure on the traditional site (about 24 by 17 meters) was used for many centuries as a charnel house, its earth reputed to decompose bodies quickly; a Greek Orthodox monastery built in more recent times stands nearby, over numerous cave tombs, and the site is still visited today.",
+      "text": "A large ruined structure on the traditional site (about 24 by 17 meters) was used for many centuries as a charnel house, its earth reputed to decompose bodies quickly; the International Standard Bible Encyclopedia (1915) records a Greek Orthodox monastery, built in more recent times, standing nearby, over numerous cave tombs.",
       "sources": [
         "bib:isbe-akeldama"
       ]

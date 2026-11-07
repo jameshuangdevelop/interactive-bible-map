@@ -24,7 +24,7 @@
       ],
       "coordinateSource": "dare:21572",
       "confidence": "high",
-      "support": "The Digital Atlas of the Roman Empire's point for Sarepta, on the coast between Tyre and Sidon, matches Pleiades' independently recorded point for the same city almost exactly. The International Standard Bible Encyclopedia likewise identifies the ancient town with the modern village of Sarafend and nearby shoreline ruins.",
+      "support": "The Digital Atlas of the Roman Empire's point for Sarepta, on the coast between Tyre and Sidon, matches Pleiades' recorded point for the same city closely, though Pleiades' point partly averages in the atlas's own location. The International Standard Bible Encyclopedia likewise identifies the ancient town with the modern village of Sarafend and nearby shoreline ruins.",
       "sources": [
         "dare:21572",
         "pleiades:678374",
@@ -33,9 +33,11 @@
     }
   ],
   "summary": {
-    "text": "Zarephath, called Sarepta in its Greek form, was a Phoenician town on the coast between Tyre and Sidon. Luke's Gospel records Jesus telling his hometown synagogue in Nazareth that in the days of the prophet Elijah, when famine gripped the land, Elijah was sent to none of the widows of Israel, but only to a widow at Zarephath, in the land of Sidon.",
+    "text": "Zarephath, called Sarepta in its Greek form, was a Phoenician town on the coast between Tyre and Sidon. Luke's Gospel records Jesus, in his hometown synagogue at Nazareth, telling his hearers that in the days of the prophet Elijah, when the sky was shut up for three and a half years and a great famine came over the land, Elijah was sent to none of the widows of Israel, but only to a widow at Zarephath, in the land of Sidon.",
     "sources": [
       "bib:isbe-zarephath",
+      "scripture:Luke 4:16",
+      "scripture:Luke 4:25",
       "scripture:Luke 4:26"
     ]
   },
@@ -63,9 +65,8 @@
   "otConnections": [
     {
       "ref": "1 Kings 17:9",
-      "note": "God directs the prophet Elijah to go to Zarephath, where a widow will provide for him during a famine.",
+      "note": "God directs the prophet Elijah to go to Zarephath, where a widow will provide for him.",
       "sources": [
-        "bib:isbe-zarephath",
         "scripture:1 Kings 17:9"
       ]
     },
@@ -78,9 +79,8 @@
     },
     {
       "ref": "Obadiah 1:20",
-      "note": "The prophet Obadiah refers to exiled Israelites possessing the land \"as far as Zarephath,\" naming it as a Phoenician town on Israel's northern horizon.",
+      "note": "The prophet Obadiah refers to exiled Israelites possessing the land \"even to Zarephath,\" naming it as a Phoenician town.",
       "sources": [
-        "bib:isbe-zarephath",
         "scripture:Obadiah 1:20"
       ]
     }

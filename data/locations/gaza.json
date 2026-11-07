@@ -25,16 +25,17 @@
       ],
       "coordinateSource": "dare:21672",
       "confidence": "high",
-      "support": "The Digital Atlas of the Roman Empire's point for ancient Gaza, on the mound known as Tell Harube beneath the old quarter of modern Gaza City, is corroborated by Pleiades' independently recorded point for the same city, about 1 kilometer away.",
+      "support": "The Digital Atlas of the Roman Empire's point for ancient Gaza, on the mound known as Tell Harube (OpenBible.info's name for the same mound) beneath the old quarter of modern Gaza City, is corroborated by Pleiades' independently recorded point for the same city, about 2 kilometers away.",
       "sources": [
         "dare:21672",
         "pleiades:687902",
+        "openbible:gaza",
         "bib:isbe-gaza"
       ]
     }
   ],
   "summary": {
-    "text": "Gaza was one of the five chief Philistine cities of the Old Testament, on the coastal route between Syria and Egypt. The International Standard Bible Encyclopedia traces a long history of conquest and rebuilding, including its destruction by Alexander the Great in 332 BC. Acts names Gaza only once, in the account of Philip and an Ethiopian official, describing the road there as \"desert.\"",
+    "text": "Gaza was one of the five chief Philistine cities of the Old Testament, on the coastal route between Syria and Egypt. The International Standard Bible Encyclopedia traces a long history of conquest and rebuilding, including its destruction by Alexander the Great in 332 BC. Acts names Gaza only once, in the account of Philip and an Ethiopian official, on \"the way that goes down from Jerusalem to Gaza,\" of which the text adds, \"This is a desert.\"",
     "sources": [
       "bib:isbe-gaza",
       "scripture:Acts 8:26"
@@ -42,19 +43,20 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia records that the Roman general Pompey restored Gaza's freedom in 63 BC, after earlier destruction, and that Gabinius, the Roman governor of Syria, rebuilt the city in 57 BC.",
+      "text": "The International Standard Bible Encyclopedia records that the Roman general Pompey restored Gaza's freedom, and that Gabinius rebuilt the city in 57 BC; the first-century Jewish historian Josephus records that Pompey left the restored coastal and inland cities, Gaza among them, in a state of freedom and joined them to the province of Syria.",
       "sources": [
-        "bib:isbe-gaza"
+        "bib:isbe-gaza",
+        "bib:josephus-antiquities"
       ]
     },
     {
-      "text": "The first-century Jewish historian Josephus records that the emperor Augustus added Gaza, among other cities, to the kingdom of Herod the Great; after Herod's death in 4 BC, Augustus removed Gaza from the territory he divided among Herod's sons and added it instead to the Roman province of Syria.",
+      "text": "Josephus records that the emperor Augustus added Gaza, among other cities, to the kingdom of Herod the Great; after Herod's death in 4 BC, Augustus removed Gaza from the territory he divided among Herod's sons and added it instead to the Roman province of Syria.",
       "sources": [
         "bib:josephus-antiquities"
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia reports that Gaza became a center of Greek commerce and culture in the second and third centuries AD, with a Christian community that grew despite persecution, until Christianity gained the upper hand under the emperor Theodosius; it was taken by Arab forces in 634 AD.",
+      "text": "The International Standard Bible Encyclopedia reports that Gaza became a center of Greek commerce and culture in the second and third centuries AD, with strong pagan influence, while \"the church founded there was struggling for existence\" and \"many martyrs there testified\" to the faith, until Christianity gained the upper hand under the emperor Theodosius; it was taken by Arab forces in 634 AD.",
       "sources": [
         "bib:isbe-gaza"
       ]
@@ -74,9 +76,10 @@
       "toYear": -30,
       "entity": "Free Greek city, within Pompey's settlement of Syria",
       "sources": [
-        "bib:isbe-gaza"
+        "bib:isbe-gaza",
+        "bib:josephus-antiquities"
       ],
-      "note": "The International Standard Bible Encyclopedia records that the Roman general Pompey restored Gaza's freedom in 63 BC, and that Gabinius, the Roman governor of Syria, rebuilt the city in 57 BC."
+      "note": "The International Standard Bible Encyclopedia records that the Roman general Pompey restored Gaza's freedom, and that Gabinius rebuilt the city in 57 BC; the first-century Jewish historian Josephus records that Pompey left the restored cities, Gaza among them, free and joined to the province of Syria."
     },
     {
       "fromYear": -30,
@@ -96,7 +99,7 @@
       "sources": [
         "bib:josephus-antiquities"
       ],
-      "note": "Josephus records that after Herod's death in 4 BC, Augustus did not include Gaza in the territory divided among Herod's sons, instead adding it to the province of Syria, administered from Antioch."
+      "note": "Josephus records that after Herod's death in 4 BC, Augustus did not include Gaza in the territory divided among Herod's sons, instead adding it to the province of Syria."
     }
   ],
   "status": "draft"

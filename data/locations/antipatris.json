@@ -23,7 +23,7 @@
       ],
       "coordinateSource": "dare:21684",
       "confidence": "high",
-      "support": "The Digital Atlas of the Roman Empire's point for Antipatris, at the source of the Yarkon river, is corroborated by Pleiades' independently recorded point for the same site, less than 50 meters away; the International Standard Bible Encyclopedia likewise identifies the site with this mound.",
+      "support": "The Digital Atlas of the Roman Empire's point for Antipatris, at the source of the Yarkon river, is corroborated by Pleiades' independently recorded point for the same site, about 54 meters away; the International Standard Bible Encyclopedia likewise identifies the site with this mound.",
       "sources": [
         "dare:21684",
         "pleiades:687996",
@@ -32,15 +32,17 @@
     }
   ],
   "summary": {
-    "text": "Antipatris was a town Herod the Great built on the road between Jerusalem and Caesarea, and named after his father, Antipater. Acts records that a Roman detachment, moving the apostle Paul from Jerusalem to Caesarea under guard at night to protect him from an assassination plot, brought him as far as Antipatris before the foot soldiers turned back and the horsemen carried on with him alone.",
+    "text": "Antipatris was a town Herod the Great built on the road between Jerusalem and Caesarea, and named after his father, Antipater. Acts records that a Roman detachment, moving the apostle Paul from Jerusalem to Caesarea under guard at night to protect him from an assassination plot against his life, brought him as far as Antipatris before the foot soldiers turned back and the horsemen carried on with him alone to Caesarea.",
     "sources": [
       "bib:isbe-antipatris",
-      "scripture:Acts 23:31"
+      "scripture:Acts 23:12",
+      "scripture:Acts 23:31",
+      "scripture:Acts 23:32"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia notes that the site preserves the remains of a Crusader-period castle, possibly the \"Mirabel\" of that era, built on the same strategic position where the main road crossed the river's source.",
+      "text": "The International Standard Bible Encyclopedia notes that the site preserves the remains of a Crusader-period castle, possibly the \"Mirabel\" of that era.",
       "sources": [
         "bib:isbe-antipatris"
       ]

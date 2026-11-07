@@ -27,7 +27,7 @@
       ],
       "coordinateSource": "dare:21685",
       "confidence": "high",
-      "support": "The Digital Atlas of the Roman Empire's point for Lydda, at the modern Israeli city of Lod, is corroborated by Pleiades' independently recorded point for the same city, about 900 meters away.",
+      "support": "The Digital Atlas of the Roman Empire's point for Lydda, at the modern Israeli city of Lod, is corroborated by Pleiades' recorded point for the same city, about 900 meters away, though Pleiades' point partly averages in the atlas's own location.",
       "sources": [
         "dare:21685",
         "pleiades:687953",
@@ -51,8 +51,9 @@
       ]
     },
     {
-      "text": "The same encyclopedia reports that Lydda suffered severely at the hands of the Roman general Cestius Gallus early in the First Jewish-Roman War, and that it later surrendered, along with Jamnia, to the future emperor Vespasian.",
+      "text": "Josephus records that the Roman commander Cestius found Lydda \"empty of its men,\" who had gone up to Jerusalem for the feast of tabernacles, destroyed fifty who remained, and burned the city; the International Standard Bible Encyclopedia reports that Lydda, along with Jamnia, later surrendered to the future emperor Vespasian.",
       "sources": [
+        "bib:josephus-jewish-war",
         "bib:isbe-lod-lydda"
       ]
     }

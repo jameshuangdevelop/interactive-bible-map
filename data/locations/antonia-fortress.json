@@ -5,7 +5,7 @@
       "The Barracks",
       "Antonia Fortress"
     ],
-    "modern": "Antonia Fortress (site)",
+    "modern": "Antonia Fortress",
     "alternate": [
       "Tower of Antonia",
       "Castle"
@@ -24,25 +24,29 @@
       ],
       "coordinateSource": "wikidata:Q570515",
       "confidence": "medium",
-      "support": "The fortress stood at the Temple Mount's northwest corner, where a Roman garrison was stationed to overlook the Temple courts; the International Standard Bible Encyclopedia's discussion of Jerusalem's walls places the tower Antonia at the point where the second wall's northern course ended, matching Wikidata's recorded coordinate for the site. No part of the fortress survives above ground, so the point is approximate to this corner of the Temple platform rather than to an excavated structure.",
+      "support": "The first-century Jewish historian Josephus writes that \"the tower of Antonia... was situated at the corner of two cloisters of the court of the temple; of that on the west, and that on the north,\" matching Wikidata's recorded coordinate for the site at the Temple Mount's northwest corner. The point is approximate to this corner of the Temple platform rather than to an excavated structure.",
       "sources": [
         "wikidata:Q570515",
-        "bib:isbe-jerusalem-2"
+        "bib:josephus-jewish-war"
       ]
     }
   ],
   "summary": {
-    "text": "The World English Bible's \"barracks\" in Acts translates a Greek word for a military camp, traditionally identified with the Antonia, a fortress Herod the Great built at the Temple Mount's northwest corner and named for his patron Mark Antony. Acts describes Roman soldiers stationed there rushing down to rescue Paul from a crowd in the Temple, after which the commander allowed Paul to address the people from the barracks' stairs.",
+    "text": "The World English Bible's \"barracks\" in Acts, traditionally identified with the Antonia, is linked to that fortress by the International Standard Bible Encyclopedia, which places the Praetorium \"in the neighborhood of the present Turkish barracks where once stood the Antonia and where was stationed a large garrison (compare Ac 21:32-35).\" Herod the Great built the fortress at the Temple Mount's northwest corner; the first-century Jewish historian Josephus records that Herod \"called\" it \"Antonia, in honor of\" the Roman statesman Mark Antony. Acts describes Roman soldiers stationed there rushing down to rescue Paul from a crowd in the Temple, after which the commander allowed Paul to address the people from the barracks' stairs.",
     "sources": [
+      "bib:isbe-praetorium",
+      "bib:josephus-jewish-war",
+      "scripture:Acts 21:31",
+      "scripture:Acts 21:32",
       "scripture:Acts 21:34",
       "scripture:Acts 21:37",
-      "scripture:Acts 22:24",
-      "bib:isbe-jerusalem-2"
+      "scripture:Acts 21:40",
+      "scripture:Acts 22:24"
     ]
   },
   "history": [
     {
-      "text": "The first-century Jewish historian Josephus describes a fortress at this corner of the Temple platform, overlooking the Temple courts, with a cohort of Roman soldiers garrisoned there during festivals to watch for unrest among the crowds, consistent with Acts' account of soldiers responding quickly to a disturbance.",
+      "text": "The first-century Jewish historian Josephus describes a Roman legion permanently stationed in this tower, which \"went several ways among the cloisters, with their arms, on the Jewish festivals,\" to watch the crowds for unrest.",
       "sources": [
         "bib:josephus-jewish-war"
       ]

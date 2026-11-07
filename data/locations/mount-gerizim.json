@@ -23,20 +23,22 @@
       ],
       "coordinateSource": "wikidata:Q1288751",
       "confidence": "high",
-      "support": "Wikidata's point for Mount Gerizim is corroborated by OpenBible.info's independently recorded point for the same mountain, overlooking Nablus (ancient Shechem) and Jacob's Well. The International Standard Bible Encyclopedia gives the mountain's height as 2,849 feet and locates it immediately south of the pass through which the main road from the coast to the Jordan Valley runs.",
+      "support": "Wikidata's point for Mount Gerizim is corroborated by the Digital Atlas of the Roman Empire's and Pleiades' independently recorded points for the same mountain, about 160 meters away, overlooking Nablus (ancient Shechem) and Jacob's Well. The International Standard Bible Encyclopedia gives the mountain's height as 2,849 feet and locates it immediately south of the pass through which the main road from the coast to the Jordan Valley runs.",
       "sources": [
         "wikidata:Q1288751",
-        "openbible:mount-gerizim",
+        "dare:37139",
+        "pleiades:678147",
         "bib:isbe-gerizim-mount"
       ]
     }
   ],
   "summary": {
-    "text": "Mount Gerizim stands south of the pass where the town of Shechem, and later Nablus, lies, facing Mount Ebal across the valley. John's Gospel does not name the mountain, but records a Samaritan woman telling Jesus at Jacob's well, \"Our fathers worshiped in this mountain,\" to which Jesus replies that true worshipers will worship the Father \"neither in this mountain, nor in Jerusalem.\" The International Standard Bible Encyclopedia identifies Gerizim as \"this mountain\" of the conversation, since the well lies almost beneath its cliffs.",
+    "text": "Mount Gerizim stands south of the pass where the town of Shechem, and later Nablus, lies, facing Mount Ebal across the valley. John's Gospel does not name the mountain, but records a Samaritan woman telling Jesus at Jacob's well, \"Our fathers worshiped in this mountain,\" to which Jesus replies that \"neither in this mountain nor in Jerusalem\" will true worship of the Father be confined, for \"the true worshipers will worship the Father in spirit and truth.\" The International Standard Bible Encyclopedia identifies Gerizim as \"this mountain\" of the conversation, since the well lies almost beneath its cliffs.",
     "sources": [
       "bib:isbe-gerizim-mount",
       "scripture:John 4:20",
-      "scripture:John 4:21"
+      "scripture:John 4:21",
+      "scripture:John 4:23"
     ]
   },
   "history": [
@@ -50,7 +52,7 @@
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia, citing the first-century Jewish historian Josephus, records that a temple was built on Gerizim around 432 BC, rivaling the Temple in Jerusalem, after a dispute over the marriage of a high-priestly family member to the daughter of Sanballat the Horonite; this schism, it notes, lies behind the continuing division between Jews and Samaritans, who still worship separately today. The Hasmonean ruler John Hyrcanus destroyed the Samaritan temple on the mountain around 110 BC. Samaritans maintain their own community and continue to celebrate the Passover on the mountain each year.",
+      "text": "The International Standard Bible Encyclopedia, citing the first-century Jewish historian Josephus, records that a temple was built on Gerizim around 432 BC, rivaling the Temple in Jerusalem, after a dispute over the marriage of a high-priestly family member to the daughter of Sanballat the Horonite; this schism, it notes, lies behind the continuing division between Jews and Samaritans. John Hyrcanus destroyed the Samaritan temple on the mountain around 110 BC. Writing in 1915, the encyclopedia reports that Samaritans still maintained their own community and celebrated the Passover on the mountain each year.",
       "sources": [
         "bib:isbe-gerizim-mount"
       ]

@@ -27,7 +27,7 @@
       ],
       "coordinateSource": "pleiades:678431",
       "confidence": "high",
-      "support": "Pleiades' point for Tiberias is corroborated by the Digital Atlas of the Roman Empire's independently recorded point for the same city and by Wikidata's own coordinate, all closely matching at the modern Israeli city of the same name on the Sea of Galilee's western shore.",
+      "support": "Pleiades' point for Tiberias is corroborated by the Digital Atlas of the Roman Empire's recorded point for the same city, about 220 meters away, and by Wikidata's own coordinate, a little over a kilometer away; all three fall within the modern Israeli city of the same name on the Sea of Galilee's western shore, an acceptable agreement at the scale this record maps a city.",
       "sources": [
         "pleiades:678431",
         "dare:21681",
@@ -56,7 +56,7 @@
       ]
     },
     {
-      "text": "After the fall of Jerusalem in AD 70, the same encyclopedia records, Tiberias became a noted center of Jewish learning: the Mishnah was compiled there under Rabbi Judah the Prince, and the city later gave its name to the Jerusalem Talmud compiled in Galilee.",
+      "text": "After the fall of Jerusalem in AD 70, the same encyclopedia records, Tiberias became a noted center of Jewish learning: the Mishnah was compiled there under Rabbi Judah the Prince, and the Jerusalem Talmud was later compiled there as well.",
       "sources": [
         "bib:isbe-tiberias"
       ]

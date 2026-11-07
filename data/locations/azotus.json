@@ -24,7 +24,7 @@
       ],
       "coordinateSource": "dare:21687",
       "confidence": "high",
-      "support": "The Digital Atlas of the Roman Empire's point for ancient Ashdod, inland from the coast, is corroborated by Pleiades' independently recorded point for the same city, about 250 meters away. A separate ancient settlement nearer the shore, Azotus Paralios (\"Ashdod-by-the-Sea\"), is attested at this period as a distinct, smaller place.",
+      "support": "The Digital Atlas of the Roman Empire's point for ancient Ashdod, inland from the coast, is corroborated by Pleiades' independently recorded point for the same city, about 190 meters away.",
       "sources": [
         "dare:21687",
         "pleiades:687838",
@@ -33,15 +33,19 @@
     }
   ],
   "summary": {
-    "text": "Azotus is the Greek name, used in Acts, for the Old Testament Philistine city of Ashdod, one of the five chief Philistine towns. Acts describes Philip the evangelist appearing at Azotus after baptizing an Ethiopian official on the road from Jerusalem to Gaza, and preaching in every town on his way north to Caesarea.",
+    "text": "Azotus is the Greek name, used in Acts, for the Old Testament Philistine city of Ashdod, one of the five chief Philistine towns. Acts describes Philip the evangelist, one of the seven, appearing at Azotus after baptizing an Ethiopian official on the road from Jerusalem to Gaza, and preaching in every town on his way north to Caesarea.",
     "sources": [
       "bib:isbe-ashdod",
-      "scripture:Acts 8:40"
+      "scripture:Acts 8:26",
+      "scripture:Acts 8:27",
+      "scripture:Acts 8:38",
+      "scripture:Acts 8:40",
+      "scripture:Acts 21:8"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia records that Ashdod was restored, in Herod the Great's time, by the Roman governor Gabinius, and that the emperor Augustus later presented the city to Salome, Herod's sister, rather than to any of Herod's own sons.",
+      "text": "The International Standard Bible Encyclopedia records that Ashdod was restored, in Herod the Great's time, by the Roman general Gabinius, and that the emperor Augustus later presented the city to Salome, Herod's sister.",
       "sources": [
         "bib:isbe-ashdod"
       ]

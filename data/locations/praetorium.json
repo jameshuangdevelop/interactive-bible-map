@@ -27,7 +27,7 @@
       ],
       "coordinateSource": "wikidata:Q3661432",
       "confidence": "disputed",
-      "support": "The International Standard Bible Encyclopedia argues, on the strength of the first-century Jewish historian Josephus, that the Roman governor's headquarters in Jerusalem was Herod the Great's former palace, on the high part of the city's southwest hill near its northwest corner, rather than the Antonia; it cites Josephus recording the procurator Florus holding court before this palace and later withdrawing to the Antonia only when his position there became untenable. Wikidata's coordinate for \"Herod's Palace at Jerusalem\" matches the area of the traditional Citadel, also called the Tower of David, which Wikidata records at a closely corresponding point about 80 meters away.",
+      "support": "The International Standard Bible Encyclopedia argues, on the strength of the first-century Jewish historian Josephus, that the Roman governor's headquarters in Jerusalem was Herod the Great's former palace, on the high part of the city's southwest hill near its northwest corner, rather than the Antonia; it cites Josephus recording the procurator Florus holding court before this palace, and later trying, but failing, to compel the people \"to get as far as the citadel (Antonia).\" Wikidata's coordinate for \"Herod's Palace at Jerusalem\" matches the area of the traditional Citadel, also called the Tower of David, which Wikidata records at a closely corresponding point about 25 meters away.",
       "sources": [
         "wikidata:Q3661432",
         "wikidata:Q1177765",
@@ -52,7 +52,7 @@
     }
   ],
   "summary": {
-    "text": "The Praetorium was the residence of the Roman governor in a provincial city, and in Jerusalem it was the scene of Jesus' trial before Pontius Pilate. Outside it stood a special pavement, named in Aramaic \"Gabbatha,\" where Pilate sat to pronounce judgment. Two sites are proposed for the Praetorium in the Gospels: Herod the Great's former palace, near today's Citadel, and the Antonia fortress beside the Temple, which later church tradition and the route of the Via Dolorosa favor. Both proposals have scholarly support, and neither pavement nor palace survives to settle the question archaeologically.",
+    "text": "The Praetorium was the residence of the Roman governor in a provincial city, and in Jerusalem it was the scene of Jesus' trial before Pontius Pilate. Outside it stood a special pavement, called \"Gabbatha\" in Hebrew, where Pilate sat to pronounce judgment; the International Standard Bible Encyclopedia reads this as probably an Aramaic name meaning \"height\" or \"ridge.\" Two sites are proposed for the Praetorium in the Gospels: Herod the Great's former palace, near today's Citadel, and the Antonia fortress beside the Temple, which later church tradition and the route of the Via Dolorosa favor.",
     "sources": [
       "bib:isbe-praetorium",
       "bib:isbe-gabbatha",
@@ -64,9 +64,10 @@
   },
   "history": [
     {
-      "text": "Mark's Gospel places the Roman soldiers' mocking of Jesus, with a purple robe and a crown of thorns, \"inside the court, which is the Praetorium\"; Matthew's parallel account uses the same word, translated \"Governor's palace.\"",
+      "text": "Mark's Gospel places the Roman soldiers' mocking of Jesus, with a purple robe and a crown of thorns, \"within the court, which is the Praetorium\"; Matthew's parallel account also names the Praetorium, saying the governor's soldiers took Jesus there and gathered the whole garrison.",
       "sources": [
         "scripture:Mark 15:16",
+        "scripture:Mark 15:17",
         "scripture:Matthew 27:27"
       ]
     },
@@ -87,6 +88,11 @@
     }
   ],
   "scripture": [
+    {
+      "ref": "Matthew 27:27",
+      "book": "Matthew",
+      "textWEB": "Then the governor’s soldiers took Jesus into the Praetorium, and gathered the whole garrison together against him."
+    },
     {
       "ref": "Mark 15:16",
       "book": "Mark",

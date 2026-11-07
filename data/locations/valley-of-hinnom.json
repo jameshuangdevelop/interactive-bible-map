@@ -28,16 +28,15 @@
       ],
       "coordinateSource": "wikidata:Q558093",
       "confidence": "high",
-      "support": "The International Standard Bible Encyclopedia identifies the valley of Hinnom with the Wadi er-Rababi, which begins west of Jaffa Gate, runs south, then curves east to join the Kidron Valley south of the Old City; it reports this as the clearest-supported of three proposed identifications among older writers (the others being the Kidron Valley itself and the Tyropoeon Valley inside the walls), based on the valley's role as the boundary between the tribes of Judah and Benjamin. OpenBible.info's ancient-place catalog independently records the same coordinate.",
+      "support": "The International Standard Bible Encyclopedia identifies the valley of Hinnom with the Wadi er-Rababi, which begins west of Jaffa Gate, runs south, then curves east to join the Kidron Valley south of the Old City; it reports this as the clearest-supported of three identifications proposed by different writers (the others being the Kidron Valley itself, and the Tyropoeon Valley inside the walls, which \"several distinguished modern writers\" have proposed), based on the valley's role as the boundary between the tribes of Judah and Benjamin.",
       "sources": [
         "wikidata:Q558093",
-        "openbible:valley-of-hinnom",
         "bib:isbe-hinnom-valley-of"
       ]
     }
   ],
   "summary": {
-    "text": "The Valley of Hinnom runs along the west and south sides of Jerusalem's Old City before joining the Kidron Valley. In the Old Testament it was the site of idolatrous child sacrifice to Molech under kings Ahaz and Manasseh, a practice King Josiah ended by defiling the valley's altar site, Topheth; the prophet Jeremiah renamed it the \"valley of slaughter\" and predicted it would be filled with the dead. The New Testament's Greek word \"Gehenna,\" used for the place of final judgment, is a transliteration of the valley's Hebrew name, \"Ge Hinnom.\" The precise course of the ancient valley has been debated, but the International Standard Bible Encyclopedia identifies it with the Wadi er-Rababi.",
+    "text": "The Valley of Hinnom runs along the west and south sides of Jerusalem's Old City before joining the Kidron Valley. In the Old Testament it was the site of idolatrous child sacrifice to Molech under kings Ahaz and Manasseh, a practice King Josiah ended when he defiled Topheth, its altar site, \"that no man might make his son or his daughter to pass through the fire to Molech\"; the prophet Jeremiah said it would be renamed \"The valley of Slaughter\" and filled with the dead. The New Testament's Greek word \"Gehenna,\" used for the place of final judgment, is a transliteration from the Aramaic form of the valley's Hebrew name, \"Ge Hinnom.\" The precise course of the ancient valley has been debated, but the International Standard Bible Encyclopedia identifies it with the Wadi er-Rababi.",
     "sources": [
       "bib:isbe-hinnom-valley-of",
       "bib:isbe-gehenna",
@@ -50,15 +49,10 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia's article on Gehenna takes no theological position on the nature of the punishment the New Testament's twelve Gehenna passages describe, noting only that in them the term designates a place of final judgment associated with fire, for both body and soul, generally connected to the resurrection.",
+      "text": "The International Standard Bible Encyclopedia reports that the valley's continuing use for burning the city's refuse, on top of its earlier idolatrous associations, likely reinforced its later use as a byword for defilement and punishment.",
       "sources": [
-        "bib:isbe-gehenna"
-      ]
-    },
-    {
-      "text": "The same encyclopedia reports that the valley's continuing use for burning the city's refuse, on top of its earlier idolatrous associations, likely reinforced its later use as a byword for defilement and punishment.",
-      "sources": [
-        "bib:isbe-gehenna"
+        "bib:isbe-gehenna",
+        "bib:isbe-hinnom-valley-of"
       ]
     }
   ],

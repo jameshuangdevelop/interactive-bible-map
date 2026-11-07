@@ -28,7 +28,7 @@
       ],
       "coordinateSource": "wikidata:Q40059",
       "confidence": "high",
-      "support": "Wikidata records two coordinate statements for the Jordan River: one near its source north of the Sea of Galilee, and one at its mouth on the Dead Sea, used here as a single representative point for this long natural feature, since it lies closest to the stretch of the river the New Testament names (John the Baptist's ministry and Jesus' baptism). OpenBible.info's own recorded point for the river matches this mouth coordinate exactly.",
+      "support": "Wikidata records two coordinate statements for the Jordan River: one near its source north of the Sea of Galilee, and one at its mouth on the Dead Sea, used here as a single representative point for this long natural feature. OpenBible.info's own recorded point for the river matches this mouth coordinate exactly.",
       "sources": [
         "wikidata:Q40059",
         "openbible:jordan"
@@ -38,6 +38,7 @@
   "summary": {
     "text": "The Jordan River runs south from the mountains near Mount Hermon, through the Sea of Galilee, down the Jordan Rift Valley, to the Dead Sea. In the New Testament it is above all the river where John the Baptist preached and baptized, including Jesus himself; Matthew describes crowds from Jerusalem, Judea and \"all the region around the Jordan\" going out to John to be baptized \"in the Jordan.\"",
     "sources": [
+      "wikidata:Q40059",
       "scripture:Matthew 3:5",
       "scripture:Matthew 3:6",
       "scripture:Matthew 3:13"
@@ -45,17 +46,18 @@
   },
   "history": [
     {
-      "text": "John's Gospel twice locates John the Baptist's ministry in relation to the Jordan, once at \"Bethany beyond the Jordan,\" and later simply \"beyond the Jordan, into the place where John was baptizing at first.\" Other Gospel passages describe the river as a boundary of travel and territory: Mark and Matthew both record Jesus and his followers in \"the borders of Judea beyond the Jordan,\" and Mark lists \"beyond the Jordan\" among the regions crowds came from to follow Jesus.",
+      "text": "John's Gospel locates John the Baptist's ministry in relation to the Jordan three times: once at \"Bethany beyond the Jordan,\" once describing him as \"beyond the Jordan,\" and later simply \"beyond the Jordan into the place where John was baptizing at first.\" Other Gospel passages describe the river as a boundary of travel and territory: Matthew records Jesus coming \"into the borders of Judea beyond the Jordan,\" Mark's parallel reads \"the borders of Judea and beyond the Jordan,\" and Mark separately lists \"beyond the Jordan\" among the regions crowds came from to follow Jesus.",
       "sources": [
         "scripture:John 1:28",
+        "scripture:John 3:26",
         "scripture:John 10:40",
-        "scripture:Mark 10:1",
         "scripture:Matthew 19:1",
+        "scripture:Mark 10:1",
         "scripture:Mark 3:8"
       ]
     },
     {
-      "text": "The first-century Jewish historian Josephus describes the Jordan flowing into the Sea of Galilee from the north and continuing south out of it; this project follows that river stretch in treating the lake's western shore as part of Galilee, with the river itself separating Galilee and Judea from Perea on its eastern bank through much of its length.",
+      "text": "The first-century Jewish historian Josephus records that the Jordan runs through the middle of the Lake of Gennesareth (the Sea of Galilee), dividing it into two parts.",
       "sources": [
         "bib:josephus-jewish-war"
       ]
@@ -148,7 +150,7 @@
     },
     {
       "ref": "2 Kings 2:8",
-      "note": "The prophet Elijah strikes the Jordan with his rolled-up cloak, parting its waters before he is taken up; his successor Elisha repeats the sign soon after.",
+      "note": "The prophet Elijah strikes the Jordan with his rolled-up cloak, parting its waters so that he and Elisha cross on dry ground.",
       "sources": [
         "scripture:2 Kings 2:8"
       ]
