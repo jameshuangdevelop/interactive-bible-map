@@ -57,7 +57,7 @@
     {
       "label": "'Ainun (Khirbet Einun), east of Nablus",
       "confidence": "low",
-      "support": "Some explorers, including Edward Robinson and Claude Conder, proposed the spring 'Ainun in Wady Far'ah, with the village of Salim east of Nablus six miles away, as the site of Aenon and Salim; OpenBible.info's ancient-place catalog records this identification among its candidates. The International Standard Bible Encyclopedia argues against it: the site \"is in the very heart of Samaria, and therefore impossible,\" and adds that Aenon's position, defined by its six-mile distance from Salim with a high ridge between them, \"would hardly be defined by the village of Salim, with the important city of Shechem quite as near, and more easily accessible.\"",
+      "support": "Some explorers, including Edward Robinson and Claude Conder, proposed 'Ainun in Wady Far'ah, with the village of Salim east of Nablus six miles away, as the site of Aenon and Salim; OpenBible.info's ancient-place catalog records this identification among its candidates. The International Standard Bible Encyclopedia argues against it: the site \"is in the very heart of Samaria, and therefore impossible,\" and adds that Aenon's position, defined by its six-mile distance from Salim with a high ridge between them, \"would hardly be defined by the village of Salim, with the important city of Shechem quite as near, and more easily accessible.\"",
       "reason": "No accepted source gives a coordinate for 'Ainun/Khirbet Einun itself; the only recorded point traces to GeoNames, which this project does not use as a coordinate source. The village of Salim, six miles away by the International Standard Bible Encyclopedia's own figure, has an accepted coordinate, but it is not itself the proposed site of Aenon.",
       "sources": [
         "openbible:aenon",
@@ -66,7 +66,7 @@
     }
   ],
   "summary": {
-    "text": "Aenon near Salim is the place where, according to John's Gospel, John the Baptist was baptizing \"because there was much water there,\" at a time when Jesus and his disciples were in the land of Judea, baptizing. The World English Bible spells the name \"Enon.\" Its location is disputed: the International Standard Bible Encyclopedia favors a district south of Beth-shean (Scythopolis), following the writer Eusebius, while a separate tradition, recorded on the Madaba mosaic map, places an \"Ainon\" east of the Jordan; other proposals, including a spring called 'Ainun east of Nablus, in Samaria, have no coordinate from an accepted source.",
+    "text": "Aenon near Salim is the place where, according to John's Gospel, John the Baptist was baptizing \"because there was much water there,\" at a time when Jesus and his disciples were in the land of Judea, baptizing. The World English Bible spells the name \"Enon.\" Its location is disputed: the International Standard Bible Encyclopedia favors a district south of Beth-shean (Scythopolis), following the writer Eusebius, while a separate tradition, recorded on the Madaba mosaic map, places an \"Ainon\" east of the Jordan; other proposals, including a site called 'Ainun east of Nablus, in Samaria, have no coordinate from an accepted source.",
     "sources": [
       "scripture:John 3:22",
       "scripture:John 3:23",
