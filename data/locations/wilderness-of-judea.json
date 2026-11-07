@@ -26,20 +26,28 @@
       ],
       "coordinateSource": "wikidata:Q2046004",
       "confidence": "high",
-      "support": "Wikidata's point for the Judaean Desert, the arid region between Jerusalem's hill country and the Dead Sea, is corroborated by the International Standard Bible Encyclopedia's cross-reference of Matthew 3:1's \"wilderness of Judea\" to this same region.",
+      "support": "Wikidata's point for the Judaean Desert lies within the area the International Standard Bible Encyclopedia describes as \"a wide area of waterless and barren desert\" on the eastern frontier of Judah's hill country, known in English Bible versions as Jeshimon, bounded by the Jordan and the Dead Sea.",
       "sources": [
         "wikidata:Q2046004",
-        "bib:isbe-judaea-wilderness-of"
+        "bib:isbe-judah-territory-of"
       ]
     }
   ],
   "summary": {
-    "text": "The wilderness of Judea is the arid, rugged region east of Jerusalem's hill country, descending toward the Dead Sea. Matthew's Gospel places the start of John the Baptist's ministry there: \"In those days, John the Baptizer came, preaching in the wilderness of Judea.\"",
+    "text": "The wilderness of Judea is a wide area of waterless, barren desert on the eastern frontier of Judah's hill country, bounded by the Jordan and the Dead Sea and by a long line of steep cliffs. Matthew's Gospel places the start of John the Baptist's ministry there: \"In those days, John the Baptizer came, preaching in the wilderness of Judea.\"",
     "sources": [
+      "bib:isbe-judah-territory-of",
       "scripture:Matthew 3:1"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia describes the region as preeminently a pastoral land on its eastern slopes, where flocks of sheep and goats graze even into the desert itself, and notes that older English Bible versions elsewhere render its name \"Jeshimon.\"",
+      "sources": [
+        "bib:isbe-judah-territory-of"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Matthew 3:1",

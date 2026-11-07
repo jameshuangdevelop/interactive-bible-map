@@ -8,7 +8,6 @@
       "West Bank"
     ],
     "alternate": [
-      "Ramathaim-Zophim",
       "Arimathaea"
     ]
   },
@@ -20,15 +19,15 @@
     {
       "label": "Rantis",
       "coordinates": [
-        35.021578,
-        32.040597
+        35.019444,
+        32.028056
       ],
-      "coordinateSource": "dare:28373",
+      "coordinateSource": "wikidata:Q7293548",
       "confidence": "disputed",
-      "support": "The Digital Atlas of the Roman Empire records the ancient names \"Ramathaim/Arimathaia\" for the modern village of Rantis, in the hill country northwest of Jerusalem; OpenBible.info's ancient-place catalog records this as the strongest-supported of several proposed identifications for Arimathea, drawing on the reference works it surveys, consistent with a tradition identifying Arimathea with the Old Testament town of Ramathaim-Zophim, the prophet Samuel's birthplace, whose name Rantis is thought to preserve.",
+      "support": "OpenBible.info's ancient-place catalog records Rantis as the most highly weighted of several proposed modern-site identifications for Arimathea; the catalog separately lists an identification of Arimathea as \"another name for Ramathaim-zophim,\" the prophet Samuel's Old Testament birthplace, without tying that proposal to a specific modern site. The Digital Atlas of the Roman Empire records the ancient names \"Ramathaim/Arimathaia\" for this village, and Wikidata's independently recorded point for Rantis corroborates the identification, about 1.4 kilometers from the atlas's own, lower-precision point.",
       "sources": [
-        "dare:28373",
         "wikidata:Q7293548",
+        "dare:28373",
         "openbible:arimathea"
       ]
     },
@@ -40,7 +39,7 @@
       ],
       "coordinateSource": "wikidata:Q4855730",
       "confidence": "disputed",
-      "support": "A village a short distance east of Rantis, proposed as an alternative identification for Arimathea; OpenBible.info's ancient-place catalog records this as the second most-supported proposal among the reference works it surveys, after Rantis.",
+      "support": "OpenBible.info's ancient-place catalog records Beit Rima as its second-ranked modern-site identification for Arimathea, after Rantis. Wikidata's coordinate is for West Bani Zeid, the municipality formed by Beit Rima's merger with the neighboring village of Deir Ghassana; no accepted source gives a coordinate for the historic village of Beit Rima alone.",
       "sources": [
         "wikidata:Q4855730",
         "openbible:arimathea"
@@ -48,16 +47,26 @@
     }
   ],
   "summary": {
-    "text": "Arimathea was the hometown of Joseph, the man who, according to all four Gospels, asked Pontius Pilate for the body of Jesus after the crucifixion and buried it in his own new tomb. All four Gospels name Joseph as a man of Arimathea; Matthew's Gospel calls him rich, Mark and Luke describe him as a member of the Jewish council who had not consented to Jesus' condemnation, and John adds that he was a secret disciple \"for fear of the Jews.\" The town's location is not settled; it is often identified with the Old Testament town of Ramathaim-Zophim, and two neighboring villages in the hill country northwest of Jerusalem, Rantis and Beit Rima, are each proposed as its site.",
+    "text": "Arimathea was the hometown of Joseph, a man all four Gospels describe asking Pontius Pilate for the body of Jesus after the crucifixion. Matthew's Gospel calls him rich and says he laid the body in his own new tomb; Mark and Luke describe him as a member of the Jewish council, and Luke adds that he had not consented to its decision against Jesus; John says he was a disciple of Jesus, but secretly, for fear of the Jewish leaders. The town's location is not settled: two neighboring villages in the hill country northwest of Jerusalem, Rantis and Beit Rima, are each proposed as its site.",
     "sources": [
       "openbible:arimathea",
       "scripture:Matthew 27:57",
+      "scripture:Matthew 27:60",
       "scripture:Mark 15:43",
+      "scripture:Luke 23:50",
       "scripture:Luke 23:51",
       "scripture:John 19:38"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Some have identified Arimathea with Ramathaim-zophim, the Old Testament prophet Samuel's birthplace in the hill country of Ephraim, an identification OpenBible.info's ancient-place catalog records among the proposals for Arimathea.",
+      "sources": [
+        "openbible:arimathea",
+        "scripture:1 Samuel 1:1"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Matthew 27:57",

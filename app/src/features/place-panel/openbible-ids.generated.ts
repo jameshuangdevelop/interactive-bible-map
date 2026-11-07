@@ -4,7 +4,6 @@
 export const OPENBIBLE_IDS_BY_SLUG: Readonly<Record<string, string>> = Object.freeze({
   "adramyttium": "a184f3a",
   "aenon": "a112fe3",
-  "akeldama": "a040ba5",
   "alexandria": "aee7248",
   "amphipolis": "a4bdea7",
   "antioch-2": "a6c704a",
@@ -35,6 +34,7 @@ export const OPENBIBLE_IDS_BY_SLUG: Readonly<Record<string, string>> = Object.fr
   "forum-of-appius": "a121d5e",
   "gadara": "afed46a",
   "galilee-1": "a9cf1e8",
+  "gaza": "aa8edd2",
   "gerasa": "ada6b64",
   "gergesa": "aabf84a",
   "gethsemane": "a42418f",
@@ -53,7 +53,6 @@ export const OPENBIBLE_IDS_BY_SLUG: Readonly<Record<string, string>> = Object.fr
   "magdala": "af75e9e",
   "malta": "a57835d",
   "mitylene": "a33910d",
-  "mount-gerizim": "a30e967",
   "mount-of-olives": "ac2c4c5",
   "myra": "aa4b3e2",
   "nain": "aee679c",
@@ -73,7 +72,6 @@ export const OPENBIBLE_IDS_BY_SLUG: Readonly<Record<string, string>> = Object.fr
   "samothrace": "a68750d",
   "sea-of-galilee": "a562fcc",
   "seleucia": "a6d306d",
-  "sheep-gate": "aa3d425",
   "sidon": "a98e4d7",
   "siloam": "a294859",
   "sychar": "a27b472",
@@ -81,6 +79,5 @@ export const OPENBIBLE_IDS_BY_SLUG: Readonly<Record<string, string>> = Object.fr
   "syrtis": "ad36371",
   "tarsus": "a666ea0",
   "three-taverns": "afef438",
-  "trogyllium": "a6f61d3",
-  "valley-of-hinnom": "a37c8e6"
+  "trogyllium": "a6f61d3"
 });

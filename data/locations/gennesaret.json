@@ -22,17 +22,18 @@
   "parentId": "galilee",
   "candidates": [
     {
-      "label": "El-Ghuweir plain, near Ginosar",
+      "label": "Beqa'at Ginosar (Ginosar valley)",
       "coordinates": [
-        35.507222,
-        32.860556
+        35.518333,
+        32.851667
       ],
-      "coordinateSource": "wikidata:Q5533392",
+      "coordinateSource": "wikidata:Q6669901",
       "confidence": "medium",
-      "support": "The International Standard Bible Encyclopedia identifies the land of Gennesaret with the crescent-shaped plain on the Sea of Galilee's northwest shore known in Arabic as el-Ghuweir, running from Tell Hum in the north to Mejdel in the south. The Digital Atlas of the Roman Empire independently records a closely corresponding point, about 2.4 kilometers away, for an ancient town called Gennesar on the mound of Khirbet 'Ureime at the plain's northern edge, used here as the nearest confirmed point to the plain the Gospels name.",
+      "support": "The International Standard Bible Encyclopedia identifies the land of Gennesaret with the crescent-shaped plain on the Sea of Galilee's northwest shore known in Arabic as el-Ghuweir, running from el-Mejdel in the south to 'Ain et-Tineh, or Khan Minyeh, in the north. Wikidata's point for the valley (Hebrew Beqa'at Ginosar) lies within that plain. A separate ancient town on the plain's northern edge, Gennesar, is independently placed about 2.5 kilometers to the east by the Digital Atlas of the Roman Empire and Pleiades, consistent with the same district.",
       "sources": [
-        "wikidata:Q5533392",
+        "wikidata:Q6669901",
         "dare:33302",
+        "pleiades:678155",
         "bib:isbe-gennesaret-land-of"
       ]
     }
