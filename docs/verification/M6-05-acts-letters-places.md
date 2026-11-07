@@ -10,6 +10,8 @@
 
 **Re-check 2 on 2026-11-06 (section 11):** 6 more records are signed off (`euphrates`, `babylon`, `mount-sinai`, `armageddon`, `athens-agora`, `corinth-bema`), so 12 of 14 are verified. `philippi-place-of-prayer` (F58) and `herods-palace-caesarea` (F59) still need a small wording fix each.
 
+**Re-check 3 on 2026-11-06 (section 12): all 14 records are verified.**
+
 First-round findings: there are 53 findings: 51 for the Research Lead (F1–F51) and 2 for the Media Curator (F52–F53). One coordinate is wrong (F50, Herod's palace, about 630 m off). One unmapped candidate has an accepted coordinate (F16), and one has no source for the proposal itself (F44). The rest are wording and citation fixes. All 39 WEB passages match `engwebp_vpl.txt` exactly, the NT passage lists are complete, and all 27 image licences match Commons exactly. 26 captions pass.
 
 ## 1. Commands (Node 24.21.0, at `4c51b45`)
@@ -426,3 +428,10 @@ Every `license` matches Commons' `LicenseShortName` exactly, every one is in an 
 **Not signed off:** `philippi-place-of-prayer` (F58) and `herods-palace-caesarea` (F59) stay `draft` until those wording fixes are made and re-checked. Their coordinates, sources, WEB text, political history and images all pass. Checked by fact-checker, 2026-11-06.
 
 **Budget delta (re-check 2):** 2026-11-06 · fact-checker · Claude (Copilot CLI) · M6-05 re-check 2 · est. ~1.5M in (mostly cached) / ~8k out · ~250 AI credits (estimated, not measured).
+
+## 12. Re-check 3 (2026-11-06, at `2dc7f89`)
+- **F58 `philippi-place-of-prayer`: pass.** The support and summary now say that "the sources disagree on which ancient river this stream was": Religious Greece calls it the Zigaktis, while Pleiades places the "Zygaktes?", with a query, at the modern Xiropotamos. `pleiades:501669` is now cited in the summary. "This research" is gone, and the summary names no database.
+- **F59 `herods-palace-caesarea`: pass.** The summary says "A marker at the site notes ...", with no database named, and that caveat is now its last sentence (ADR-0041). No other text changed.
+- **Commands (at `2dc7f89` plus the sign-off edits):** `npm run validate:data` passes with 217 warnings (unchanged), and `npm test` passes, 323 passed, 0 failed.
+- **Final sign-off:** `philippi-place-of-prayer` and `herods-palace-caesarea` are set to `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-11-06"`. **All 14 M6-05 records are now verified** (`philippi-forum` was removed by the PO). Checked by fact-checker, 2026-11-06.
+- **Budget delta (re-check 3):** est. ~0.5M in (mostly cached) / ~3k out · ~80 AI credits (estimated, not measured).
