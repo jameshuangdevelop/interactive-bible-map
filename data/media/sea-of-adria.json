@@ -1,0 +1,18 @@
+{
+  "locationId": "sea-of-adria",
+  "images": [
+    {
+      "id": "sea-of-adria-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/Ionian_sea_view.jpg",
+      "width": 2972,
+      "height": 3963,
+      "author": "Νικόλαος Κυριακάκης",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ionian_sea_view.jpg",
+      "caption": "The Ionian Sea, part of the waters the first century called \"Adria,\" seen from the Greek coast.",
+      "kind": "modern",
+      "aiGenerated": false
+    }
+  ]
+}

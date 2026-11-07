@@ -1,0 +1,129 @@
+{
+  "id": "cyrene",
+  "names": {
+    "ancient": [
+      "Cyrene"
+    ],
+    "modern": "Shahhat",
+    "modernCountries": [
+      "Libya"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Kyrene"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "libya",
+  "candidates": [
+    {
+      "label": "Cyrene (near Shahhat)",
+      "coordinates": [
+        21.851229,
+        32.820946
+      ],
+      "coordinateSource": "openbible:cyrene",
+      "confidence": "high",
+      "support": "The extensively excavated Greek and Roman city near modern Shahhat is undisputed as ancient Cyrene. OpenBible.info, Pleiades and Wikidata's coordinates for the site agree closely.",
+      "sources": [
+        "openbible:cyrene",
+        "pleiades:373778",
+        "wikidata:Q44112"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Cyrene was a major Greek city on the coast of North Africa, in the region the New Testament calls \"Libya around Cyrene,\" and was later organized, with Crete, into a single Roman province. Its large Jewish community is named several times in the New Testament: Simon, the man compelled to carry Jesus' cross, was \"a man of Cyrene,\" and men of Cyrene who had been scattered from Jerusalem were later among those who preached to the Hellenists at Antioch.",
+    "sources": [
+      "openbible:cyrene",
+      "wikidata:Q44112",
+      "bib:isbe-cyrene",
+      "bib:isbe-crete",
+      "scripture:Matthew 27:32",
+      "scripture:Acts 2:10",
+      "scripture:Acts 11:19",
+      "scripture:Acts 11:20"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that Cyrene was a Greek colony founded by Battus in 630 BC, and that the Ptolemaic king Ptolemy I transported Jews there, after which Jews were very numerous in the city.",
+      "sources": [
+        "bib:isbe-cyrene"
+      ]
+    },
+    {
+      "text": "All three Synoptic Gospels record that the soldiers leading Jesus to his crucifixion compelled Simon of Cyrene to carry his cross. Acts records that some of the believers scattered from Jerusalem, men of Cyprus and Cyrene, preached to the Hellenists at Antioch, names Cyrenian Jews among those who disputed with Stephen, and lists Lucius of Cyrene among the prophets and teachers of the church at Antioch.",
+      "sources": [
+        "scripture:Matthew 27:32",
+        "scripture:Mark 15:21",
+        "scripture:Luke 23:26",
+        "scripture:Acts 6:9",
+        "scripture:Acts 11:19",
+        "scripture:Acts 11:20",
+        "scripture:Acts 13:1"
+      ]
+    },
+    {
+      "text": "Today the ruins of Cyrene, a UNESCO World Heritage Site, lie near the Libyan town of Shahhat.",
+      "sources": [
+        "wikidata:Q44112"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 27:32",
+      "book": "Matthew",
+      "textWEB": "As they came out, they found a man of Cyrene, Simon by name, and they compelled him to go with them, that he might carry his cross."
+    },
+    {
+      "ref": "Mark 15:21",
+      "book": "Mark",
+      "textWEB": "They compelled one passing by, coming from the country, Simon of Cyrene, the father of Alexander and Rufus, to go with them that he might bear his cross."
+    },
+    {
+      "ref": "Luke 23:26",
+      "book": "Luke",
+      "textWEB": "When they led him away, they grabbed one Simon of Cyrene, coming from the country, and laid the cross on him to carry it after Jesus."
+    },
+    {
+      "ref": "Acts 2:10",
+      "book": "Acts",
+      "textWEB": "Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene, visitors from Rome, both Jews and proselytes,"
+    },
+    {
+      "ref": "Acts 6:9",
+      "book": "Acts",
+      "textWEB": "But some of those who were of the synagogue called “The Libertines”, and of the Cyrenians, of the Alexandrians, and of those of Cilicia and Asia arose, disputing with Stephen."
+    },
+    {
+      "ref": "Acts 11:20",
+      "book": "Acts",
+      "textWEB": "But there were some of them, men of Cyprus and Cyrene, who, when they had come to Antioch, spoke to the Hellenists, preaching the Lord Jesus."
+    },
+    {
+      "ref": "Acts 13:1",
+      "book": "Acts",
+      "textWEB": "Now in the assembly that was at Antioch there were some prophets and teachers: Barnabas, Simeon who was called Niger, Lucius of Cyrene, Manaen the foster brother of Herod the tetrarch, and Saul."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -67,
+      "toYear": 101,
+      "holderId": "crete-cyrene-province",
+      "entity": "Roman province of Crete and Cyrene (ruler: Crete joined with Cyrenaica)",
+      "sources": [
+        "bib:isbe-crete"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "crete-cyrene"
+}

@@ -1,0 +1,92 @@
+{
+  "id": "ephesus-theater",
+  "names": {
+    "ancient": [
+      "The theater at Ephesus"
+    ],
+    "modern": "Great Theatre of Ephesus",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [],
+    "otherLanguages": []
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "ephesus",
+  "candidates": [
+    {
+      "label": "Great Theatre of Ephesus",
+      "coordinates": [
+        27.342403,
+        37.941022
+      ],
+      "coordinateSource": "pleiades:818256726",
+      "confidence": "high",
+      "support": "The large excavated theater, set into the hillside of Mount Pion (Panayirdag) and able to host up to about 25,000 spectators, is identified, per the International Standard Bible Encyclopedia, as the scene of the riot Acts describes during Paul's time in Ephesus. Pleiades and Wikidata's coordinates for the theater agree closely.",
+      "sources": [
+        "pleiades:818256726",
+        "wikidata:Q15723477",
+        "bib:isbe-ephesus",
+        "scripture:Acts 19:29"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The theater at Ephesus is a large ancient theater set into the hillside of Mount Pion (Panayirdag), able to host up to about 25,000 spectators. According to Acts, a crowd dragged two of Paul's traveling companions into this theater and shouted for about two hours, \"Great is Artemis of the Ephesians!\"",
+    "sources": [
+      "pleiades:818256726",
+      "wikidata:Q15723477",
+      "scripture:Acts 19:29",
+      "scripture:Acts 19:34"
+    ]
+  },
+  "history": [
+    {
+      "text": "Acts describes a riot started by the silversmith Demetrius, whose trade in silver shrines of Artemis was threatened by Paul's preaching; a crowd rushed into the theater with Paul's companions Gaius and Aristarchus, and some of the Asiarchs, who were his friends, sent word begging him not to risk entering the theater himself. The disturbance ended only when the city clerk quieted the crowd and dismissed the assembly.",
+      "sources": [
+        "scripture:Acts 19:24",
+        "scripture:Acts 19:28",
+        "scripture:Acts 19:29",
+        "scripture:Acts 19:31",
+        "scripture:Acts 19:35",
+        "scripture:Acts 19:41"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia, describing the ruins of Ephesus as explored in the nineteenth century, calls the theater \"huge\" and notes that although its marble facing has long since been carried away, it remains recognizable as a great hollow in the hillside of Prion (Mount Pion).",
+      "sources": [
+        "bib:isbe-ephesus"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 19:29",
+      "book": "Acts",
+      "textWEB": "The whole city was filled with confusion, and they rushed with one accord into the theater, having seized Gaius and Aristarchus, men of Macedonia, Paul’s companions in travel."
+    },
+    {
+      "ref": "Acts 19:31",
+      "book": "Acts",
+      "textWEB": "Certain also of the Asiarchs, being his friends, sent to him and begged him not to venture into the theater."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -129,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "asia"
+}

@@ -1,0 +1,143 @@
+{
+  "id": "herods-palace-caesarea",
+  "names": {
+    "ancient": [
+      "Herod's palace"
+    ],
+    "modern": "Promontory Palace, Caesarea",
+    "modernCountries": [
+      "Israel"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Promontory Palace"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "caesarea-maritima",
+  "candidates": [
+    {
+      "label": "Promontory Palace, Caesarea Maritima",
+      "coordinates": [
+        34.890033,
+        32.4966
+      ],
+      "coordinateSource": "bib:hmdb-promontory-palace-marker",
+      "confidence": "high",
+      "support": "The Historical Marker Database records the location of the physical \"Promontory Palace\" marker, on the walkway to the palace in the Caesarea Maritima National Park, as \"32° 29.796′ N, 34° 53.402′ E\"; this lies close to Wikidata's points for the adjacent Theater of Herod and Caesarea Hippodrome, which the marker's own text says the palace overlooks. Cornell University's archaeology program, which has worked at the site, describes a palace built around a large rock-cut pool on a rocky promontory extending about 100 meters into the sea, adjacent to the restored ancient theater, matching the first-century Jewish historian Josephus's account of a palace Herod the Great built at Caesarea; a peer-reviewed article in the Journal of Roman Archaeology, titled \"The promontory palace at Caesarea Maritima: preliminary evidence for Herod's Praetorium,\" documents this identification in the scholarly literature. Wikidata's own point labeled \"Herod's Palace\" (Q2527367), by contrast, falls about 670 m north, nearer the harbor and Crusader-period town, and is not used here.",
+      "sources": [
+        "bib:hmdb-promontory-palace-marker",
+        "wikidata:Q110300838",
+        "wikidata:Q3537241",
+        "wikidata:Q2527367",
+        "bib:cornell-caesarea-maritima",
+        "bib:gleason-burrell-netzer-promontory-palace",
+        "scripture:Acts 23:35"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Herod's palace at Caesarea was a seaside palace built on a rocky promontory jutting into the Mediterranean, later excavated and identified as the \"Promontory Palace.\" Cornell University's archaeology program attributes the building to Herod the Great, citing the first-century Jewish historian Josephus, and a peer-reviewed article in the Journal of Roman Archaeology titles its identification \"Herod's Praetorium.\" According to Acts, after Paul was brought to Caesarea under guard, the governor Felix ordered him kept in custody in Herod's palace to await his accusers. A marker at the site notes that archaeology has not settled whether Herod or a later Roman governor was responsible for building it.",
+    "sources": [
+      "bib:hmdb-promontory-palace-marker",
+      "bib:cornell-caesarea-maritima",
+      "bib:gleason-burrell-netzer-promontory-palace",
+      "scripture:Acts 23:33",
+      "scripture:Acts 23:35"
+    ]
+  },
+  "history": [
+    {
+      "text": "Cornell University's archaeology program describes the Promontory Palace in two parts: a Lower Palace near sea level, with a colonnade framing a great rock-cut pool, and an Upper Palace on higher ground centered on a large paved courtyard, citing the first-century Jewish historian Josephus's account that Herod the Great built a splendid palace as a showpiece of his new city.",
+      "sources": [
+        "bib:cornell-caesarea-maritima"
+      ]
+    },
+    {
+      "text": "Acts records that when the Roman governor Felix learned Paul was from Cilicia, he said, \"I will hear you fully when your accusers also arrive,\" and ordered him kept under guard in Herod's palace; Paul remained in custody for two years, until Felix was succeeded by Porcius Festus.",
+      "sources": [
+        "scripture:Acts 23:34",
+        "scripture:Acts 23:35",
+        "scripture:Acts 24:27"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 23:35",
+      "book": "Acts",
+      "textWEB": "“I will hear you fully when your accusers also arrive.” He commanded that he be kept in Herod’s palace."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "judea-samaria-idumea"
+}

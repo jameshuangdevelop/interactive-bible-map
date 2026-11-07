@@ -1,0 +1,146 @@
+{
+  "id": "areopagus",
+  "names": {
+    "ancient": [
+      "The Areopagus"
+    ],
+    "modern": "Areopagus Hill / Mars Hill",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [
+      "Mars' Hill"
+    ],
+    "otherLanguages": [
+      "Areios Pagos"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "athens",
+  "candidates": [
+    {
+      "label": "Areopagus Hill",
+      "coordinates": [
+        23.723611,
+        37.972222
+      ],
+      "coordinateSource": "wikidata:Q202487",
+      "confidence": "high",
+      "support": "A rocky outcrop northwest of the Acropolis, named after a mythical trial of the god Ares and identified as a meeting place for the Council of the Areopagus (Pleiades); the International Standard Bible Encyclopedia places the Court of the Areopagus in this same neighborhood, and the hill is traditionally identified as the setting of Paul's speech in Acts 17. Pleiades' point for the hill, based on an OpenStreetMap outline, lies about 30 m from Wikidata's.",
+      "sources": [
+        "wikidata:Q202487",
+        "pleiades:969121823",
+        "bib:isbe-athens",
+        "scripture:Acts 17:19"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Areopagus is a rocky outcrop in Athens, northwest of the Acropolis, which gave its name to an ancient council associated with legislative and judicial functions. According to Acts, the Athenians brought Paul to the Areopagus to explain his teaching about Jesus and the resurrection, and there he preached about an altar he had seen inscribed \"TO AN UNKNOWN GOD.\"",
+    "sources": [
+      "wikidata:Q202487",
+      "pleiades:969121823",
+      "bib:isbe-athens",
+      "scripture:Acts 17:18",
+      "scripture:Acts 17:19",
+      "scripture:Acts 17:22",
+      "scripture:Acts 17:23"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia places the Court of the Areopagus near the Painted Portico (Stoa Poecile), where Paul had been reasoning daily with Epicurean and Stoic philosophers in the marketplace below, and notes that the philosopher Socrates had faced his own accusers in the same neighborhood five centuries before Paul.",
+      "sources": [
+        "bib:isbe-athens",
+        "scripture:Acts 17:17",
+        "scripture:Acts 17:18"
+      ]
+    },
+    {
+      "text": "Acts records that when Paul spoke of the resurrection of the dead, some of his hearers mocked him, but others wanted to hear more, and a few believed, including Dionysius the Areopagite and a woman named Damaris.",
+      "sources": [
+        "scripture:Acts 17:32",
+        "scripture:Acts 17:34"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 17:19",
+      "book": "Acts",
+      "textWEB": "They took hold of him and brought him to the Areopagus, saying, “May we know what this new teaching is, which you are speaking about?"
+    },
+    {
+      "ref": "Acts 17:22",
+      "book": "Acts",
+      "textWEB": "Paul stood in the middle of the Areopagus and said, “You men of Athens, I perceive that you are very religious in all things."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:isbe-macedonia"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Imperial legate of Moesia (governed with Macedonia))",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:isbe-macedonia"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 67,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul (restored by the emperor Claudius))",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "fromYear": 67,
+      "toYear": 70,
+      "holderId": "achaia-free",
+      "entity": "Free Achaia",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius: on his departure from Greece, the emperor Nero \"presented the entire province with freedom.\""
+    },
+    {
+      "fromYear": 70,
+      "toYear": 79,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius records that the emperor Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor until his death in 79, when it is a province again."
+    },
+    {
+      "fromYear": 79,
+      "toYear": 101,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "achaia"
+}

@@ -1,0 +1,31 @@
+{
+  "locationId": "straight-street",
+  "images": [
+    {
+      "id": "straight-street-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Damascus_Old_Town_Midhat_Pasha_Street.jpg",
+      "width": 2368,
+      "height": 4224,
+      "author": "Amani Sharaa",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Damascus_Old_Town_Midhat_Pasha_Street.jpg",
+      "caption": "Midhat Pasha Street in Damascus's Old City, the modern street following the course of the ancient street called Straight (Acts 9:11).",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "straight-street-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Street-called-Straight-Detroit.jpeg",
+      "width": 2568,
+      "height": 3519,
+      "author": "Detroit Photographic Company",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Street-called-Straight-Detroit.jpeg",
+      "caption": "A photochrom print of the street called Straight, Damascus, photographed between about 1890 and 1900 and published in 1905.",
+      "kind": "historical",
+      "aiGenerated": false
+    }
+  ]
+}
