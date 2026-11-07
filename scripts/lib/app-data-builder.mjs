@@ -19,6 +19,7 @@ const DEFAULT_OUTPUT_DIRECTORY = path.join(repositoryRoot, "app", "public", "gen
 const DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES = 330_000;
 const DEFAULT_MAX_ANCIENT_REGION_OUTLINES_GZIP_BYTES = 25_000;
 const DEFAULT_MAX_ROUTES_LAYER_GZIP_BYTES = 100_000;
+const DEFAULT_MAX_PLACES_INDEX_GZIP_BYTES = 30_000;
 const DEFAULT_ROUTES_FIXTURE_DIRECTORY = path.join(
   repositoryRoot,
   "tests",
@@ -205,6 +206,8 @@ export async function buildAppData(options = {}) {
     options.maxAncientRegionOutlinesGzipBytes ?? DEFAULT_MAX_ANCIENT_REGION_OUTLINES_GZIP_BYTES;
   const maxRoutesLayerGzipBytes =
     options.maxRoutesLayerGzipBytes ?? DEFAULT_MAX_ROUTES_LAYER_GZIP_BYTES;
+  const maxPlacesIndexGzipBytes =
+    options.maxPlacesIndexGzipBytes ?? DEFAULT_MAX_PLACES_INDEX_GZIP_BYTES;
 
   const validationResult = await validateData({
     locationsDirectory,
@@ -285,17 +288,30 @@ export async function buildAppData(options = {}) {
 
   const indexRecords = locationRecords.map((locationRecord) => toIndexRecord(locationRecord));
   const indexPayload = JSON.stringify(indexRecords);
+  const indexBytes = Buffer.byteLength(indexPayload, "utf8");
+  const indexGzipBytes = zlib.gzipSync(indexPayload, {
+    level: zlib.constants.Z_BEST_COMPRESSION
+  }).length;
+  if (indexGzipBytes > maxPlacesIndexGzipBytes) {
+    throw new Error(
+      `places.index.json exceeds ${maxPlacesIndexGzipBytes} bytes gzip (${indexGzipBytes} bytes).`
+    );
+  }
 
   await fs.rm(outputDirectory, { recursive: true, force: true });
   const placesDirectory = path.join(outputDirectory, "places");
   await fs.mkdir(placesDirectory, { recursive: true });
 
   await fs.writeFile(path.join(outputDirectory, "places.index.json"), indexPayload, "utf8");
+  const placesIndexBuild = {
+    gzipBytes: indexGzipBytes,
+    maxGzipBytes: maxPlacesIndexGzipBytes
+  };
   const outputFiles = [
     {
       file: "places.index.json",
-      bytes: Buffer.byteLength(indexPayload, "utf8"),
-      gzipBytes: zlib.gzipSync(indexPayload, { level: zlib.constants.Z_BEST_COMPRESSION }).length
+      bytes: indexBytes,
+      gzipBytes: indexGzipBytes
     }
   ];
 
@@ -496,8 +512,9 @@ export async function buildAppData(options = {}) {
     validationResult,
     outputDirectory,
     locationCount: locationRecords.length,
-    indexBytes: Buffer.byteLength(indexPayload, "utf8"),
+    indexBytes,
     outputFiles,
+    placesIndexBuild,
     routesBuild,
     ancientBuild
   };
