@@ -33,7 +33,7 @@
     }
   ],
   "summary": {
-    "text": "Mount Gerizim stands south of the pass where the town of Shechem, and later Nablus, lies, facing Mount Ebal across the valley. John's Gospel does not name the mountain, but records a Samaritan woman telling Jesus at Jacob's well, \"Our fathers worshiped in this mountain,\" to which Jesus replies that \"neither in this mountain nor in Jerusalem\" will true worship of the Father be confined, for \"the true worshipers will worship the Father in spirit and truth.\" The International Standard Bible Encyclopedia identifies Gerizim as \"this mountain\" of the conversation, since the well lies almost beneath its cliffs.",
+    "text": "Mount Gerizim stands south of the pass where the town of Shechem, and later Nablus, lies, facing Mount Ebal across the valley. John's Gospel does not name the mountain, but records a Samaritan woman telling Jesus at Jacob's well, \"Our fathers worshiped in this mountain,\" to which Jesus replies, \"the hour is coming when neither in this mountain nor in Jerusalem will you worship the Father,\" for \"the true worshipers will worship the Father in spirit and truth.\" The International Standard Bible Encyclopedia identifies Gerizim as \"this mountain\" of the conversation, since the well lies almost beneath its cliffs.",
     "sources": [
       "bib:isbe-gerizim-mount",
       "scripture:John 4:20",
@@ -68,6 +68,11 @@
       "ref": "John 4:21",
       "book": "John",
       "textWEB": "Jesus said to her, “Woman, believe me, the hour is coming when neither in this mountain nor in Jerusalem will you worship the Father."
+    },
+    {
+      "ref": "John 4:23",
+      "book": "John",
+      "textWEB": "But the hour comes, and now is, when the true worshipers will worship the Father in spirit and truth, for the Father seeks such to be his worshipers."
     }
   ],
   "otConnections": [

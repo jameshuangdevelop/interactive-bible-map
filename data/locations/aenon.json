@@ -5,9 +5,9 @@
       "Aenon"
     ],
     "modernCountries": [
-      "West Bank",
       "Israel",
-      "Jordan"
+      "Jordan",
+      "West Bank"
     ],
     "alternate": [
       "Enon",
@@ -44,9 +44,10 @@
       ],
       "coordinateSource": "wikidata:Q5977371",
       "confidence": "disputed",
-      "support": "The sixth-century Madaba mosaic map labels a site at the start of Wadi al-Kharrar, east of the Jordan, \"known as Sapsas or Sapsaphas ('the place of Willows') ... which identifies it with Ainon,\" per Michele Piccirillo's study of the map; the seventh-century writer John Moschus likewise calls the same place, near a monastic settlement, \"Sapsas near the Jordan.\" OpenBible.info's ancient-place catalog also records this identification, with a higher aggregate score than the Nablus-area Salim proposal below. This point lies close to, but is not identical with, the separate Al-Maghtas candidate this project records for Bethany beyond the Jordan (John 1:28).",
+      "support": "The sixth-century Madaba mosaic map (so dated by its own Wikidata record) labels a site at the start of Wadi al-Kharrar, east of the Jordan, with a name meaning \"the place of Willows,\" which, according to Michele Piccirillo's study of the map, the map itself equates with Ainon; the seventh-century writer John Moschus likewise locates the same place, near a monastic settlement, close to the Jordan, in Piccirillo's account of his record. OpenBible.info's ancient-place catalog also records this identification, under its own listing for \"Aenon,\" with less confidence than the catalog's higher-ranked candidate, Khirbet Einun, recorded below as an unmapped candidate. This point lies close to, but is not identical with, the separate Al-Maghtas candidate this project records for Bethany beyond the Jordan (John 1:28).",
       "sources": [
         "wikidata:Q5977371",
+        "wikidata:Q1346870",
         "openbible:aenon",
         "bib:piccirillo-ainon-sapsaphas"
       ]
@@ -54,10 +55,10 @@
   ],
   "unmappedCandidates": [
     {
-      "label": "'Ainun (Khirbet Einun), near the village of Salim east of Nablus",
+      "label": "'Ainun (Khirbet Einun), east of Nablus",
       "confidence": "low",
-      "support": "Some explorers, including Edward Robinson and Claude Conder, proposed the spring 'Ainun in Wady Far'ah, with the nearby village of Salim east of Nablus, as the site of Aenon and Salim; OpenBible.info's ancient-place catalog records this identification among its candidates. The International Standard Bible Encyclopedia argues against it: the site \"is in the very heart of Samaria, and therefore impossible,\" since Aenon's position, defined by its six-mile distance from Salim with a high ridge between them, \"would hardly be defined by the village of Salim, with the important city of Shechem quite as near, and more easily accessible.\"",
-      "reason": "No accepted source gives a coordinate for 'Ainun/Khirbet Einun itself; the only recorded point traces to GeoNames, which this project does not use as a coordinate source. The nearby village of Salim, six miles away by the International Standard Bible Encyclopedia's own figure, has an accepted coordinate, but it is not itself the proposed site of Aenon.",
+      "support": "Some explorers, including Edward Robinson and Claude Conder, proposed the spring 'Ainun in Wady Far'ah, with the village of Salim east of Nablus six miles away, as the site of Aenon and Salim; OpenBible.info's ancient-place catalog records this identification among its candidates. The International Standard Bible Encyclopedia argues against it: the site \"is in the very heart of Samaria, and therefore impossible,\" and adds that Aenon's position, defined by its six-mile distance from Salim with a high ridge between them, \"would hardly be defined by the village of Salim, with the important city of Shechem quite as near, and more easily accessible.\"",
+      "reason": "No accepted source gives a coordinate for 'Ainun/Khirbet Einun itself; the only recorded point traces to GeoNames, which this project does not use as a coordinate source. The village of Salim, six miles away by the International Standard Bible Encyclopedia's own figure, has an accepted coordinate, but it is not itself the proposed site of Aenon.",
       "sources": [
         "openbible:aenon",
         "bib:isbe-salim"
@@ -65,12 +66,13 @@
     }
   ],
   "summary": {
-    "text": "Aenon near Salim is the place where, according to John's Gospel, John the Baptist was baptizing \"because there was much water there,\" at a time when Jesus and his disciples were also in Judea, baptizing nearby. The World English Bible spells the name \"Enon.\" Its location is disputed: the International Standard Bible Encyclopedia favors a district south of Beth-shean (Scythopolis), following the writer Eusebius, while a separate tradition, recorded on the Madaba mosaic map, places an \"Ainon\" east of the Jordan; other proposals, including a spring called 'Ainun near the village of Salim east of Nablus, in Samaria, have no coordinate from an accepted source.",
+    "text": "Aenon near Salim is the place where, according to John's Gospel, John the Baptist was baptizing \"because there was much water there,\" at a time when Jesus and his disciples were in the land of Judea, baptizing. The World English Bible spells the name \"Enon.\" Its location is disputed: the International Standard Bible Encyclopedia favors a district south of Beth-shean (Scythopolis), following the writer Eusebius, while a separate tradition, recorded on the Madaba mosaic map, places an \"Ainon\" east of the Jordan; other proposals, including a spring called 'Ainun east of Nablus, in Samaria, have no coordinate from an accepted source.",
     "sources": [
       "scripture:John 3:22",
       "scripture:John 3:23",
       "bib:isbe-aenon",
-      "bib:isbe-salim"
+      "bib:isbe-salim",
+      "bib:piccirillo-ainon-sapsaphas"
     ]
   },
   "history": [

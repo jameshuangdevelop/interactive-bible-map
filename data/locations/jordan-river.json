@@ -36,9 +36,11 @@
     }
   ],
   "summary": {
-    "text": "The Jordan River runs south from the mountains near Mount Hermon, through the Sea of Galilee, down the Jordan Rift Valley, to the Dead Sea. In the New Testament it is above all the river where John the Baptist preached and baptized, including Jesus himself; Matthew describes crowds from Jerusalem, Judea and \"all the region around the Jordan\" going out to John to be baptized \"in the Jordan.\"",
+    "text": "The first-century Jewish historian Josephus records that \"Jordan's visible stream arises from this cavern\" at Panium and, after further distance, \"passes through the middle of the lake Gennesareth\"; a separate record, Wikidata's entry for the river, gives its source near the Golan Heights and Sde Nehemia, the Sea of Galilee as the lake on its course, and the Dead Sea as its mouth. In the New Testament it is above all the river where John the Baptist preached and baptized, including Jesus himself; Matthew describes crowds from Jerusalem, Judea and \"all the region around the Jordan\" going out to John to be baptized \"in the Jordan.\"",
     "sources": [
       "wikidata:Q40059",
+      "bib:josephus-jewish-war",
+      "scripture:Luke 3:3",
       "scripture:Matthew 3:5",
       "scripture:Matthew 3:6",
       "scripture:Matthew 3:13"
@@ -57,7 +59,7 @@
       ]
     },
     {
-      "text": "The first-century Jewish historian Josephus records that the Jordan runs through the middle of the Lake of Gennesareth (the Sea of Galilee), dividing it into two parts.",
+      "text": "The first-century Jewish historian Josephus records that the Jordan passes through the middle of the Lake of Gennesareth (the Sea of Galilee).",
       "sources": [
         "bib:josephus-jewish-war"
       ]
