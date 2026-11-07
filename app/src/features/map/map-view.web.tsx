@@ -76,6 +76,10 @@ import {
   linkedTimelineLocationIds
 } from "./ancient-area-label-visibility";
 import {
+  expandAncientStopPayloadFromCatalogue,
+  loadAncientStopCatalogue
+} from "./ancient-stop-catalogue";
+import {
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
   findSelectedRegionGeometry,
@@ -87,6 +91,7 @@ import type {
   AncientHolderUnionsPayload,
   AncientEntityRecord,
   AncientShapesPayload,
+  AncientStopCompactPayload,
   AncientStopPayload,
   FeatureCollection,
   LineStringGeometry,
@@ -3339,9 +3344,12 @@ export function MapView({
 
     stopPayloadRequestIdsRef.current.add(stopId);
     try {
-      const response = await fetch(`/generated/ancient.stop.${encodeURIComponent(stopId)}.json`, {
-        cache: "no-store"
-      });
+      const [response, stopCatalogue] = await Promise.all([
+        fetch(`/generated/ancient.stop.${encodeURIComponent(stopId)}.json`, {
+          cache: "no-store"
+        }),
+        loadAncientStopCatalogue()
+      ]);
       if (!response.ok) {
         if (response.status === 404) {
           failedStopIdsRef.current.add(stopId);
@@ -3353,7 +3361,8 @@ export function MapView({
         throw new Error(`Could not load ancient stop payload '${stopId}' (${response.status})`);
       }
 
-      const payload = (await response.json()) as AncientStopPayload;
+      const compactPayload = (await response.json()) as AncientStopCompactPayload;
+      const payload = expandAncientStopPayloadFromCatalogue(compactPayload, stopCatalogue);
       setAncientStopsById((previous) => {
         if (previous[payload.stopId]) {
           return previous;
@@ -3498,7 +3507,8 @@ export function MapView({
         }
 
         return (await response.json()) as GeoJsonSourceData;
-      })
+      }),
+      loadAncientStopCatalogue()
     ])
       .then(
         ([

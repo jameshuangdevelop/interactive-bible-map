@@ -131,6 +131,21 @@ export interface AncientStopPayload {
   holderLabels: AncientHolderLabelPoint[];
 }
 
+export type AncientHolderBorderFeature = AncientStopPayload["holderBorders"]["features"][number];
+
+export interface AncientStopCataloguePayload {
+  areas: AncientAreaAssignment[];
+  holderBorders: AncientHolderBorderFeature[];
+  holderLabels: AncientHolderLabelPoint[];
+}
+
+export interface AncientStopCompactPayload
+  extends Omit<AncientStopPayload, "areas" | "holderBorders" | "holderLabels"> {
+  areas: number[];
+  holderBorders: number[];
+  holderLabels: number[];
+}
+
 export interface AncientHolderUnionsPayload {
   geometries: Record<string, PolygonGeometry | MultiPolygonGeometry>;
 }

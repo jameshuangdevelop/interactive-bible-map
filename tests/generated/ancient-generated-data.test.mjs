@@ -5,6 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import polylabel from "polylabel";
 import { polygonsOf, polygonAreaKm2 } from "../../scripts/lib/geometry-cleanup.mjs";
+import { __testOnly as ancientBuilderTestOnly } from "../../scripts/lib/ancient-app-data-builder.mjs";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, "..", "..");
@@ -372,24 +373,40 @@ async function loadGeneratedAncientData() {
   generatedDataPromise = (async () => {
     await assertGeneratedOutputAvailable();
 
-    const [timelinePayload, roadsPayload, timelineData, sourceRoads, holderUnionsPayload, shapesPayload, coastlinePayload] = await Promise.all([
+    const [
+      timelinePayload,
+      roadsPayload,
+      timelineData,
+      sourceRoads,
+      holderUnionsPayload,
+      shapesPayload,
+      coastlinePayload,
+      stopCataloguePayload
+    ] = await Promise.all([
       fs.readFile(path.join(generatedDirectory, "ancient.timeline.json"), "utf8").then((content) => JSON.parse(content)),
       fs.readFile(path.join(generatedDirectory, "ancient.roads.geojson"), "utf8").then((content) => JSON.parse(content)),
       fs.readFile(repositoryTimelinePath, "utf8").then((content) => JSON.parse(content)),
       fs.readFile(repositoryAncientRoadsPath, "utf8").then((content) => JSON.parse(content)),
       fs.readFile(path.join(generatedDirectory, "ancient.holder-unions.json"), "utf8").then((content) => JSON.parse(content)),
       fs.readFile(path.join(generatedDirectory, "ancient.shapes.json"), "utf8").then((content) => JSON.parse(content)),
-      fs.readFile(path.join(generatedDirectory, "ancient.coastline.geojson"), "utf8").then((content) => JSON.parse(content))
+      fs.readFile(path.join(generatedDirectory, "ancient.coastline.geojson"), "utf8").then((content) => JSON.parse(content)),
+      fs.readFile(path.join(generatedDirectory, "ancient.stop-catalogue.json"), "utf8").then((content) => JSON.parse(content))
     ]);
 
     const stopPayloadById = new Map(
       await Promise.all(
-        timelinePayload.stops.map(async (stop) => [
-          stop.id,
-          JSON.parse(
+        timelinePayload.stops.map(async (stop) => {
+          const compactStopPayload = JSON.parse(
             await fs.readFile(path.join(generatedDirectory, `ancient.stop.${stop.id}.json`), "utf8")
-          )
-        ])
+          );
+          return [
+            stop.id,
+            ancientBuilderTestOnly.expandStopPayloadFromCatalogue(
+              compactStopPayload,
+              stopCataloguePayload
+            )
+          ];
+        })
       )
     );
 
