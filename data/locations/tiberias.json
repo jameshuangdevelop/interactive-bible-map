@@ -122,6 +122,8 @@
       "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change."
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
   "politicalAreaId": "galilee-perea"
 }

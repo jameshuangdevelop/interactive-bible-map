@@ -4,7 +4,13 @@
 - **Checked:** the 21 new `data/locations/*.json` records and their 21 `data/media/*.json` files (37 images); the 22 new `bib:isbe-*` entries; the regenerated `openbible-ids` files; the new `"Gaza Strip"` value in `schema/location.schema.json`. Against ADR-0017, ADR-0026, ADR-0028, ADR-0033, ADR-0041 item 1, `schema/README.md` and `docs/LICENSES.md`.
 - **Verifier:** fact-checker (Claude, Copilot CLI) · **Date:** 2026-11-06
 
-**Result: no record passes yet. All 21 stay `status: "draft"`.** 21 findings (F1–F21, one per record) and 4 cross-cutting notes (X1–X4).
+**Re-check on 2026-11-06 (section 9), at `fbd1cd2`:**
+- **Scope is now 20 records.** `sheep-gate` was removed (PO decision Q2).
+- **5 records are signed off:** `azotus`, `lydda`, `antipatris`, `tiberias`, `jacobs-well`.
+- **15 stay draft.** Each has one to five small remaining fixes (section 9.3).
+- The PO accepted `"Gaza Strip"` (Q1) and the title "Aenon" (Q3).
+
+**First-round result: no record passed. All 21 stayed `status: "draft"`.** 21 findings (F1–F21, one per record) and 4 cross-cutting notes (X1–X4).
 - **Major (8 records):** a coordinate that isn't of the candidate (`sheep-gate`, `gennesaret`, `aenon`, `arimathea`); a coordinate with no second source (`wilderness-of-judea`); a misreported source on a theological point (`valley-of-hinnom`); a missing WEB passage and misquotations (`praetorium`); an uncited identification the card asked for (`antonia-fortress`).
 - **Minor (13 records):** wording, missing citations or a WEB quotation that differs from the WEB.
 
@@ -359,4 +365,98 @@ Captions are otherwise neutral: Gaza and West Bank places are described without 
 
 ## Sign-off
 
-**Not signed off.** All 21 records stay `status: "draft"`. I'll re-check once the Research Lead (F1–F21) and the Media Curator (sheep-gate-01, wilderness-of-judea-01, zarephath-01, antonia-fortress-01, samaria-city-01 and the Akeldama images) have pushed their fixes. — fact-checker, 2026-11-06
+**First round: not signed off.** All 21 records stayed `status: "draft"`. I said I would re-check once the Research Lead (F1–F21) and the Media Curator (sheep-gate-01, wilderness-of-judea-01, zarephath-01, antonia-fortress-01, samaria-city-01 and the Akeldama images) had pushed their fixes. — fact-checker, 2026-11-06
+
+## 9. Re-check (2026-11-06, at `fbd1cd2`; diff `22a70a9..fbd1cd2`)
+
+### 9.1 What changed
+- **Research Lead** (`6b611a3`, `9128b0b`):
+  - Addressed F1–F21.
+  - Removed `sheep-gate`.
+  - Retitled `aenon` and rebuilt it with three proposals: two mapped candidates (Tel Shalem; Wadi al-Kharrar, the Madaba map's "Ainon") and one unmapped candidate ('Ainun/Khirbet Einun).
+  - Removed `bib:isbe-jerusalem-2` and `bib:isbe-judaea-wilderness-of`, and added `bib:isbe-judah-territory-of`.
+- **Media Curator** (`d8bd876`): credits, captions, and two new Akeldama photos.
+- **PO** (`5804565`, `fbd1cd2`): removed `sheep-gate`'s media and the unused `bib:isbe-sheep-gate`.
+
+I re-checked only what changed, against the same sources as round 1. New sources opened: ISBE "Judah, Territory of" (E. W. G. Masterman, 1915; public domain) and Josephus *War* 1.21.1 and 2.19.1 (Whiston). I also re-read Piccirillo and *War* 3.10.7, and read the two new Commons files (`imageinfo` and categories, plus a 500 px look at each).
+
+**Scope: 20 records.** `sheep-gate` is gone, as are its record, media and `bib:` entry. No file references it any more: I searched `data/` and `app/src`.
+
+### 9.2 Status of every round-1 finding
+
+| Finding | Record | Result |
+|---|---|---|
+| F1 | sheep-gate | **Closed:** the record was removed (PO Q2). No accepted source places the gate, which is consistent with `solomons-porch` and `beautiful-gate` |
+| F2 | gennesaret | a. **Pass:** now `wikidata:Q6669901` (Beqa'at Ginosar), the plain itself. b. **Pass.** **New, minor:** see 9.3 |
+| F3 | aenon | a. **Pass:** 'Ainun is now an unmapped candidate with an accurate reason, and Salim is no longer mapped. b. **Pass in substance:** the Jordan-side Ainon is a mapped candidate (Q5977371, 85 m from the `bethany-beyond-the-jordan` Al-Maghtas point, as the support says), and its political history equals the `galilee-perea` derivation exactly. c. **Pass:** `pleiades:678368` added, Tell Ridhghah stated. d, e, g. **Pass.** f. **Pass.** Remaining items: 9.3 |
+| F4 | arimathea | a. **Pass:** `coordinateSource` is now `wikidata:Q7293548`. b. **Pass:** the merged municipality is disclosed. c, d, e. Partly fixed: 9.3. "Ramathaim-Zophim" removed from the names (note followed) |
+| F5 | wilderness-of-judea | a, b. **Pass:** ISBE "Judah, Territory of" says "a wide area of waterless and barren desert, the Wilderness of Judah (or Judea) known in English Versions of the Bible as JESHIMON", inside the Jordan, the Dead Sea and "a long line of semi-precipitous cliffs". The Wikidata label point lies within that area, so it has a qualitative second source, the same standard as `plain-of-sharon`. c. History added, but see 9.3. d. **Pass** |
+| F6 | valley-of-hinnom | a. **Pass:** the misreported entry is gone. b. **Pass.** c. Partly fixed: 9.3. d. **Pass** |
+| F7 | praetorium | a. **Pass:** Matthew 27:27 added; `textWEB` matches. b. **Pass.** c. Partly fixed: 9.3. d. **Pass** |
+| F8 | antonia-fortress | b, c, d. **Pass.** *War* 5.5.8 and 1.21.1 are quoted correctly ("which he called Antonia, in honor of Antony"). a. Partly fixed: 9.3 |
+| F9 | akeldama | a, b, c. **Pass:** quotations match the WEB and ISBE; the cross-check is now St. Onuphrius Q3320224, 49 m away. Images: 9.3 |
+| F10 | kidron-valley | b, c, d. **Pass:** "holy to the LORD"; John 18:3 and 18:12 cited; "Cedron" added. a. Partly fixed: 9.3 |
+| F11 | gaza | a, b, d, e, f. **Pass.** The political history's -63 entry is now supported by Josephus *Ant.* 14.4.4 ("All these Pompey left in a state of freedom, and joined them to the province of Syria"). c. Partly fixed: 9.3 |
+| F12 | azotus | **Pass.** a: 190 m, and the Azotus Paralios sentence is gone. b: Acts 8:26, 8:27, 8:38 and 21:8 cited. c: "general", and the editorial clause is gone. I withdraw the "north" item: Caesarea is north of Azotus by the two records' own sourced coordinates, so it isn't a new factual claim |
+| F13 | lydda | **Pass.** *War* 2.19.1 is paraphrased correctly ("empty of its men … the feast of tabernacles … destroy fifty … burnt the city"), and Pleiades' averaging is disclosed |
+| F14 | antipatris | **Pass:** Acts 23:12 and 23:32 cited, the clause removed, and "about 54 meters" |
+| F15 | zarephath | **Pass** except one source: 9.3 |
+| F16 | samaria-city | a. **Pass:** the note now quotes ISBE exactly and comes last. b. **Pass.** c. **Pass**, but the rewrite adds "Hasmonean ruler": 9.3. Image caption: **Pass.** I added the missing full stop as a typo fix |
+| F17 | tiberias | **Pass:** "the Jerusalem Talmud was later compiled there", and the distances are stated honestly |
+| F18 | jordan-river | b, d, e. **Pass:** "three times", with John 3:26 added; the Mark 10:1 wording is fixed; the 2 Kings 2:8 note is fixed. a, c. Partly fixed: 9.3 |
+| F19 | plain-of-sharon | **Pass:** "excellence"; "Saron" added; Wikidata and Acts 9:33–34 cited. New item: 9.3 |
+| F20 | jacobs-well | **Pass:** Genesis 33:18-19; history set in 1915 and attributed; "no good reason to doubt" quoted |
+| F21 | mount-gerizim | **Pass:** DARE and Pleiades at about 160 m; "Hasmonean" removed; the 1915 claims attributed. New item from the summary rewrite: 9.3 |
+| Images | — | **Pass:** "Andrew Shiva / Wikipedia" (wilderness-of-judea-01); "Louis Haghe, after David Roberts; Wellcome Collection"; the two captions; the Akeldama files are 5,472 × 3,648 and 5,364 × 3,352, `CC BY 4.0`, Bukvoed, Category:Aceldama. One caption: 9.3 |
+
+**Political history:** recomputed. The 18 derived records still equal `fill:political-history`'s output. `gaza` and `aenon` are manual and pass; `aenon`'s candidate 1 is the `galilee-perea` derivation exactly.
+
+### 9.3 Remaining fixes (15 records stay draft)
+
+The owner is the Research Lead unless marked MC.
+
+| Record | Remaining fix |
+|---|---|
+| kidron-valley | History 2: "an association the International Standard Bible Encyclopedia connects to the prophet Joel's vision" comes from ISBE "Hinnom, Valley of" ("the 'Valley of Jehoshaphat' of Joe 3:2"), not "Kidron". Add `bib:isbe-hinnom-valley-of` to that entry |
+| akeldama | **MC.** akeldama-01's caption "on the slope below Mount Zion" contradicts ISBE, which puts the site on the valley's *southern* slope, opposite Mount Zion. Commons says only "Hinnom Valley" and Category:Aceldama. Drop the phrase. The record itself passes |
+| valley-of-hinnom | Summary: "a practice King Josiah ended". 2 Kings 23:10 states the purpose ("that no man might …"), not the result. Use "sought to end", or drop "ended" |
+| antonia-fortress | Summary: ISBE doesn't "place the Praetorium" at the Antonia. It says the Praetorium "has been traditionally located" there, and then argues for Herod's palace. Reword to what it does say: the Antonia was "where was stationed a large garrison (compare Ac 21:32-35)" |
+| praetorium | Herod's palace support: "trying, but failing, to compel the people". In ISBE's quotation, Florus "would have compelled *them*", meaning "such as were with him" (his own men), "to get as far as the citadel". Reword |
+| gaza | Summary: "of which the text adds, 'This is a desert'" still ties "This" to the road (F11c). Change it to "and the text adds" |
+| zarephath | The Obadiah 1:20 note's "naming it as a Phoenician town" has only the verse as its source, and the verse says "among the Canaanites". Restore `bib:isbe-zarephath` ("a Canaanite (probably meaning Phoenicia) town"), or say "Canaanite" |
+| samaria-city | (1) **New, consistent with F12:** "Philip the evangelist" needs `scripture:Acts 21:8`, or drop "the evangelist". (2) History 1's "the Hasmonean ruler John Hyrcanus": ISBE says only "John Hyrcanus" (as in F21, where "Hasmonean" was removed). Cite a source, or drop "Hasmonean ruler" |
+| arimathea | (1) "All four Gospels describe asking Pontius Pilate for the body": Matthew 27:58 and Luke 23:52 aren't cited. (2) "for fear of the Jewish leaders": WEB John 19:38 reads "for fear of the Jews". Quote the WEB. (3) "The prophet Samuel's (Old Testament) birthplace", in the Rantis support and in the history: 1 Samuel 1:1 says only that Elkanah was "of Ramathaim Zophim, of the hill country of Ephraim". Cite 1 Samuel 1:19–20 plus a source that equates Ramah with Ramathaim, or say "home of Samuel's father Elkanah". (4) Summary: "in the hill country northwest of Jerusalem" has no source. (5) Rantis support: Wikidata "corroborates the identification". It corroborates the *location* only (Q7293548 doesn't mention Arimathea) |
+| jordan-river | (1) Summary: Wikidata Q40059 gives the source (Golan Heights; Sde Nehemia), the lake on the river (Sea of Galilee) and the mouth (Dead Sea). "From the mountains near Mount Hermon" and "down the Jordan Rift Valley" aren't stated. Cite *War* 3.10.7 ("Jordan's visible stream arises from this cavern [Panium]") or reword. "Preached" needs Luke 3:3. (2) History 2: *War* 3.10.7 says the Jordan "passes through the middle of the lake Gennesareth". "Dividing it into two parts" isn't stated (Josephus says it "divides the marshes and fens of the lake Semechonitis"). Drop it |
+| gennesaret | Support: DARE and Pleiades' Gennesar is 1.74 km to the north-east of the new point, not "about 2.5 kilometers to the east". "On the plain's northern edge" isn't stated by DARE or Pleiades |
+| plain-of-sharon | Summary: "described by Wikidata as …" names a database in the summary (ADR-0033). Keep the source in `sources` and drop the attribution from the text |
+| wilderness-of-judea | History: ISBE calls the *hill country's* eastern slopes "preeminently a pastoral land", with flocks "invading in the spring even the desert itself". The record gives this to "the region" (the wilderness). Reword. "Older English Bible versions": ISBE says "English Versions of the Bible", so drop "older" |
+| aenon | (1) **Licence:** the Wadi al-Kharrar support quotes Piccirillo (1999, a cite-only copyrighted work) word for word ("known as Sapsas or Sapsaphas ('the place of Willows') … which identifies it with Ainon"; and his translation "Sapsas near the Jordan"). That breaks the verbatim-quotation rule in `docs/LICENSES.md`. Paraphrase both. (2) "The sixth-century Madaba mosaic map": no cited source gives the century. (3) "with a higher aggregate score than the Nablus-area Salim proposal below": the proposal below is 'Ainun/Khirbet Einun, which OpenBible scores 96, above this candidate's 66; Salim alone scores 17. Reword. (4) Summary: "were also in Judea, baptizing nearby". John 3:22 puts Jesus in Judea; it doesn't put Aenon there or say "nearby". Drop "also" and "nearby". The summary's Madaba-map clause needs `bib:piccirillo-ainon-sapsaphas` in the summary's sources. (5) Unmapped 'Ainun: ISBE gives Salim as "6 miles distant, with a high ridge intervening", so drop "near" and "nearby" in the label and support. ISBE doesn't call 'Ainun "the spring". "Since" turns ISBE's two separate objections into one argument; use "and adds". (6) `modernCountries` `["West Bank", "Israel", "Jordan"]` puts first a territory that holds only the unmapped, low-confidence proposal. Put the mapped candidates' countries first (`["Israel", "Jordan", "West Bank"]`), or drop "West Bank" if the PO counts only mapped candidates |
+| mount-gerizim | Summary: "'neither in this mountain nor in Jerusalem' will true worship of the Father be confined" glosses John 4:21. The WEB says "neither in this mountain nor in Jerusalem will you worship the Father", and "confined" adds an interpretation (card: no theological position). Quote 4:21 and 4:23 as written |
+
+**Notes (non-blocking):**
+- `arimathea`'s history names OpenBible.info in the text. ADR-0033's rule is for summaries, so this is a style note only.
+- `praetorium` lists Matthew 27:27 after the John verses in `scripture[]`. The order isn't validated.
+
+### 9.4 Commands (on `fbd1cd2`, before my sign-off edits)
+
+| Command | Result |
+|---|---|
+| `npm run validate:data` | **Pass**, 0 errors, 212 warnings. The new records' warnings are the same 5 explained "contains none of this location's names" warnings; the two Akeldama width warnings are gone |
+| `npm test` | **Pass**, 323/323 |
+| `npm run build:data` | **Pass**; no tracked file changed |
+| `npm run check:images` | **Pass**: "Checked 1365 Commons URLs (original + 330, 500, 960, 1280px), 273 Commons size records, and 31 AI files. All image checks passed." No 429 was reported |
+
+After my sign-off edits I re-ran `validate:data` (pass, 212 warnings) and `npm test` (323/323).
+
+### 9.5 Sign-off
+
+**5 records are signed off.** I set `status: "verified"`, `verifiedBy: "fact-checker"` and `lastReviewed: "2026-11-06"` on:
+- `azotus`
+- `lydda`
+- `antipatris`
+- `tiberias`
+- `jacobs-well`
+
+**The other 15 stay `draft`** with the fixes in 9.3. Thirteen of them need about one sentence each. `arimathea`, `jordan-river` and `aenon` need a few clauses each, and `aenon`'s Piccirillo quotation is a licence item.
+
+My only data edit apart from the status fields is the missing full stop in `samaria-city-01`'s caption (a typo). — fact-checker, 2026-11-06
