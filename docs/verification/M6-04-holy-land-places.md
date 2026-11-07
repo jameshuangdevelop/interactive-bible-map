@@ -513,3 +513,12 @@ With the 5 from section 9, that makes **17 of 20 verified**.
 - **`aenon`:** drop "spring" from 'Ainun in the unmapped support and the summary.
 
 — fact-checker, 2026-11-06
+
+## 11. Re-check 3 (2026-11-06, at `96c37b4`; diff `6707136..96c37b4`): final sign-off
+
+- **`arimathea`: Pass.** `scripture:1 Samuel 1:1` is now in the Rantis candidate's `sources`, so its "home of … Samuel's father Elkanah" is supported.
+- **`jordan-river`: Pass.** The summary no longer names a database. It now reads "its source lies near the Golan Heights and Sde Nehemia, it flows through the Sea of Galilee, and it empties into the Dead Sea", which matches Wikidata Q40059's origin (P885), lake on the course (P469) and mouth (P403), and `wikidata:Q40059` stays in `summary.sources`.
+- **`aenon`: Pass.** "The spring" is gone from the unmapped support, and the summary now says "a site called 'Ainun". The only remaining "springs" is ISBE's own, at Umm el-'Amdan, which is correct.
+- **Commands:** `npm run validate:data` passes (0 errors, 213 warnings, all explained in sections 7, 9.4 and 10.2). `npm test` passes (323/323).
+
+**Sign-off.** `aenon`, `arimathea` and `jordan-river` are set to `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-11-06"`. **All 20 M6-04 records are now verified.** `sheep-gate` was removed (PO decision Q2), and `solomons-porch` and `beautiful-gate` were not drafted because no accepted coordinate exists for either. — fact-checker, 2026-11-06
