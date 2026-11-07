@@ -122,6 +122,8 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
   "politicalAreaId": "crete-cyrene"
 }

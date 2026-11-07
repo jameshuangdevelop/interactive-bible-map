@@ -4,7 +4,11 @@
 - **Checked:** the 15 records in `data/locations/`, their 27 images in `data/media/`, the 12 new `bib:` entries, `data/reference/openbible-ids.json`, `ATTRIBUTION.md` and `docs/research/SOURCES.md` (open questions 6–9). Against ADR-0017, ADR-0026, ADR-0033 item 1, ADR-0041 item 1, `schema/README.md` and `docs/LICENSES.md`.
 - **Verifier:** fact-checker (Claude, Copilot CLI) · **Date:** 2026-11-06
 
-**Result: 0 verified, 15 fix required.** Every record stays `status: "draft"`. There are 53 findings: 51 for the Research Lead (F1–F51) and 2 for the Media Curator (F52–F53). One coordinate is wrong (F50, Herod's palace, about 630 m off). One unmapped candidate has an accepted coordinate (F16), and one has no source for the proposal itself (F44). The rest are wording and citation fixes. All 39 WEB passages match `engwebp_vpl.txt` exactly, the NT passage lists are complete, and all 27 image licences match Commons exactly. 26 captions pass.
+**Result: 0 verified, 15 fix required.** Every record stays `status: "draft"`.
+
+**Re-check on 2026-11-06 (section 10):** 6 records are signed off (`cyrene`, `sea-of-adria`, `areopagus`, `straight-street`, `ephesus-theater`, `temple-of-artemis`). 8 still need fixes: `euphrates`, `babylon`, `mount-sinai`, `armageddon`, `athens-agora`, `philippi-place-of-prayer`, `corinth-bema` and `herods-palace-caesarea`. `philippi-forum` was removed (PO decision on Q1).
+
+First-round findings: there are 53 findings: 51 for the Research Lead (F1–F51) and 2 for the Media Curator (F52–F53). One coordinate is wrong (F50, Herod's palace, about 630 m off). One unmapped candidate has an accepted coordinate (F16), and one has no source for the proposal itself (F44). The rest are wording and citation fixes. All 39 WEB passages match `engwebp_vpl.txt` exactly, the NT passage lists are complete, and all 27 image licences match Commons exactly. 26 captions pass.
 
 ## 1. Commands (Node 24.21.0, at `4c51b45`)
 | Command | Result |
@@ -240,3 +244,137 @@ Every `license` matches Commons' `LicenseShortName` exactly, every one is in an 
 **Not signed off.** All 15 records stay `status: "draft"` until F1–F53 are fixed and re-checked. The licence edits are made: the ToposText rows and the cite-only list in `docs/LICENSES.md` and `ATTRIBUTION.md`. Checked by fact-checker, 2026-11-06.
 
 **Budget (for the PR's row; not written to `docs/BUDGET.md`, per ADR-0051):** 2026-11-06 · fact-checker · Claude (Copilot CLI) · M6-05 verification · est. ~9M in (mostly cached context) / ~45k out · ~1,700 AI credits (estimated, not measured).
+
+## 10. Re-check of the fix round (2026-11-06, at `37dd5c9`)
+- **Scope:** `git diff 95f1bea..HEAD` (the Research Lead's commits `c2c3310`, `7a7c61b` and `37dd5c9`): 15 location files, 2 media files, 2 new `bib:` entries (`hmdb-promontory-palace-marker`, `unesco-babylon`).
+  - I re-opened HMdb.org (marker page and Copyright page), UNESCO's Babylon listing, Wikidata Q6923657, Q722426 and Q91742263, and the area polygons. ISBE, Powell, Franz, BAS, ToposText and Cornell were read in the first round.
+  - I re-ran `derivePoliticalHistoryFromTimeline` and the validator's derived-history check.
+- **PO decisions recorded:**
+  - Q1: `philippi-forum` and its media are removed. Nothing outside `docs/` refers to it; `app/dist/`, which is ignored, holds a stale export.
+  - Q2: `babylon` keeps `parentId: mesopotamia`, and its Egyptian candidate gets `politicalAreaId: "egypt"`.
+  - Q3: a `bib:` publication may be a `coordinateSource` only if it states the coordinate explicitly, is licence-compatible for citing facts, and a second independent source corroborates it.
+
+### Findings F1–F53
+| Finding | Re-check | Verdict |
+|---|---|---|
+| F1 | Acts 2:10 and 11:19 are cited; "preached to the Hellenists at Antioch" follows the WEB | Pass |
+| F2 | `bib:isbe-crete` is cited ("With Cyrene on the North coast of Africa, it was formed into a Roman province"); "leading city" is gone | Pass |
+| F3 | Now "a Greek colony founded by Battus in 630 BC", and Ptolemy I "transported Jews", as ISBE says | Pass |
+| F4 | "matches one of Wikidata's two recorded points ... exactly"; the distance is gone | Pass |
+| F5 | Now sourced to `pleiades:912849` (content passes), but the summary now names Pleiades: see F56 | Pass (F56 open) |
+| F6 | The Trajan clause is gone, and ISBE is quoted (public domain) | Pass |
+| F7 | "Part of the Parthian Empire at this label point", sourced to ISBE; Livius is dropped | Pass |
+| F8 | "rescued by a ship sailing from Cyrene to Puteoli" | Pass |
+| F9 | "by the first century" is gone ("various ancient writers") | Pass |
+| F10 | Babylonia, 608/626–539 BC (Pleiades; UNESCO "capital of the Neo-Babylonian Empire (626-539 BCE)") and "85 km south of Baghdad" (UNESCO) now pass. **"exiled in the sixth century BC" is still stated by none of the summary's sources** | **Fix required** |
+| F11 | "the traditional view" | Pass |
+| F12 | "no evidence that Peter was ever in Babylon"; "Many good scholars"; the coordinate sentence comes before the caveat | Pass |
+| F13 | `pleiades:758514868` is cited; the surviving walls date to the late 3rd or early 4th century AD | Pass |
+| F14 | It now reads "whom 2 Timothy describes as having been summoned to Rome by Paul". **2 Timothy 4:11 ("Take Mark and bring him with you") doesn't mention Rome**; "to Rome" is ISBE's reading. Attribute it: "whom, ISBE notes, Paul had summoned to Rome (2 Timothy 4:11)" | **Fix required** |
+| F15 | "2 Kings 25:1-11" now covers the siege, fall, destruction and exile; the Daniel note no longer cites ISBE | Pass |
+| F16 | Jebel Serbal is mapped (`wikidata:Q722426`, 28.646389 N, 33.651667 E, which is also OpenBible's point; ~34 km WNW of Jebel Musa, as in ISBE's "20 miles West") | Pass |
+| F17 | Jebel Sin Bishar is mapped (`wikidata:Q6923657`, "Mount Sin Bishar ... mountain in Egypt"), and the Midianite Hypothesis is attributed to BAS in Jabal al-Lawz's support. **The summary still cites only ISBE and BAS for Jabal al-Lawz and Jebel Sin Bishar, which neither source names**: add `bib:biblearchaeology-sinai-in-arabia`. Franz's and BAS's words are quoted verbatim (F57) | **Fix required** |
+| F18 | Franz now responds as Franz states it, and the proponents are named. **"popular writers" is still the project's characterization** (Franz names Cornuke, Williams and Wyatt but doesn't call them that): use "writers". "the ancient writers Herodotus, the Septuagint, Josephus, and Strabo": the Septuagint is not a writer, so use "ancient sources" | **Fix required** |
+| F19 | "Italian" is gone and "at least 800 years earlier" is right. **"describes the main objection" still differs from BAS's "One major obstacle"** | **Fix required** |
+| F20 | Eusebius and Jerome "placed ... Horeb near Paran ... Wady Feiran"; St. Catherine's is cited to BAS | Pass |
+| F21 | Exodus 31:18 is cited in the summary and added as an OT connection (WEB: "he gave Moses the two tablets of the covenant"); the Exodus 19:20 note is fixed | Pass |
+| F22 | "Jebel Musa" is removed from `otherLanguages` | Pass |
+| F23 | It now quotes Revelation 16:14 exactly ("the war of that great day of God the Almighty"), and 16:14 is cited | Pass |
+| F24 | "Armageddon (the WEB's 'Harmagedon')", "a Hebrew name" | Pass |
+| F25 | The attribution to Powell's conditional suggestion now passes, as does OpenBible's 15%. **The support still gives the distance, now as Powell's words "only five miles northeast"**: Carmel lies north-west of Megiddo, and the mapped point is ~18 km away, so the record repeats Powell's error. It is also a verbatim quotation from an all-rights-reserved source (F57). Drop the distance and direction | **Fix required** |
+| F26 | Nestle is credited and Powell introduced (ADR-0033); "seminary-level" is gone. Content passes, but Powell is quoted verbatim (F57) | Pass (F57 open) |
+| F27 | The project's own argument is replaced by sources; ISBE's quotation is fine (public domain). Powell is quoted verbatim (F57) | Pass (F57 open) |
+| F28 | "Har Megiddo" and "Old Testament scholar" are removed | Pass |
+| F29 | `pleiades:969121823` is cited; "next to" is gone; "about 30 m" | Pass |
+| F30 | Acts 17:18 and 17:23 are cited; the council clause follows Wikidata and Pleiades; "Hill of Ares" is gone | Pass |
+| F31 | "a member of the council" is gone | Pass |
+| F32 | The synagogue and marketplace are now distinguished. **ISBE is still credited with "Epicurean and Stoic philosophers"**: ISBE names only the Stoics ("the successors of Zeno"), and the Epicureans are in Acts 17:18, which the candidate doesn't cite. Add `scripture:Acts 17:18` and credit the Epicureans to Acts | **Fix required** |
+| F33 | "passing the Ceramicus and the 'Theseum' on his way to the Agora"; "north-west" | Pass |
+| F34 | "ringed by porticoes (stoas)"; Acts 17:18 and 17:19 are cited | Pass |
+| F35 | Damascus's AD 37–40 override is copied, and the derived history matches the parent (-64…-27, -27…37, 37…40 uncertain, 40…101) | Pass |
+| F36 | `history[1]` follows ISBE (Greek period, the East Gate). The support's "the city's main Roman-era street" is stated by `wikidata:Q3399016` ("the main Roman road of Damascus"), so I withdraw that part. Acts 9:17–18 are cited, and the caveat is last | Pass |
+| F37 | "some of the Asiarchs, who were his friends" | Pass |
+| F38 | `bib:isbe-ephesus` is cited ("identified, per [ISBE], as the scene of the riot"); the unsourced descriptors are gone | Pass |
+| F39 | "January 1, 1870, after six years of searching within his eleven-year excavation" | Pass |
+| F40 | "they are no gods that are made with hands" (exact WEB) | Pass |
+| F41 | "marble" is gone; "treasure-house"; Acts 19:24 and 19:27 are cited | Pass |
+| F42 | `coordinateSource: wikidata:Q91742263`, with its own value (24.276917, 41.020889); Religious Greece is kept as a cited source | Pass |
+| F43 | The Pleiades caveat (Gangites "unlocated"; Zygaktes? = Xiropotamos) and the 1974 shrine now pass. **Two parts are still open.** (1) The support says the "small river west of Philippi" at Lydia is the river ISBE calls the Angites, "today's Anghista". ISBE's Angites/Anghista is the river of the plain's valley toward the Strymon (Pleiades 501350 "Angites (river)", ~30 km west). ISBE says Paul went to "the bank of the Angites" but never places it at Lydia, and Religious Greece calls the Lydia stream the "Zigaktis". (2) The label "Gangites River (near Lydia village)" and the summary's "traditionally identified with the ancient Gangites" have no cited source. Either cite a source that identifies the Lydia stream with the Gangites, or give ISBE's identification (the place of prayer on the Angites/Gangites) and the shrine's stream as separate, attributed facts, with a neutral label (e.g. "Stream at Lydia village (traditional site)"). Also, "since its resident Jewish population was small" (summary and `history[1]`) adds a causal link that ISBE doesn't state ("There was no synagogue here ... The number of resident Jews was small"): use "and" | **Fix required** |
+| F44 | The Krenides entry is removed and the summary no longer mentions springs (one of the two options F44 gave). The record now has one mapped candidate (`medium`), and its caveats say Acts doesn't name the river and that the Gangites is unlocated | Pass |
+| F45–F48 | `philippi-forum` was removed (PO, Q1) | Not applicable |
+| F49 | Content passes: "Corinth Excavations of the American School", "centre ... on the terrace of its Upper Forum", "according to tradition", and the NSRF programme by name. ToposText's sentence is quoted verbatim (F57) | Pass (F57 open) |
+| F50 | Coordinate accepted (see the ruling below). **The record now cites `osm:way/96066573` and describes its outline, which the OSM rule forbids**; details below | **Fix required** |
+| F51 | The unsourced excavation history, the Lower Palace dating and "widely accepted" are gone; "there" is dropped; Acts 23:33 is cited. See F54 for a new issue | Pass (F54 open) |
+| F52 | `armageddon-02`'s caption now gives the right viewpoint (Ma'agan Michael, coastal plain) and attributes the Carmel idea to the textbook supplement | Pass |
+| F53 | The caption now reads "traditionally identified with the ancient Gangites". This follows F43(2): change it with the record | **Fix required** (Media Curator, after F43) |
+
+### HMdb.org and the corroboration of Herod's palace (F50; the PO's Q3 rule)
+- **States the coordinate explicitly:** yes. The marker page reads "Location. 32° 29.796′ N, 34° 53.402′ E", which is 32.4966 N, 34.890033 E, the record's value. It is the marker's position, which HMdb describes as "situated along a park walkway that leads from the Theater/ Archaeological Park area, to the Promontory Palace". The support's "placed at the excavated site" overstates this; say "on the walkway to the palace".
+- **Licence:** compatible for citing this fact, but HMdb is cite-only otherwise. Its Copyright page says "Commercial use rights reserved", requires attribution "From HMdb.org" with a link, and forbids commercial use of its content without permission.
+  - Its text and photographs are therefore incompatible with CC BY-SA 4.0, like World History Encyclopedia's.
+  - One stated coordinate is a fact, used once and credited through `bib:hmdb-promontory-palace-marker`. This follows the existing practice for NonCommercial and all-rights-reserved sources (World History Encyclopedia's facts in our words; Derbe's article coordinate).
+  - Rows are added to `docs/LICENSES.md` ("Source compatibility") and `ATTRIBUTION.md`. If an open source with the palace's position appears, prefer it.
+- **Second, independent, non-OSM source:** yes, to about 100 m, which is enough for a site pin.
+  - Wikidata's "Caesarea Hippodrome" (Q110300838) is 79 m away, and "Theater of Herod" (Q3537241) 107 m away.
+  - Cornell says the palace is "adjacent to the restored ancient theater and the newly discovered amphitheatron"; the marker's own text says it looks "north, to the hippodrome ...; southeast, to the theater".
+  - These are independent of HMdb and of OSM. OSM's "Promontory Palace" outline (way 96066573, centre 62 m away) agrees as well, as my own cross-check.
+- **OSM:** a cross-check by the Fact-Checker is allowed (`docs/LICENSES.md` lists OSM for "Modern basemap / cross-check"). Citing an OSM way in a location record's `sources`, or stating its geometry in the text, is not: under the one consistent OSM rule (M1 Q3), OSM-derived facts never go into the CC BY-SA 4.0 location records, and this is the first record to try it.
+- **Required (F50, remaining):**
+  1. Remove `osm:way/96066573` from `sources` and the OSM clause from the support.
+  2. If the support keeps the theatre and hippodrome points, cite `wikidata:Q110300838` and `wikidata:Q3537241`.
+  3. Either cite `wikidata:Q2527367` for the "Herod's Palace" comparison or drop it. From the new point it is ~670 m away, not 630 m.
+  4. Reword "placed at the excavated site" as above.
+
+### `babylon`'s political history (the PO's Q2)
+- **Acceptable as done, with one ordering fix (F55).** `npm run validate:data` validates with `requireDerivedPoliticalHistory: true`, and once any candidate has `politicalAreaId` the stored history must equal `derivePoliticalHistoryFromTimeline`'s output.
+- That function emits entries only for candidates that have an area, and candidate-level overrides apply only inside such an area (`deriveForArea`). `data/timeline.json` has 28 areas, all Roman-side, and no Parthian area or holder.
+- So the Mesopotamian candidate cannot carry a structured entry without a timeline or code change. The sourced prose note is the right interim: ISBE: "This empire stretched from the Euphrates to the confines of India and the Oxus"; the `mesopotamia` record says the same.
+- The Egyptian entry equals the derived `egypt-prefecture` entry, and the candidate lies in the `egypt` polygon.
+- A Parthian holder in the timeline, or a candidate-level "no holder" entry in the validator, would remove the need for the note. That is optional work for the gis-engineer, if the PO wants it.
+
+### `mount-sinai`'s new candidates and `philippi-place-of-prayer`
+- **Jebel Serbal:** passes (F16).
+- **Jebel Sin Bishar:** passes as a `low` candidate. Its only coordinate is Wikidata's (precision 0.01°, about 1 km; OpenBible's point is the same item, and OSM has no named peak to compare). That is coarse but acceptable for a mountain at this confidence (N12).
+- **All five candidates** lie inside the drawn `arabia` area, so the record-level `politicalAreaId` and its derived history still hold. `modernCountries` (Egypt, Saudi Arabia, Israel) covers them all.
+- **`philippi-place-of-prayer`:** the coordinate source passes (F42) and the Krenides removal passes (F44). F43 is open.
+
+### New findings (Research Lead)
+- **F54 (`herods-palace-caesarea`, neutrality and citation):** the newly cited marker says archaeology has not settled whether King Herod or a Roman governor built the palace ("Archaeology could not solve this riddle"). The summary cites the marker but states as fact "a seaside palace that Herod the Great built". Attribute the identification to Cornell (Josephus's account) and to the *Journal of Roman Archaeology* article's title, and add the marker's caveat last, in the project's own words (HMdb's text is NonCommercial, so don't quote it).
+- **F55 (`babylon`, ADR-0041 item 1):** `history[0]` is the first entry and ends with a disclaimer about this project's timeline. Keep the Parthian fact if you like, but put the disclaimer last (its own last entry, or the last clause of the last entry).
+- **F56 (`euphrates`, ADR-0033 item 1):** the summary says "in Pleiades' words". The About text must not name databases. Drop the attribution; the quotation itself may stay, since Pleiades is CC BY 3.0 and the Sources list credits it.
+- **F57 (licence: verbatim quotations from cite-only sources):** `docs/LICENSES.md` ("Verbatim quotations from cite-only sources") allows word-for-word quotation only from PD, CC0, CC BY or CC BY-SA text. Six quotations come from all-rights-reserved sources. My first report quoted them as evidence for checking, not for reuse. Put each in the project's own words, without quotation marks:
+  - `armageddon`: Powell's "no mountain by that name is known to us" and "only five miles northeast" (see F25, which also removes the latter), and "the reference is metaphorical and no literal spot on earth was ever intended".
+  - `mount-sinai`: Franz's "should be located at Jebel Sin-Bishar", and BAS's "not in the Sinai Peninsula, but in Midian in northwest Saudi Arabia". The name "Midianite Hypothesis" may stay.
+  - `corinth-bema`: ToposText's "is thought to have corresponded to the Bema mentioned in the Acts of the Apostles".
+  - Proper names, titles and the HMdb coordinate are not affected, and neither are the glosses "Mount of Assembly" and "His Fruitful Mountain" (N7).
+
+### Remaining fixes by record
+| Record | Remaining | Owner |
+|---|---|---|
+| `euphrates` | F56 | research-lead |
+| `babylon` | F10 ("sixth century BC"), F14, F55 | research-lead |
+| `mount-sinai` | F17 (summary citation), F18, F19, F57 | research-lead |
+| `armageddon` | F25, F57 | research-lead |
+| `athens-agora` | F32 | research-lead |
+| `philippi-place-of-prayer` | F43; then F53 | research-lead; media-curator (caption) |
+| `corinth-bema` | F57 | research-lead |
+| `herods-palace-caesarea` | F50 (OSM out, citations, wording), F54 | research-lead |
+
+### Notes (no change required)
+- **N12:** Jebel Sin Bishar's coordinate has a precision of about 1 km. Its support calls it "in the northwest of the Sinai Peninsula"; at 29.67 N, 32.96 E it is west-central, near the Gulf of Suez. It also says Franz cites "earlier proposals of Faiman, Har-el, and Rasmussen", but Faiman 2000 is the same year as Franz 2000.
+- **N13:** `athens-agora`'s summary still says "just north of the Acropolis" (ISBE's words), while `history[1]` now says "north-west". Consider making them consistent.
+- **N14:** `philippi-place-of-prayer` keeps `names.alternate` "Lydia's river", which no cited source uses as a name.
+- **N15:** `docs/research/SOURCES.md` question 7 still discusses `philippi-forum`. It is now historical.
+
+### Commands (Node 24.21.0, at `37dd5c9` plus the sign-off edits)
+- `npm run validate:data`: pass, 217 warnings. `philippi-forum`'s one warning is gone; the 10 on the new records are the expected linkage warnings.
+- `npm test`: 323 passed, 0 failed.
+- `npm run build:data`: pass (generated 2,504,391 bytes, 776,423 gzip).
+- `npm run check:images`: pass ("Checked 1310 Commons URLs ..., 262 Commons size records, and 31 AI files. All image checks passed."). No 429s were reported. Two fewer images now that `philippi-forum` is gone.
+
+## Sign-off (re-check)
+**Signed off:** `cyrene`, `sea-of-adria`, `areopagus`, `straight-street`, `ephesus-theater` and `temple-of-artemis`. They are set to `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-11-06"`; that edit changes no facts.
+
+**Not signed off:** `euphrates`, `babylon`, `mount-sinai`, `armageddon`, `athens-agora`, `philippi-place-of-prayer`, `corinth-bema` and `herods-palace-caesarea` stay `draft` until the fixes above are made and re-checked. The licence edits are made: the HMdb.org rows in `docs/LICENSES.md` and `ATTRIBUTION.md`. Checked by fact-checker, 2026-11-06.
+
+**Budget delta (re-check):** 2026-11-06 · fact-checker · Claude (Copilot CLI) · M6-05 re-check · est. ~3.5M in (mostly cached) / ~20k out · ~650 AI credits (estimated, not measured).
