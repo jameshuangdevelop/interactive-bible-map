@@ -1,0 +1,31 @@
+{
+  "locationId": "kidron-valley",
+  "images": [
+    {
+      "id": "kidron-valley-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Jerusalem_from_south_Kedron_%28i.e.%2C_Kidron%29_Valley_LOC_matpc.08433.jpg",
+      "width": 7294,
+      "height": 5364,
+      "author": "Matson Collection",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem_from_south_Kedron_(i.e.,_Kidron)_Valley_LOC_matpc.08433.jpg",
+      "caption": "An early twentieth-century photograph of Jerusalem seen from the south along the Kidron Valley.",
+      "kind": "historical",
+      "aiGenerated": false
+    },
+    {
+      "id": "kidron-valley-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/2023-03-11_Jerusalem_Eastern_Wall_Panorama_from_All_Nations_Church.jpg",
+      "width": 6000,
+      "height": 2107,
+      "author": "Databases",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:2023-03-11_Jerusalem_Eastern_Wall_Panorama_from_All_Nations_Church.jpg",
+      "caption": "The Kidron Valley and Jerusalem's eastern wall, seen from the Church of All Nations near the Mount of Olives.",
+      "kind": "modern",
+      "aiGenerated": false
+    }
+  ]
+}

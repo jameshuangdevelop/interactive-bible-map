@@ -1,0 +1,31 @@
+{
+  "locationId": "wilderness-of-judea",
+  "images": [
+    {
+      "id": "wilderness-of-judea-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Aerial_view_of_the_Judean_Desert_%28near_Masada%29%2C_Israel.jpg",
+      "width": 2848,
+      "height": 4288,
+      "author": "Andrew Shiva / Wikipedia",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Aerial_view_of_the_Judean_Desert_(near_Masada),_Israel.jpg",
+      "caption": "Aerial view of the Judean Desert, the arid region east of Jerusalem's hill country descending toward the Dead Sea.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "wilderness-of-judea-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Dead_Sea_and_wilderness_of_Judea._%28Moab_mountains_in_the_background%29_LOC_matpc.05915.jpg",
+      "width": 5426,
+      "height": 3815,
+      "author": "Matson Collection",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Dead_Sea_and_wilderness_of_Judea._(Moab_mountains_in_the_background)_LOC_matpc.05915.jpg",
+      "caption": "An early twentieth-century photograph of the wilderness of Judea and the Dead Sea, with the mountains of Moab in the background.",
+      "kind": "historical",
+      "aiGenerated": false
+    }
+  ]
+}

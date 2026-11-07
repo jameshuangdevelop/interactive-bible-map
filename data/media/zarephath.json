@@ -1,0 +1,31 @@
+{
+  "locationId": "zarephath",
+  "images": [
+    {
+      "id": "zarephath-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Landscape_with_site_of_ancient_Sarepta._Coloured_lithograph_Wellcome_V0049482.jpg",
+      "width": 3142,
+      "height": 2232,
+      "author": "Louis Haghe, after David Roberts; Wellcome Collection",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Landscape_with_site_of_ancient_Sarepta._Coloured_lithograph_Wellcome_V0049482.jpg",
+      "caption": "An 1843 coloured lithograph of the coastal site of ancient Zarephath (Sarepta), between Tyre and Sidon.",
+      "kind": "historical",
+      "aiGenerated": false
+    },
+    {
+      "id": "zarephath-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Site_of_Sarepta._As_early_as_the_thirteenth_century%2C_this_city_was_in_ruins%2C_and_now_only_fragments_of_its_foundations_exist%2C_chiefly_on_a_headland_called_%27Ain_el_Kantarah_and_also_along_the_%28NYPL_b10607452-80597%29.jpg",
+      "width": 3751,
+      "height": 4498,
+      "author": "New York Public Library",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Site_of_Sarepta._As_early_as_the_thirteenth_century,_this_city_was_in_ruins,_and_now_only_fragments_of_its_foundations_exist,_chiefly_on_a_headland_called_'Ain_el_Kantarah_and_also_along_the_(NYPL_b10607452-80597).jpg",
+      "caption": "A nineteenth-century depiction of the ruined coastal site of ancient Zarephath, near the headland of 'Ain el Kantarah.",
+      "kind": "historical",
+      "aiGenerated": false
+    }
+  ]
+}

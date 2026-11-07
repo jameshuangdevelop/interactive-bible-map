@@ -1,0 +1,129 @@
+{
+  "id": "tiberias",
+  "names": {
+    "ancient": [
+      "Tiberias"
+    ],
+    "modern": "Tiberias",
+    "modernCountries": [
+      "Israel"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Tverya",
+      "Tabariyeh"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "Tiberias",
+      "coordinates": [
+        35.542294,
+        32.787692
+      ],
+      "coordinateSource": "pleiades:678431",
+      "confidence": "high",
+      "support": "Pleiades' point for Tiberias is corroborated by the Digital Atlas of the Roman Empire's recorded point for the same city, about 220 meters away, and by Wikidata's own coordinate, a little over a kilometer away; all three fall within the modern Israeli city of the same name on the Sea of Galilee's western shore, an acceptable agreement at the scale this record maps a city.",
+      "sources": [
+        "pleiades:678431",
+        "dare:21681",
+        "wikidata:Q151920"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Tiberias was a city Herod Antipas built on the western shore of the Sea of Galilee around AD 26, naming it after the emperor Tiberius, who had befriended him. John's Gospel names the city once, as the port some boats came from, and elsewhere calls the lake itself the \"Sea of Tiberias.\"",
+    "sources": [
+      "bib:isbe-tiberias",
+      "scripture:John 6:23"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that building the city disturbed old tombs, which made observant Jews reluctant to settle there; Antipas is said to have populated it by gathering a mixed company of the poor, foreigners and others not fully free, promising them houses and land, and that for some years it remained largely a Greek city, despite also containing a Jewish house of prayer.",
+      "sources": [
+        "bib:isbe-tiberias"
+      ]
+    },
+    {
+      "text": "The same encyclopedia records that Tiberias superseded Sepphoris as Galilee's capital under Herod Agrippa I and the Roman procurators, surrendered to the future emperor Vespasian during the First Jewish-Roman War, and was later given by Nero to Herod Agrippa II, at which point Sepphoris again became the capital.",
+      "sources": [
+        "bib:isbe-tiberias"
+      ]
+    },
+    {
+      "text": "After the fall of Jerusalem in AD 70, the same encyclopedia records, Tiberias became a noted center of Jewish learning: the Mishnah was compiled there under Rabbi Judah the Prince, and the Jerusalem Talmud was later compiled there as well.",
+      "sources": [
+        "bib:isbe-tiberias"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "John 6:23",
+      "book": "John",
+      "textWEB": "However, boats from Tiberias came near to the place where they ate the bread after the Lord had given thanks."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "holderId": "antipas-tetrarchy",
+      "entity": "Tetrarchy of Galilee and Perea (ruler: Herod Antipas)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:jewish-encyclopedia-agrippa-ii",
+        "bib:iaa-magdala-excavation"
+      ],
+      "note": "The emperor Nero later added the Galilean towns of Tiberias and Taricheae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; the Jewish historian Josephus dates this to AD 54, but the Jewish Encyclopedia (1906) reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "galilee-perea"
+}

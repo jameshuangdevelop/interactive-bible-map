@@ -1,0 +1,159 @@
+{
+  "id": "kidron-valley",
+  "names": {
+    "ancient": [
+      "Kidron Valley"
+    ],
+    "modern": "Kidron Valley",
+    "alternate": [
+      "Brook Kidron",
+      "Valley of Jehoshaphat",
+      "Cedron"
+    ],
+    "otherLanguages": [
+      "Wadi Sitti Miriam",
+      "Nahal Kidron",
+      "Wadi en-Nar"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Kidron Valley",
+      "coordinates": [
+        35.238972,
+        31.776972
+      ],
+      "coordinateSource": "wikidata:Q860532",
+      "confidence": "high",
+      "support": "Wikidata's coordinate for the Kidron Valley, between Jerusalem's Old City and the Mount of Olives, is corroborated by a separate Wikidata item for the same valley under its traditional name, the Valley of Jehoshaphat, recorded about 370 meters away along the same valley, and matches the International Standard Bible Encyclopedia's description of the valley running along the city's eastern wall.",
+      "sources": [
+        "wikidata:Q860532",
+        "wikidata:Q531729",
+        "bib:isbe-kidron-the-brook"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Kidron Valley runs between the eastern wall of Jerusalem's Old City, below the Temple Mount, and the Mount of Olives. The International Standard Bible Encyclopedia describes it beginning on the plateau north of the city, sweeping southeast, and then running south until, below the Temple's southeastern corner, it is joined by the Tyropoeon valley and then the Valley of Hinnom; from there it continues as the Wadi en-Nar through the wilderness of Judea to the Dead Sea. The valley usually carries water only after heavy rain. John's Gospel names it as the brook Jesus and his disciples crossed, going out to a garden, on the night Judas came there with soldiers to arrest him.",
+    "sources": [
+      "bib:isbe-kidron-the-brook",
+      "scripture:John 18:1",
+      "scripture:John 18:3",
+      "scripture:John 18:12"
+    ]
+  },
+  "history": [
+    {
+      "text": "The Old Testament repeatedly names the Kidron as a place where idolatrous objects were destroyed and their remains discarded: King Asa burned an Asherah pole there, and King Josiah, during his reforms, burned cult objects from the Jerusalem temple there and scattered the ashes over the graves of the common people buried along the valley.",
+      "sources": [
+        "bib:isbe-kidron-the-brook",
+        "scripture:2 Kings 23:4",
+        "scripture:2 Kings 23:6"
+      ]
+    },
+    {
+      "text": "Since the fourth century AD the valley has also been called the Valley of Jehoshaphat; Jewish and Muslim tradition alike have identified it as the site of the last judgment, an association the International Standard Bible Encyclopedia connects to the prophet Joel's vision of a coming judgment in \"the valley of Jehoshaphat.\"",
+      "sources": [
+        "bib:isbe-kidron-the-brook",
+        "bib:isbe-hinnom-valley-of",
+        "scripture:Joel 3:2"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "John 18:1",
+      "book": "John",
+      "textWEB": "When Jesus had spoken these words, he went out with his disciples over the brook Kidron, where there was a garden, into which he and his disciples entered."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "2 Samuel 15:23",
+      "note": "King David crossed the brook Kidron, heading toward the wilderness, while fleeing Jerusalem during his son Absalom's revolt, the valley's earliest narrative mention.",
+      "sources": [
+        "bib:isbe-kidron-the-brook",
+        "scripture:2 Samuel 15:23"
+      ]
+    },
+    {
+      "ref": "Jeremiah 31:40",
+      "note": "Jeremiah prophesies that the valley associated with graves and ashes, reaching to the brook Kidron, will be \"holy to the LORD\" and never again be uprooted.",
+      "sources": [
+        "scripture:Jeremiah 31:40"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "judea-samaria-idumea"
+}

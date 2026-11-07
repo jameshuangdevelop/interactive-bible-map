@@ -1,0 +1,18 @@
+{
+  "locationId": "aenon",
+  "images": [
+    {
+      "id": "aenon-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Salem8250.JPG",
+      "width": 4608,
+      "height": 3456,
+      "author": "יעקב",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Salem8250.JPG",
+      "caption": "The village of Salim, east of Nablus, seen from Mount Ebal — one proposed location near Aenon.",
+      "kind": "modern",
+      "aiGenerated": false
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "id": "plain-of-sharon",
+  "names": {
+    "ancient": [
+      "Sharon"
+    ],
+    "modern": "Sharon Plain",
+    "modernCountries": [
+      "Israel"
+    ],
+    "alternate": [
+      "Plain of Sharon",
+      "Saron"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "region",
+  "prominence": "standard",
+  "parentId": "judea-province",
+  "candidates": [
+    {
+      "label": "Sharon Plain",
+      "coordinates": [
+        34.91667,
+        32.28333
+      ],
+      "coordinateSource": "pleiades:465843763",
+      "confidence": "high",
+      "support": "Pleiades' point for the Sharon Plain exactly matches Wikidata's value, so this is not an independent cross-check; both match the International Standard Bible Encyclopedia's description of a coastal strip running between the mountains and the Mediterranean, from south of Jaffa north to Mount Carmel.",
+      "sources": [
+        "pleiades:465843763",
+        "wikidata:Q218907",
+        "bib:isbe-sharon"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Sharon is a coastal plain, the northern half of the coastal plain of Israel, running between the central hill country and the Mediterranean Sea from near Jaffa in the south to Mount Carmel in the north. Acts describes the apostle Peter healing a paralyzed man named Aeneas at Lydda, after which \"all who lived at Lydda and in Sharon saw him, and they turned to the Lord.\"",
+    "sources": [
+      "bib:isbe-sharon",
+      "wikidata:Q218907",
+      "scripture:Acts 9:33",
+      "scripture:Acts 9:34",
+      "scripture:Acts 9:35"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia describes the plain's deep, rich soil, its perennial streams, and a once-extensive oak forest in its northern part, and records that the Old Testament pictures Sharon as excellent pasture land, where King David kept royal herds.",
+      "sources": [
+        "bib:isbe-sharon",
+        "scripture:1 Chronicles 27:29"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 9:35",
+      "book": "Acts",
+      "textWEB": "All who lived at Lydda and in Sharon saw him, and they turned to the Lord."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "1 Chronicles 27:29",
+      "note": "Shitrai the Sharonite is named as the official over King David's herds that fed in Sharon.",
+      "sources": [
+        "bib:isbe-sharon",
+        "scripture:1 Chronicles 27:29"
+      ]
+    },
+    {
+      "ref": "Isaiah 35:2",
+      "note": "Isaiah names \"the excellence of Carmel and Sharon\" among signs of future restoration and glory.",
+      "sources": [
+        "bib:isbe-sharon",
+        "scripture:Isaiah 35:2"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "judea-samaria-idumea"
+}

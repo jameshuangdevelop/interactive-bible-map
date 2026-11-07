@@ -1,6 +1,266 @@
 {
   "entries": [
     {
+      "id": "isbe-aenon",
+      "type": "chapter",
+      "title": "Aenon",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/aenon.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-akeldama",
+      "type": "chapter",
+      "title": "Akeldama",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/akeldama.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-antipatris",
+      "type": "chapter",
+      "title": "Antipatris",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/antipatris.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-ashdod",
+      "type": "chapter",
+      "title": "Ashdod",
+      "authors": [
+        "H. Porter"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/ashdod.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-gabbatha",
+      "type": "chapter",
+      "title": "Gabbatha",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gabbatha.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-gaza",
+      "type": "chapter",
+      "title": "Gaza",
+      "authors": [
+        "H. Porter"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gaza.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-gehenna",
+      "type": "chapter",
+      "title": "Gehenna",
+      "authors": [
+        "Geerhardus Vos"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gehenna.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-gennesaret-land-of",
+      "type": "chapter",
+      "title": "Gennesaret, Land of",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gennesaret-land-of.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-gerizim-mount",
+      "type": "chapter",
+      "title": "Gerizim, Mount",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gerizim-mount.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-hinnom-valley-of",
+      "type": "chapter",
+      "title": "Hinnom, Valley of",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/H/hinnom-valley-of.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-jacobs-well",
+      "type": "chapter",
+      "title": "Jacob's Well",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/J/jacobs-well.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-judah-territory-of",
+      "type": "chapter",
+      "title": "Judah, Territory of",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/J/judah-territory-of.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-kidron-the-brook",
+      "type": "chapter",
+      "title": "Kidron, the Brook",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/K/kidron-the-brook.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-lod-lydda",
+      "type": "chapter",
+      "title": "Lod; Lydda",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/L/lod-lydda.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-praetorium",
+      "type": "chapter",
+      "title": "Praetorium",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/praetorium.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-salim",
+      "type": "chapter",
+      "title": "Salim",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/salim.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-samaria-city-of",
+      "type": "chapter",
+      "title": "Samaria, City of",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/samaria-city-of.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-sharon",
+      "type": "chapter",
+      "title": "Sharon",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/sharon.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-tiberias",
+      "type": "chapter",
+      "title": "Tiberias",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/tiberias.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-zarephath",
+      "type": "chapter",
+      "title": "Zarephath",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/Z/zarephath.html",
+      "accessed": "2026-11-06"
+    },
+    {
       "id": "pleiades-place-resource",
       "type": "dataset",
       "title": "Pleiades: A Gazetteer of Past Places",

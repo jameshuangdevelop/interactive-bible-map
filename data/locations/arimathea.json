@@ -1,0 +1,164 @@
+{
+  "id": "arimathea",
+  "names": {
+    "ancient": [
+      "Arimathea"
+    ],
+    "modernCountries": [
+      "West Bank"
+    ],
+    "alternate": [
+      "Arimathaea"
+    ]
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "judea",
+  "candidates": [
+    {
+      "label": "Rantis",
+      "coordinates": [
+        35.019444,
+        32.028056
+      ],
+      "coordinateSource": "wikidata:Q7293548",
+      "confidence": "disputed",
+      "support": "OpenBible.info's ancient-place catalog records Rantis as the most highly weighted of several proposed modern-site identifications for Arimathea; the catalog separately lists an identification of Arimathea as \"another name for Ramathaim-zophim,\" home of the Old Testament prophet Samuel's father Elkanah, without tying that proposal to a specific modern site. The Digital Atlas of the Roman Empire records the ancient names \"Ramathaim/Arimathaia\" for this village, and Wikidata's independently recorded point for Rantis, about 1.4 kilometers from the atlas's own, lower-precision point, corroborates the village's location, though Wikidata's own record does not mention Arimathea.",
+      "sources": [
+        "wikidata:Q7293548",
+        "dare:28373",
+        "openbible:arimathea",
+        "scripture:1 Samuel 1:1"
+      ]
+    },
+    {
+      "label": "Beit Rima",
+      "coordinates": [
+        35.101667,
+        32.041111
+      ],
+      "coordinateSource": "wikidata:Q4855730",
+      "confidence": "disputed",
+      "support": "OpenBible.info's ancient-place catalog records Beit Rima as its second-ranked modern-site identification for Arimathea, after Rantis. Wikidata's coordinate is for West Bani Zeid, the municipality formed by Beit Rima's merger with the neighboring village of Deir Ghassana; no accepted source gives a coordinate for the historic village of Beit Rima alone.",
+      "sources": [
+        "wikidata:Q4855730",
+        "openbible:arimathea"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Arimathea was the hometown of Joseph, a man all four Gospels describe asking Pontius Pilate for the body of Jesus after the crucifixion. Matthew's Gospel calls him rich and says he laid the body in his own new tomb; Mark and Luke describe him as a member of the Jewish council, and Luke adds that he had not consented to its decision against Jesus; John says he was a disciple of Jesus, but secretly, for fear of the Jews. The town's location is not settled: two neighboring villages, Rantis and Beit Rima, are each proposed as its site.",
+    "sources": [
+      "openbible:arimathea",
+      "scripture:Matthew 27:57",
+      "scripture:Matthew 27:58",
+      "scripture:Matthew 27:60",
+      "scripture:Mark 15:43",
+      "scripture:Luke 23:50",
+      "scripture:Luke 23:51",
+      "scripture:Luke 23:52",
+      "scripture:John 19:38"
+    ]
+  },
+  "history": [
+    {
+      "text": "Some have identified Arimathea with Ramathaim-zophim, home of the Old Testament prophet Samuel's father Elkanah, in the hill country of Ephraim, an identification OpenBible.info's ancient-place catalog records among the proposals for Arimathea.",
+      "sources": [
+        "openbible:arimathea",
+        "scripture:1 Samuel 1:1"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 27:57",
+      "book": "Matthew",
+      "textWEB": "When evening had come, a rich man from Arimathaea named Joseph, who himself was also Jesus’ disciple, came."
+    },
+    {
+      "ref": "Mark 15:43",
+      "book": "Mark",
+      "textWEB": "Joseph of Arimathaea, a prominent council member who also himself was looking for God’s Kingdom, came. He boldly went in to Pilate, and asked for Jesus’ body."
+    },
+    {
+      "ref": "Luke 23:51",
+      "book": "Luke",
+      "textWEB": "(he had not consented to their counsel and deed), from Arimathaea, a city of the Jews, who was also waiting for God’s Kingdom."
+    },
+    {
+      "ref": "John 19:38",
+      "book": "John",
+      "textWEB": "After these things, Joseph of Arimathaea, being a disciple of Jesus, but secretly for fear of the Jews, asked of Pilate that he might take away Jesus’ body. Pilate gave him permission. He came therefore and took away his body."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "judea-samaria-idumea"
+}

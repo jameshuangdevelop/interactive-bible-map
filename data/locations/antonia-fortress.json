@@ -1,0 +1,156 @@
+{
+  "id": "antonia-fortress",
+  "names": {
+    "ancient": [
+      "The Barracks",
+      "Antonia Fortress"
+    ],
+    "modern": "Antonia Fortress",
+    "alternate": [
+      "Tower of Antonia",
+      "Castle"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Antonia Fortress, northwest corner of the Temple Mount",
+      "coordinates": [
+        35.234303,
+        31.780094
+      ],
+      "coordinateSource": "wikidata:Q570515",
+      "confidence": "medium",
+      "support": "The first-century Jewish historian Josephus writes that \"the tower of Antonia... was situated at the corner of two cloisters of the court of the temple; of that on the west, and that on the north,\" matching Wikidata's recorded coordinate for the site at the Temple Mount's northwest corner. The point is approximate to this corner of the Temple platform rather than to an excavated structure.",
+      "sources": [
+        "wikidata:Q570515",
+        "bib:josephus-jewish-war"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The World English Bible's \"barracks\" in Acts, traditionally identified with the Antonia, is the fortress where, according to the International Standard Bible Encyclopedia, the Praetorium of Jesus' trial \"has been traditionally located... where once stood the Antonia and where was stationed a large garrison (compare Ac 21:32-35)\"; the Encyclopedia itself argues the governor's actual headquarters were at Herod's palace instead. Herod the Great built the fortress at the Temple Mount's northwest corner; the first-century Jewish historian Josephus records that Herod \"called\" it \"Antonia, in honor of\" the Roman statesman Mark Antony. Acts describes Roman soldiers stationed there rushing down to rescue Paul from a crowd in the Temple, after which the commander allowed Paul to address the people from the barracks' stairs.",
+    "sources": [
+      "bib:isbe-praetorium",
+      "bib:josephus-jewish-war",
+      "scripture:Acts 21:31",
+      "scripture:Acts 21:32",
+      "scripture:Acts 21:34",
+      "scripture:Acts 21:37",
+      "scripture:Acts 21:40",
+      "scripture:Acts 22:24"
+    ]
+  },
+  "history": [
+    {
+      "text": "The first-century Jewish historian Josephus describes a Roman legion permanently stationed in this tower, which \"went several ways among the cloisters, with their arms, on the Jewish festivals,\" to watch the crowds for unrest.",
+      "sources": [
+        "bib:josephus-jewish-war"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 21:34",
+      "book": "Acts",
+      "textWEB": "Some shouted one thing and some another, among the crowd. When he couldn’t find out the truth because of the noise, he commanded him to be brought into the barracks."
+    },
+    {
+      "ref": "Acts 21:37",
+      "book": "Acts",
+      "textWEB": "As Paul was about to be brought into the barracks, he asked the commanding officer, “May I speak to you?” He said, “Do you know Greek?"
+    },
+    {
+      "ref": "Acts 22:24",
+      "book": "Acts",
+      "textWEB": "the commanding officer commanded him to be brought into the barracks, ordering him to be examined by scourging, that he might know for what crime they shouted against him like that."
+    },
+    {
+      "ref": "Acts 23:10",
+      "book": "Acts",
+      "textWEB": "When a great argument arose, the commanding officer, fearing that Paul would be torn in pieces by them, commanded the soldiers to go down and take him by force from among them and bring him into the barracks."
+    },
+    {
+      "ref": "Acts 23:16",
+      "book": "Acts",
+      "textWEB": "But Paul’s sister’s son heard they were lying in wait, and he came and entered into the barracks and told Paul."
+    },
+    {
+      "ref": "Acts 23:32",
+      "book": "Acts",
+      "textWEB": "But on the next day they left the horsemen to go with him, and returned to the barracks."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "judea-samaria-idumea"
+}
