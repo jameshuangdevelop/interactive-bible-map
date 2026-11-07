@@ -8,6 +8,8 @@
 
 **Re-check on 2026-11-06 (section 10):** 6 records are signed off (`cyrene`, `sea-of-adria`, `areopagus`, `straight-street`, `ephesus-theater`, `temple-of-artemis`). 8 still need fixes: `euphrates`, `babylon`, `mount-sinai`, `armageddon`, `athens-agora`, `philippi-place-of-prayer`, `corinth-bema` and `herods-palace-caesarea`. `philippi-forum` was removed (PO decision on Q1).
 
+**Re-check 2 on 2026-11-06 (section 11):** 6 more records are signed off (`euphrates`, `babylon`, `mount-sinai`, `armageddon`, `athens-agora`, `corinth-bema`), so 12 of 14 are verified. `philippi-place-of-prayer` (F58) and `herods-palace-caesarea` (F59) still need a small wording fix each.
+
 First-round findings: there are 53 findings: 51 for the Research Lead (F1–F51) and 2 for the Media Curator (F52–F53). One coordinate is wrong (F50, Herod's palace, about 630 m off). One unmapped candidate has an accepted coordinate (F16), and one has no source for the proposal itself (F44). The rest are wording and citation fixes. All 39 WEB passages match `engwebp_vpl.txt` exactly, the NT passage lists are complete, and all 27 image licences match Commons exactly. 26 captions pass.
 
 ## 1. Commands (Node 24.21.0, at `4c51b45`)
@@ -378,3 +380,49 @@ Every `license` matches Commons' `LicenseShortName` exactly, every one is in an 
 **Not signed off:** `euphrates`, `babylon`, `mount-sinai`, `armageddon`, `athens-agora`, `philippi-place-of-prayer`, `corinth-bema` and `herods-palace-caesarea` stay `draft` until the fixes above are made and re-checked. The licence edits are made: the HMdb.org rows in `docs/LICENSES.md` and `ATTRIBUTION.md`. Checked by fact-checker, 2026-11-06.
 
 **Budget delta (re-check):** 2026-11-06 · fact-checker · Claude (Copilot CLI) · M6-05 re-check · est. ~3.5M in (mostly cached) / ~20k out · ~650 AI credits (estimated, not measured).
+
+## 11. Re-check 2 (2026-11-06, at `21600ba`)
+- **Scope:** `git diff aa851f7..HEAD` (the Research Lead's `21600ba`): 8 location files and `data/media/philippi-place-of-prayer.json`.
+  - Sources were read in the earlier rounds. I re-confirmed UNESCO's Babylon listing: "Situated 85 km south of Baghdad"; its description is offered under CC BY-SA 3.0 IGO.
+
+| Finding | Re-check | Verdict |
+|---|---|---|
+| F56 `euphrates` | "in Pleiades' words" is gone. The quotation stays, which is allowed: Pleiades is CC BY 3.0 and is credited in the Sources list | Pass |
+| F10 `babylon` | "in the sixth century BC" is gone; "the city to which the kingdom of Judah was exiled" is stated by ISBE ("the captivity in Babylon") | Pass |
+| F14 `babylon` | "whom, the encyclopedia notes, Paul had summoned to Rome (2 Timothy 4:11)" | Pass |
+| F55 `babylon` | The Parthian entry, with its timeline disclaimer, is now the last `history` entry | Pass |
+| F17 `mount-sinai` | `bib:biblearchaeology-sinai-in-arabia` is in the summary's sources. Franz names Jebel Sin-Bishar and, through Wyatt, Jebel al-Lawz, so all five candidates named in the summary are now sourced | Pass |
+| F18 `mount-sinai` | "writers"; "ancient sources including Herodotus, the Septuagint, Josephus, and Strabo" | Pass |
+| F19 `mount-sinai` | "calls chronology one major obstacle" (BAS: "One major obstacle") | Pass |
+| F57 `mount-sinai` | Franz's and BAS's sentences are now in the project's own words; only the name "Midianite Hypothesis" stays quoted | Pass |
+| F25 `armageddon` | The distance and direction are gone | Pass |
+| F57 `armageddon` | Powell's sentences are paraphrased, and the remaining quotation marks are ISBE (public domain), OpenBible (CC BY 4.0), a book title, or glosses (N7) | Pass |
+| F32 `athens-agora` | ISBE is credited with the Stoics only; "Acts 17:18 adds that Epicurean philosophers were also among those who reasoned with him there", and `scripture:Acts 17:18` is cited | Pass |
+| F57 `corinth-bema` | "ToposText likewise connects the structure with the Bema named in Acts" is a paraphrase | Pass |
+| F43 `philippi-place-of-prayer` | The neutral label, the separation of ISBE's Angites/Gangites (with Paul "on its bank") from the shrine's stream, the Pleiades Angites point ~30 km west (I measured 30.6 km), the Gangites "unlocated" entry and the plain "and" all pass. One new contradiction is in F58 | Pass (F58 open) |
+| F53 `philippi-place-of-prayer-01` | "marked by Greek Orthodox tradition as the site of Acts 16:13's place of prayer; the chapel and seating are modern" | Pass |
+| F50 `herods-palace-caesarea` | The OSM way and clause are removed. `wikidata:Q110300838` (79 m) and `wikidata:Q3537241` (107 m) are cited as non-OSM corroboration, and `wikidata:Q2527367` is cited for the comparison ("about 670 m": I measured 673 m). The marker is "on the walkway to the palace", and "adjacent to the restored ancient theater" is Cornell's | Pass |
+| F54 `herods-palace-caesarea` | Content passes: the building is attributed to Cornell (via Josephus) and to the JRA title, and the marker's "archaeology has not settled" is paraphrased, not quoted. Wording issues in F59 | Pass (F59 open) |
+
+### Remaining fixes (Research Lead)
+- **F58 (`philippi-place-of-prayer`, accuracy):** the support says the stream is the one "which Religious Greece calls the Zigaktis". It then says "No source this research opened identifies the stream at Lydia itself with any of these named rivers", and those named rivers include Pleiades' "Zygaktes?". The summary likewise says "no source found in this research ties that stream to the river named in classical sources for the area".
+  - Religious Greece does tie it, by name, to the Zigaktis/Zygaktes, a classical river name: ISBE names "the rivers Zygactes and Nestus", and Pleiades' Barrington entry is "Zygaktes?".
+  - The disagreement lies elsewhere: Pleiades places the Zygaktes, with a query, at the modern Xiropotamos and lists the Gangites as unlocated, so the sources disagree on which ancient river, if any, the Lydia stream was.
+  - Reword both sentences to say that, without "this research". For example: "the sources disagree on which ancient river this stream was: Religious Greece calls it the Zigaktis, while Pleiades places the ancient Zygaktes, with a query, at the modern Xiropotamos."
+- **F59 (`herods-palace-caesarea`, ADR-0033 item 1 and ADR-0041 item 1):**
+  - The summary names a database ("the Historical Marker Database notes"). Refer to the source itself, for example "the marker at the site notes" or "a marker in the national park notes".
+  - Its caveat ("archaeology has not settled whether Herod or a later Roman governor was responsible") sits in the middle of the summary, before the Acts sentence. Move it to the end of the summary.
+  - Naming HMdb in the candidate's support, as now, is fine (first-round precedent).
+
+### Commands (Node 24.21.0, at `21600ba` plus the sign-off edits)
+- `npm run validate:data`: pass, 217 warnings (unchanged; the expected linkage warnings).
+- `npm test`: 323 passed, 0 failed.
+- `npm run build:data`: pass (generated 2,505,485 bytes, 776,771 gzip).
+- `npm run check:images`: pass ("Checked 1310 Commons URLs ..., 262 Commons size records, and 31 AI files. All image checks passed."). No 429s were reported.
+
+## Sign-off (re-check 2)
+**Signed off in this round:** `euphrates`, `babylon`, `mount-sinai`, `armageddon`, `athens-agora` and `corinth-bema`. They are set to `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-11-06"`; that edit changes no facts. With the six from section 10, **12 of the 14 records are verified.**
+
+**Not signed off:** `philippi-place-of-prayer` (F58) and `herods-palace-caesarea` (F59) stay `draft` until those wording fixes are made and re-checked. Their coordinates, sources, WEB text, political history and images all pass. Checked by fact-checker, 2026-11-06.
+
+**Budget delta (re-check 2):** 2026-11-06 · fact-checker · Claude (Copilot CLI) · M6-05 re-check 2 · est. ~1.5M in (mostly cached) / ~8k out · ~250 AI credits (estimated, not measured).
