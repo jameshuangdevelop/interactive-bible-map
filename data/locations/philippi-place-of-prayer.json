@@ -27,7 +27,7 @@
       ],
       "coordinateSource": "wikidata:Q91742263",
       "confidence": "medium",
-      "support": "The Greek Orthodox Church marks a traditional site of Paul's encounter with Lydia at a stream near the modern village of Lydia, west of Philippi, which Religious Greece calls the Zigaktis, with a 1974 open-air baptistery and chapel dedicated to her. The International Standard Bible Encyclopedia separately records that the plain around Philippi was watered by a river the Greek historian Herodotus calls the Angites, and the Roman-era historian Appian also calls the Gangas or Gangites (today's Anghista), and that Paul went to its bank; Pleiades gives a representative point for an \"Angites (river)\" about 30 km west, near the Strymon, and separately catalogs a \"Gangites/Gangas\" river as formally unlocated, and a \"Zygaktes?\" river identified with the modern Xiropotamos. No source this research opened identifies the stream at Lydia itself with any of these named rivers. Acts does not itself name the river.",
+      "support": "The Greek Orthodox Church marks a traditional site of Paul's encounter with Lydia at a stream near the modern village of Lydia, west of Philippi, which Religious Greece calls the Zigaktis, with a 1974 open-air baptistery and chapel dedicated to her. The International Standard Bible Encyclopedia separately records that the plain around Philippi was watered by a river the Greek historian Herodotus calls the Angites, and the Roman-era historian Appian also calls the Gangas or Gangites (today's Anghista), and that Paul went to its bank; Pleiades gives a representative point for an \"Angites (river)\" about 30 km west, near the Strymon, and separately catalogs a \"Gangites/Gangas\" river as formally unlocated. The sources disagree on which ancient river this stream was: Religious Greece calls it the Zigaktis, while Pleiades places the ancient \"Zygaktes?\" river, with a query, at the modern Xiropotamos. Acts does not itself name the river.",
       "sources": [
         "wikidata:Q91742263",
         "bib:isbe-philippi",
@@ -40,13 +40,14 @@
     }
   ],
   "summary": {
-    "text": "The place of prayer by the river is where, according to Acts, Paul and his companions met a group of women outside the gate of Philippi on the Sabbath, and where Lydia, a dealer in purple cloth, believed and was baptized. The International Standard Bible Encyclopedia states that Philippi had no synagogue; its resident Jewish population was small, and their meetings for prayer took place on a river's bank instead. A stream at the modern village of Lydia, west of the city, is marked today by a Greek Orthodox shrine as the traditional site, though Acts itself does not name the river, and no source found in this research ties that stream to the river named in classical sources for the area.",
+    "text": "The place of prayer by the river is where, according to Acts, Paul and his companions met a group of women outside the gate of Philippi on the Sabbath, and where Lydia, a dealer in purple cloth, believed and was baptized. The International Standard Bible Encyclopedia states that Philippi had no synagogue; its resident Jewish population was small, and their meetings for prayer took place on a river's bank instead. A stream at the modern village of Lydia, west of the city, is marked today by a Greek Orthodox shrine as the traditional site, though Acts itself does not name the river, and the sources disagree on which ancient river it was: Religious Greece calls it the Zigaktis, while the ancient name Zygaktes is otherwise placed, with a query, at the modern Xiropotamos.",
     "sources": [
       "scripture:Acts 16:13",
       "scripture:Acts 16:14",
       "scripture:Acts 16:15",
       "bib:isbe-philippi",
-      "bib:religiousgreece-lydia-baptistery"
+      "bib:religiousgreece-lydia-baptistery",
+      "pleiades:501669"
     ]
   },
   "history": [
