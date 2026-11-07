@@ -56,6 +56,9 @@ try {
   console.log(
     `Total generated size: ${totalBytes} bytes (${totalGzipBytes} bytes gzip)`
   );
+  console.log(
+    `places.index.json size: ${result.placesIndexBuild.gzipBytes} bytes gzip (budget ${result.placesIndexBuild.maxGzipBytes})`
+  );
   if (result.ancientBuild.generated) {
     console.log(
       `Ancient roads joins: ${result.ancientBuild.roadJoinCount} join(s), ${result.ancientBuild.roadJoinTotalLengthKm.toFixed(1)} km total`

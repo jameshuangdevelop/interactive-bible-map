@@ -108,13 +108,16 @@ Generated app payloads:
 - `app/public/generated/ancient.roads.geojson`
 - `app/public/generated/ancient.coastline.geojson`
 - `app/public/generated/ancient.empire-edge.geojson` (the static empire edge, written once rather than per stop, and only when `data/geo/ancient-empire-edge.geojson` exists)
-- `app/public/generated/ancient.stop.<stopId>.json` (area holders, holder borders, empire edge, holder label points)
+- `app/public/generated/ancient.stop-catalogue.json` (shared unique stop entries: `areas[]`, `holderBorders[]` feature objects, `holderLabels[]`)
+- `app/public/generated/ancient.stop.<stopId>.json` (per-stop data; `areas`, `holderBorders` and `holderLabels` are ordered integer index arrays into `ancient.stop-catalogue.json`)
+- `app/public/generated/ancient.holder-unions.json` (deduplicated union geometries referenced by each stop's `holderUnions` and `romanSideUnion`)
 - `ancient.shapes.json` keeps only each shape's `areaId` in properties; provenance stays in `data/geo/`.
 - `ancient.roads.geojson` keeps only `roadId`, `major`, `known` and `timeperiod` in properties; provenance stays in `data/geo/`.
+- Reconstruct a stop's legacy shape by mapping each `areas`/`holderBorders`/`holderLabels` index to the same position in `ancient.stop-catalogue.json`; `holderBorders` then wraps back into `{ "type": "FeatureCollection", "features": [...] }`.
 - The per-stop `romanEmpireEdge` is the line between drawn Roman-side and drawn non-Roman areas in that stop; it is `null` while no area outside the empire is drawn (ADR-0037 rule 5), and the static `ancient.empire-edge.geojson` shows the empire's edge instead.
 - `ancient.roads.geojson` is simplified and rounded during `build:data` for transfer size, and the builder adds straight join segments where one road end sits more than 0.2 km and at most 4 km from another road so sheet-edge digitising breaks draw as continuous roads; `data/geo/ancient-roads.geojson` remains the full-detail source and is not edited.
 - Full ancient shapes keep 5 decimals (about 1 m); the zoom<=10 shapes, holder borders, per-stop edge and static edge use 4 (about 11 m), well below their simplification.
-- Everything the ancient layer loads (the `ancient.*` files) must stay within 300,000 bytes compressed with gzip, as `npm run build:data` reports it (ADR-0037's update of 2026-10-08).
+- Everything the ancient startup layer loads (all `ancient.*` files except lazily loaded `ancient.region-outlines.json`) must stay within 330,000 bytes compressed with gzip, as `npm run build:data` reports it (ADR-0037's update of 2026-10-19).
 - Stop-area assignments carry each period's optional `note`.
 - Stop-area assignments include `heldFromYear` and `heldToYear`: the unbroken half-open holder span for that area that contains the stop's year. They also include `heldFromKnown`, which is `false` when that span starts at the timeline range's `fromYear` and there is no earlier period in that area's data.
 - `uncertain` holders are included in area assignments and borders but omitted from `holderLabels`.
