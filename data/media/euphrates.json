@@ -1,0 +1,18 @@
+{
+  "locationId": "euphrates",
+  "images": [
+    {
+      "id": "euphrates-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/20151228-Euphrates_9283.jpg",
+      "width": 5760,
+      "height": 3840,
+      "author": "Aziz1005",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:20151228-Euphrates_9283.jpg",
+      "caption": "The Euphrates River in Dhi Qar Governorate, southern Iraq.",
+      "kind": "modern",
+      "aiGenerated": false
+    }
+  ]
+}

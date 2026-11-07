@@ -1,0 +1,31 @@
+{
+  "locationId": "ephesus-theater",
+  "images": [
+    {
+      "id": "ephesus-theater-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Ancient_Greek_theatre_%28Ephesus%29.jpg",
+      "width": 3964,
+      "height": 1915,
+      "author": "Dudva",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_Greek_theatre_(Ephesus).jpg",
+      "caption": "The Great Theatre of Ephesus, cut into the western slope of Mount Pion.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "ephesus-theater-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Great_Theatre%2C_Ephesus.jpg",
+      "width": 2475,
+      "height": 1732,
+      "author": "Austrian Archaeological Institute",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Great_Theatre,_Ephesus.jpg",
+      "caption": "The Great Theatre of Ephesus, seen above the ancient harbor street.",
+      "kind": "site",
+      "aiGenerated": false
+    }
+  ]
+}

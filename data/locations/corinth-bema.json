@@ -1,0 +1,142 @@
+{
+  "id": "corinth-bema",
+  "names": {
+    "ancient": [
+      "The judgment seat"
+    ],
+    "modern": "The Bema",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [
+      "Bema of Corinth"
+    ],
+    "otherLanguages": [
+      "Bema"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "corinth",
+  "candidates": [
+    {
+      "label": "Bema, Roman Forum of Corinth",
+      "coordinates": [
+        22.88028,
+        37.9051
+      ],
+      "coordinateSource": "bib:topostext-corinth-bema",
+      "confidence": "medium",
+      "support": "Excavation by the Corinth Excavations of the American School of Classical Studies at Athens uncovered a large marble-faced rostrum standing prominently at the center of Corinth's Roman forum, on the terrace of its Upper Forum; the Greek Ministry of Culture and Sports titles the site \"Bema of Saint Paul\" and states that, according to tradition, it was the site of Paul's trial, and ToposText likewise connects the structure with the Bema named in Acts.",
+      "sources": [
+        "bib:topostext-corinth-bema",
+        "bib:odysseus-corinth-bema",
+        "scripture:Acts 18:12"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The bema was a raised, marble-faced speaker's platform standing at the center of Corinth's Roman forum, from which the city's officials addressed the public. According to Acts, the city's Jewish community brought Paul before this judgment seat and accused him before the Roman proconsul Gallio, who dismissed the case as a dispute over Jewish law rather than a crime.",
+    "sources": [
+      "bib:topostext-corinth-bema",
+      "bib:odysseus-corinth-bema",
+      "scripture:Acts 18:12",
+      "scripture:Acts 18:16"
+    ]
+  },
+  "history": [
+    {
+      "text": "Acts records that when Gallio was proconsul of Achaia, the Jews of Corinth rose up together against Paul and brought him before the judgment seat, accusing him of persuading people to worship God in a way contrary to the law; Gallio, before Paul could even answer, ruled that the matter was one of Jewish wording and names rather than wrongdoing, and drove the accusers from his court, after which a crowd seized Sosthenes, the ruler of the synagogue, and beat him in front of the judgment seat.",
+      "sources": [
+        "scripture:Acts 18:12",
+        "scripture:Acts 18:14-15",
+        "scripture:Acts 18:16",
+        "scripture:Acts 18:17"
+      ]
+    },
+    {
+      "text": "The Greek Ministry of Culture and Sports records that, probably because of its traditional connection to Paul, the bema was later converted into a Christian church during the Byzantine period, and that its partial restoration was funded through the Operational Program \"Western Greece-Peloponnesus-Ionian Islands 2007-2013\" (NSRF), carried out by Greece's 37th Ephorate of Prehistoric and Classical Antiquities.",
+      "sources": [
+        "bib:odysseus-corinth-bema"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 18:12",
+      "book": "Acts",
+      "textWEB": "But when Gallio was proconsul of Achaia, the Jews with one accord rose up against Paul and brought him before the judgment seat,"
+    },
+    {
+      "ref": "Acts 18:16-17",
+      "book": "Acts",
+      "textWEB": "So he drove them from the judgment seat. Then all the Greeks seized Sosthenes, the ruler of the synagogue, and beat him before the judgment seat. Gallio didn’t care about any of these things."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:isbe-macedonia"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Imperial legate of Moesia (governed with Macedonia))",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:isbe-macedonia"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 67,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul (restored by the emperor Claudius))",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "fromYear": 67,
+      "toYear": 70,
+      "holderId": "achaia-free",
+      "entity": "Free Achaia",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius: on his departure from Greece, the emperor Nero \"presented the entire province with freedom.\""
+    },
+    {
+      "fromYear": 70,
+      "toYear": 79,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius records that the emperor Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor until his death in 79, when it is a province again."
+    },
+    {
+      "fromYear": 79,
+      "toYear": 101,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "achaia"
+}

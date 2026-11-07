@@ -1,0 +1,172 @@
+{
+  "id": "armageddon",
+  "names": {
+    "ancient": [
+      "Armageddon"
+    ],
+    "modernCountries": [
+      "Israel"
+    ],
+    "alternate": [
+      "Har-Magedon",
+      "Harmagedon"
+    ],
+    "otherLanguages": []
+  },
+  "type": "site",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "Tel Megiddo",
+      "coordinates": [
+        35.184444,
+        32.585278
+      ],
+      "coordinateSource": "wikidata:Q208379",
+      "confidence": "disputed",
+      "support": "Revelation's \"Har-Magedon\" is widely read as \"Mount of Megiddo,\" after the ancient city whose mound overlooks the Jezreel Valley; the International Standard Bible Encyclopedia, quoting the scholar Nestle, calls this \"the most probable explanation\" and recalls Megiddo's long history as a battlefield, citing the defeat of Sisera and the death of King Josiah there. OpenBible.info's aggregated scholarly identifications for this verse likewise favor Megiddo by a wide margin. Mark Allan Powell's supplement to his textbook \"Introducing the New Testament\" raises a difficulty with this reading: no mountain by that name is otherwise known (the International Standard Bible Encyclopedia itself calls Megiddo \"a hill-town\"); a widely cited proposed solution, which Powell discusses, is that an early copying error turned an original \"Mount Megiddo\" into the \"Har-Magedon\" of surviving manuscripts.",
+      "sources": [
+        "wikidata:Q208379",
+        "openbible:armageddon",
+        "bib:isbe-har-magedon",
+        "bib:powell-introducing-nt-armageddon"
+      ]
+    },
+    {
+      "label": "Mount Carmel",
+      "coordinates": [
+        35.023333,
+        32.6725
+      ],
+      "coordinateSource": "wikidata:Q185318",
+      "confidence": "low",
+      "support": "Mark Allan Powell's supplement to his textbook \"Introducing the New Testament\" suggests, as a possibility rather than a settled claim, that people living in the area may sometimes have called the Carmel range \"Mount Megiddo\"; if so, Revelation's \"Har-Magedon\" could refer to Carmel instead. Carmel was also the site of the prophet Elijah's contest with the prophets of Baal. OpenBible.info records \"another name for Mount Carmel\" as a secondary identification for this verse, at about 15% of its aggregated scholarly support, well behind Megiddo.",
+      "sources": [
+        "wikidata:Q185318",
+        "openbible:armageddon",
+        "bib:powell-introducing-nt-armageddon"
+      ]
+    }
+  ],
+  "unmappedCandidates": [
+    {
+      "label": "A symbolic name, not a mappable place",
+      "confidence": "medium",
+      "support": "Some scholars read \"Har-Magedon\" as a symbolic name rather than a reference to any single real location. Mark Allan Powell's supplement to his textbook \"Introducing the New Testament\" explains that for these scholars the reference is meant metaphorically, with no literal location intended, and discusses proposed meanings including \"Mount of Assembly\" or \"His Fruitful Mountain\"; the International Standard Bible Encyclopedia likewise notes that \"Har-Magedon may stand for the battlefield without indicating any particular locality.\" A 2005 academic study in Novum Testamentum argues instead that the name's background lies in Isaiah and Jeremiah's oracles describing the coming destruction of Babylon, rather than in Megiddo.",
+      "reason": "A figurative or symbolic reading has no coordinate to map; this project takes no position on whether Revelation 16:16 refers to a real place.",
+      "sources": [
+        "bib:powell-introducing-nt-armageddon",
+        "bib:isbe-har-magedon",
+        "bib:jauhiainen-ot-background-armageddon",
+        "scripture:Revelation 16:16"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Armageddon (the WEB's \"Harmagedon\") is named only once in the Bible, at Revelation 16:16, which calls it a Hebrew name for the place where kings are gathered for what Revelation 16:14 calls \"the war of that great day of God the Almighty.\" It is widely, though not universally, read as a reference to Megiddo, a city overlooking the Jezreel Valley with a long history as a battlefield; Mount Carmel and purely symbolic readings are also proposed. This project takes no position on the end-times meaning of the passage.",
+    "sources": [
+      "scripture:Revelation 16:14",
+      "scripture:Revelation 16:16",
+      "bib:isbe-har-magedon",
+      "openbible:armageddon"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia recalls that the hills around Megiddo had \"witnessed perhaps a greater number of bloody encounters than have ever stained a like area of the world's surface,\" including Israel's victory over the Canaanite general Sisera and the death of King Josiah in battle against Pharaoh Necho, and suggests this history gave the site \"a peculiar appropriateness\" as the setting Revelation names for a final conflict.",
+      "sources": [
+        "bib:isbe-har-magedon"
+      ]
+    },
+    {
+      "text": "A 2005 academic study in Novum Testamentum challenges the Megiddo reading advocated by John Day, which the study describes as linking \"Har-Magedon\" to Megiddo through Zechariah's mention of Megiddo and Ezekiel's \"mountains of Israel\"; the same study argues instead that Revelation 16:16 draws on the prophets Isaiah and Jeremiah's oracles describing Babylon's destruction as the \"cutting down\" of a \"mountain.\"",
+      "sources": [
+        "bib:jauhiainen-ot-background-armageddon",
+        "scripture:Revelation 16:16"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Revelation 16:16",
+      "book": "Revelation",
+      "textWEB": "He gathered them together into the place which is called in Hebrew, “Harmagedon”."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Zechariah 12:11",
+      "note": "Zechariah describes a great mourning in Jerusalem, \"like the mourning of Hadadrimmon in the valley of Megiddo\"; a 2005 academic study describes this verse, together with Ezekiel's \"mountains of Israel,\" as the basis of a reading (associated with John Day) that links Revelation's \"Har-Magedon\" to Megiddo, a reading the same study goes on to challenge.",
+      "sources": [
+        "scripture:Zechariah 12:11",
+        "bib:jauhiainen-ot-background-armageddon"
+      ]
+    },
+    {
+      "ref": "2 Kings 23:29",
+      "note": "2 Kings records that King Josiah of Judah was killed in battle against Pharaoh Necho at Megiddo, one of the battles the International Standard Bible Encyclopedia cites as giving the site its reputation as a place of conflict.",
+      "sources": [
+        "scripture:2 Kings 23:29",
+        "bib:isbe-har-magedon"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "holderId": "antipas-tetrarchy",
+      "entity": "Tetrarchy of Galilee and Perea (ruler: Herod Antipas)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:jewish-encyclopedia-agrippa-ii",
+        "bib:iaa-magdala-excavation"
+      ],
+      "note": "The emperor Nero later added the Galilean towns of Tiberias and Taricheae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; the Jewish historian Josephus dates this to AD 54, but the Jewish Encyclopedia (1906) reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "galilee-perea"
+}

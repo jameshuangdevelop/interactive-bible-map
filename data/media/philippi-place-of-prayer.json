@@ -1,0 +1,18 @@
+{
+  "locationId": "philippi-place-of-prayer",
+  "images": [
+    {
+      "id": "philippi-place-of-prayer-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/69/Lydia_-_baptismal_in_the_creek.jpg",
+      "width": 4224,
+      "height": 2376,
+      "author": "DocWoKav",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Lydia_-_baptismal_in_the_creek.jpg",
+      "caption": "The stream at Lydia, west of Philippi, marked by Greek Orthodox tradition as the site of Acts 16:13's place of prayer; the chapel and seating are modern.",
+      "kind": "modern",
+      "aiGenerated": false
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "locationId": "mount-sinai",
+  "images": [
+    {
+      "id": "mount-sinai-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Sinai-Katharinenberg-162-Abstieg-Oase-2009-gje.jpg",
+      "width": 3072,
+      "height": 2048,
+      "author": "Gerd Eichmann",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Sinai-Katharinenberg-162-Abstieg-Oase-2009-gje.jpg",
+      "caption": "Jebel Musa, the traditional site of Mount Sinai, in Egypt's southern Sinai Peninsula.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "mount-sinai-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Har_Karkom.jpg",
+      "width": 5312,
+      "height": 2988,
+      "author": "שועל",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Har_Karkom.jpg",
+      "caption": "Har Karkom, in Israel's Negev desert, one proposed alternative site for Mount Sinai.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "mount-sinai-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/%D8%A7%D9%84%D8%AB%D9%84%D9%88%D8%AC_%D8%AA%D8%BA%D8%B7%D9%8A_%D8%AC%D8%A8%D9%84_%D8%A7%D9%84%D9%84%D9%88%D8%B2_%D9%81%D9%8A_%D8%AA%D8%A8%D9%88%D9%83_2022.jpg",
+      "width": 2500,
+      "height": 1405,
+      "author": "وكالة الأنباء السعودية",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:%D8%A7%D9%84%D8%AB%D9%84%D9%88%D8%AC_%D8%AA%D8%BA%D8%B7%D9%8A_%D8%AC%D8%A8%D9%84_%D8%A7%D9%84%D9%84%D9%88%D8%B2_%D9%81%D9%8A_%D8%AA%D8%A8%D9%88%D9%83_2022.jpg",
+      "caption": "Jabal al-Lawz, in northwestern Saudi Arabia, under winter snow; a less widely held proposed site for Mount Sinai.",
+      "kind": "modern",
+      "aiGenerated": false
+    }
+  ]
+}

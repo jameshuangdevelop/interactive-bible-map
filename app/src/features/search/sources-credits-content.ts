@@ -143,9 +143,17 @@ export const UPSTREAM_SOURCES: UpstreamSourceItem[] = [
     url: "https://esa-worldcover.org/en/data-access"
   },
   {
-    name: "Cite-only references in `data/bibliography.json` (e.g. UNESCO World Heritage Centre listings, World History Encyclopedia, Livius.org, Zondervan Academic, BiblePlaces.com, HMML, the Hellenic Ministry of Culture and Sports' Odysseus portal, the Austrian Academy of Sciences, the Biblical Archaeology Society, Nikos Kokkinos's article in *Scripta Classica Israelica*, the Custody of the Holy Land's custodia.org, and the Society of Biblical Literature's Bible Odyssey, whose articles are CC BY-NC-ND 3.0)",
+    name: "Cite-only references in `data/bibliography.json` (e.g. UNESCO World Heritage Centre listings, World History Encyclopedia, Livius.org, Zondervan Academic, BiblePlaces.com, HMML, the Hellenic Ministry of Culture and Sports' Odysseus portal, the Austrian Academy of Sciences, the Biblical Archaeology Society, Nikos Kokkinos's article in *Scripta Classica Israelica*, the Custody of the Holy Land's custodia.org, the Society of Biblical Literature's Bible Odyssey, whose articles are CC BY-NC-ND 3.0, ToposText's place descriptions, Associates for Biblical Research (biblearchaeology.org), the Cornell University Archaeology Program, the *Journal of Roman Archaeology* (Cambridge University Press), Baker Academic's *Introducing the New Testament* supplement, *Novum Testamentum* (Brill), and Religious Greece (a platform of the Archdiocese of Athens))",
     url: null,
     note: "See each entry's `url` in `data/bibliography.json`."
+  },
+  {
+    name: "ToposText (Brady Kiesling; developed by Pavla SA): its place data",
+    url: "https://topostext.org/place/379229ABem"
+  },
+  {
+    name: "The Historical Marker Database (HMdb.org): \"The Promontory Palace\" marker page",
+    url: "https://www.hmdb.org/m.asp?m=64517"
   },
   {
     name: "Musée du Louvre collections website: the entry for the Victory of Samothrace (Ma 2369)",
