@@ -46,7 +46,7 @@
       ],
       "coordinateSource": "wikidata:Q2569739",
       "confidence": "disputed",
-      "support": "A ridge in Israel's southern Negev desert where the archaeologist Emmanuel Anati, after more than thirty years of fieldwork, documented some 1,300 archaeological sites and tens of thousands of rock engravings, and proposed the ridge as Mount Sinai; the proposal was debated at a 2013 scholarly colloquium in Israel. The Biblical Archaeology Society describes the main objection as chronological: the religious center at Har Karkom flourished at least 800 years earlier than the traditional date of the Exodus.",
+      "support": "A ridge in Israel's southern Negev desert where the archaeologist Emmanuel Anati, after more than thirty years of fieldwork, documented some 1,300 archaeological sites and tens of thousands of rock engravings, and proposed the ridge as Mount Sinai; the proposal was debated at a 2013 scholarly colloquium in Israel. The Biblical Archaeology Society calls chronology one major obstacle: the religious center at Har Karkom flourished at least 800 years earlier than the traditional date of the Exodus.",
       "sources": [
         "wikidata:Q2569739",
         "openbible:mount-sinai",
@@ -61,7 +61,7 @@
       ],
       "coordinateSource": "wikidata:Q4115817",
       "confidence": "low",
-      "support": "A mountain in northwestern Saudi Arabia that popular writers, among them Robert Cornuke (president of the BASE Institute), Larry Williams (1990), and Ron Wyatt (1994), have identified with Mount Sinai, partly on the argument that Galatians 4:25 places Mount Sinai \"in Arabia.\" Gordon Franz, writing for the Associates for Biblical Research, responds that in the days of the apostle Paul the term \"Arabia\" already included the Sinai Peninsula, citing the ancient writers Herodotus, the Septuagint, Josephus, and Strabo, so the verse does not by itself rule out the traditional site. The Biblical Archaeology Society describes a broader \"Midianite Hypothesis\" locating Mount Sinai \"not in the Sinai Peninsula, but in Midian in northwest Saudi Arabia,\" without naming a specific peak; OpenBible.info's aggregated scholarly identifications give Jabal al-Lawz specifically only a small fraction of the support Jebel Musa receives.",
+      "support": "A mountain in northwestern Saudi Arabia that writers, among them Robert Cornuke (president of the BASE Institute), Larry Williams (1990), and Ron Wyatt (1994), have identified with Mount Sinai, partly on the argument that Galatians 4:25 places Mount Sinai \"in Arabia.\" Gordon Franz, writing for the Associates for Biblical Research, responds that in the days of the apostle Paul the term \"Arabia\" already included the Sinai Peninsula, citing ancient sources including Herodotus, the Septuagint, Josephus, and Strabo, so the verse does not by itself rule out the traditional site. The Biblical Archaeology Society describes a broader \"Midianite Hypothesis\" that places Mount Sinai in Midian, in northwestern Saudi Arabia, rather than in the Sinai Peninsula, without naming a specific peak; OpenBible.info's aggregated scholarly identifications give Jabal al-Lawz specifically only a small fraction of the support Jebel Musa receives.",
       "sources": [
         "wikidata:Q4115817",
         "openbible:mount-sinai",
@@ -93,7 +93,7 @@
       ],
       "coordinateSource": "wikidata:Q6923657",
       "confidence": "low",
-      "support": "A mountain in the northwest of the Sinai Peninsula, within Egypt, well north of Jebel Musa. Gordon Franz, writing for the Associates for Biblical Research, states his own view that Sinai \"should be located at Jebel Sin-Bishar,\" citing the earlier proposals of Faiman, Har-el, and Rasmussen alongside his own 2000 article. OpenBible.info's aggregated scholarly identifications record it as a secondary candidate, well behind Jebel Musa.",
+      "support": "A mountain in the northwest of the Sinai Peninsula, within Egypt, well north of Jebel Musa. Gordon Franz, writing for the Associates for Biblical Research, states his own view that Sinai is better located at Jebel Sin Bishar, citing the earlier proposals of Faiman, Har-el, and Rasmussen alongside his own 2000 article. OpenBible.info's aggregated scholarly identifications record it as a secondary candidate, well behind Jebel Musa.",
       "sources": [
         "wikidata:Q6923657",
         "openbible:mount-sinai",
@@ -106,6 +106,7 @@
     "sources": [
       "bib:isbe-sinai",
       "bib:bas-mount-sinai-candidates",
+      "bib:biblearchaeology-sinai-in-arabia",
       "scripture:Acts 7:30",
       "scripture:Galatians 4:24",
       "scripture:Exodus 31:18"

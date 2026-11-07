@@ -26,10 +26,12 @@
       ],
       "coordinateSource": "bib:hmdb-promontory-palace-marker",
       "confidence": "high",
-      "support": "The Historical Marker Database records the location of the physical \"Promontory Palace\" marker, placed at the excavated site in the Caesarea Maritima National Park, as \"32° 29.796′ N, 34° 53.402′ E\"; this is corroborated by OpenStreetMap's independently drawn outline for the Promontory Palace (way 96066573, centred about 60 m away) and lies close to Wikidata's points for the adjacent Theater of Herod and Caesarea Hippodrome, which the marker's own text says the palace overlooks. Cornell University's archaeology program, which has worked at the site, describes a palace built around a large rock-cut pool on a rocky promontory extending about 100 meters into the sea, matching the first-century Jewish historian Josephus's account of a palace Herod the Great built at Caesarea; a peer-reviewed article in the Journal of Roman Archaeology, titled \"The promontory palace at Caesarea Maritima: preliminary evidence for Herod's Praetorium,\" documents this identification in the scholarly literature. Wikidata's own point for \"Herod's Palace\" (Q2527367), by contrast, falls about 630 m north, nearer the harbor and Crusader-period town, and is not used here.",
+      "support": "The Historical Marker Database records the location of the physical \"Promontory Palace\" marker, on the walkway to the palace in the Caesarea Maritima National Park, as \"32° 29.796′ N, 34° 53.402′ E\"; this lies close to Wikidata's points for the adjacent Theater of Herod and Caesarea Hippodrome, which the marker's own text says the palace overlooks. Cornell University's archaeology program, which has worked at the site, describes a palace built around a large rock-cut pool on a rocky promontory extending about 100 meters into the sea, adjacent to the restored ancient theater, matching the first-century Jewish historian Josephus's account of a palace Herod the Great built at Caesarea; a peer-reviewed article in the Journal of Roman Archaeology, titled \"The promontory palace at Caesarea Maritima: preliminary evidence for Herod's Praetorium,\" documents this identification in the scholarly literature. Wikidata's own point labeled \"Herod's Palace\" (Q2527367), by contrast, falls about 670 m north, nearer the harbor and Crusader-period town, and is not used here.",
       "sources": [
         "bib:hmdb-promontory-palace-marker",
-        "osm:way/96066573",
+        "wikidata:Q110300838",
+        "wikidata:Q3537241",
+        "wikidata:Q2527367",
         "bib:cornell-caesarea-maritima",
         "bib:gleason-burrell-netzer-promontory-palace",
         "scripture:Acts 23:35"
@@ -37,10 +39,11 @@
     }
   ],
   "summary": {
-    "text": "Herod's palace at Caesarea was a seaside palace that Herod the Great built on a rocky promontory jutting into the Mediterranean, later excavated and identified as the \"Promontory Palace.\" According to Acts, after Paul was brought to Caesarea under guard, the governor Felix ordered him kept in custody in Herod's palace to await his accusers.",
+    "text": "Herod's palace at Caesarea was a seaside palace built on a rocky promontory jutting into the Mediterranean, later excavated and identified as the \"Promontory Palace.\" Cornell University's archaeology program attributes the building to Herod the Great, citing the first-century Jewish historian Josephus, and a peer-reviewed article in the Journal of Roman Archaeology titles its identification \"Herod's Praetorium\"; the Historical Marker Database notes that archaeology has not settled whether Herod or a later Roman governor was responsible for building it. According to Acts, after Paul was brought to Caesarea under guard, the governor Felix ordered him kept in custody in Herod's palace to await his accusers.",
     "sources": [
       "bib:hmdb-promontory-palace-marker",
       "bib:cornell-caesarea-maritima",
+      "bib:gleason-burrell-netzer-promontory-palace",
       "scripture:Acts 23:33",
       "scripture:Acts 23:35"
     ]

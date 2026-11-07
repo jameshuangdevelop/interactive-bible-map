@@ -20,18 +20,19 @@
   "parentId": "philippi",
   "candidates": [
     {
-      "label": "Gangites River (near Lydia village)",
+      "label": "Stream at Lydia village (traditional site)",
       "coordinates": [
         24.276917,
         41.020889
       ],
       "coordinateSource": "wikidata:Q91742263",
       "confidence": "medium",
-      "support": "A small river west of Philippi: the International Standard Bible Encyclopedia reports the Greek historian Herodotus calls it the Angites, while the Roman-era historian Appian also records the names Gangas or Gangites, today's Anghista. Pleiades records this ancient river as formally unlocated, and separately identifies a different river, the \"Zygaktes?,\" with the modern Xiropotamos. The Greek Orthodox Church marks a traditional baptism site at this stream, near the modern village of Lydia, with a 1974 open-air baptistery and chapel dedicated to Lydia. Acts does not itself name the river.",
+      "support": "The Greek Orthodox Church marks a traditional site of Paul's encounter with Lydia at a stream near the modern village of Lydia, west of Philippi, which Religious Greece calls the Zigaktis, with a 1974 open-air baptistery and chapel dedicated to her. The International Standard Bible Encyclopedia separately records that the plain around Philippi was watered by a river the Greek historian Herodotus calls the Angites, and the Roman-era historian Appian also calls the Gangas or Gangites (today's Anghista), and that Paul went to its bank; Pleiades gives a representative point for an \"Angites (river)\" about 30 km west, near the Strymon, and separately catalogs a \"Gangites/Gangas\" river as formally unlocated, and a \"Zygaktes?\" river identified with the modern Xiropotamos. No source this research opened identifies the stream at Lydia itself with any of these named rivers. Acts does not itself name the river.",
       "sources": [
         "wikidata:Q91742263",
         "bib:isbe-philippi",
         "bib:religiousgreece-lydia-baptistery",
+        "pleiades:501350",
         "pleiades:507402",
         "pleiades:501669",
         "scripture:Acts 16:13"
@@ -39,7 +40,7 @@
     }
   ],
   "summary": {
-    "text": "The place of prayer by the river is where, according to Acts, Paul and his companions met a group of women outside the gate of Philippi on the Sabbath, and where Lydia, a dealer in purple cloth, believed and was baptized. The International Standard Bible Encyclopedia states that Philippi had no synagogue, since its resident Jewish population was small, and that their meetings for prayer took place on a river's bank instead. A small river west of the city, traditionally identified with the ancient Gangites and marked today by a Greek Orthodox shrine, is the traditional site, though Acts itself does not name the river.",
+    "text": "The place of prayer by the river is where, according to Acts, Paul and his companions met a group of women outside the gate of Philippi on the Sabbath, and where Lydia, a dealer in purple cloth, believed and was baptized. The International Standard Bible Encyclopedia states that Philippi had no synagogue; its resident Jewish population was small, and their meetings for prayer took place on a river's bank instead. A stream at the modern village of Lydia, west of the city, is marked today by a Greek Orthodox shrine as the traditional site, though Acts itself does not name the river, and no source found in this research ties that stream to the river named in classical sources for the area.",
     "sources": [
       "scripture:Acts 16:13",
       "scripture:Acts 16:14",
@@ -58,7 +59,7 @@
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia records that there was no synagogue at Philippi, since the number of resident Jews was small, and that their meetings for prayer took place on the river's bank.",
+      "text": "The International Standard Bible Encyclopedia records that there was no synagogue at Philippi; the number of resident Jews was small, and their meetings for prayer took place on the river's bank.",
       "sources": [
         "bib:isbe-philippi"
       ]

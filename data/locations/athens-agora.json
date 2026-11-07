@@ -28,11 +28,12 @@
       ],
       "coordinateSource": "wikidata:Q395367",
       "confidence": "high",
-      "support": "The excavated civic square just north of the Acropolis is identified as Athens's ancient marketplace (agora); the International Standard Bible Encyclopedia places Paul's daily reasoning with those who met him there, including Epicurean and Stoic philosophers, in this marketplace, distinct from his reasoning with the Jews and devout persons in the synagogue, and locates the Painted Portico in and around this square.",
+      "support": "The excavated civic square just north of the Acropolis is identified as Athens's ancient marketplace (agora); the International Standard Bible Encyclopedia places Paul's daily reasoning with those who met him there, including Stoic philosophers, in this marketplace, distinct from his reasoning with the Jews and devout persons in the synagogue, and locates the Painted Portico in and around this square. Acts 17:18 adds that Epicurean philosophers were also among those who reasoned with him there.",
       "sources": [
         "wikidata:Q395367",
         "bib:isbe-athens",
-        "scripture:Acts 17:17"
+        "scripture:Acts 17:17",
+        "scripture:Acts 17:18"
       ]
     }
   ],
