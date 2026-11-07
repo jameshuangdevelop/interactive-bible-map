@@ -21,16 +21,17 @@
     {
       "label": "Promontory Palace, Caesarea Maritima",
       "coordinates": [
-        34.891767,
-        32.502506
+        34.890033,
+        32.4966
       ],
-      "coordinateSource": "wikidata:Q2527367",
+      "coordinateSource": "bib:hmdb-promontory-palace-marker",
       "confidence": "high",
-      "support": "Excavations in the 1970s and 1990s (Universities of Pennsylvania and Hebrew University teams, later the Cornell University archaeology program) uncovered a palace extending about 100 meters into the sea on a rocky promontory, identified in the resulting peer-reviewed publication as Herod the Great's palace at Caesarea and, after Rome took direct control of Judea, the Roman governor's headquarters (praetorium); the identification with the \"Herod's palace\" of Acts 23:35 is widely accepted, though Acts gives no architectural description to confirm which rooms held which events.",
+      "support": "The Historical Marker Database records the location of the physical \"Promontory Palace\" marker, placed at the excavated site in the Caesarea Maritima National Park, as \"32° 29.796′ N, 34° 53.402′ E\"; this is corroborated by OpenStreetMap's independently drawn outline for the Promontory Palace (way 96066573, centred about 60 m away) and lies close to Wikidata's points for the adjacent Theater of Herod and Caesarea Hippodrome, which the marker's own text says the palace overlooks. Cornell University's archaeology program, which has worked at the site, describes a palace built around a large rock-cut pool on a rocky promontory extending about 100 meters into the sea, matching the first-century Jewish historian Josephus's account of a palace Herod the Great built at Caesarea; a peer-reviewed article in the Journal of Roman Archaeology, titled \"The promontory palace at Caesarea Maritima: preliminary evidence for Herod's Praetorium,\" documents this identification in the scholarly literature. Wikidata's own point for \"Herod's Palace\" (Q2527367), by contrast, falls about 630 m north, nearer the harbor and Crusader-period town, and is not used here.",
       "sources": [
-        "wikidata:Q2527367",
-        "bib:gleason-burrell-netzer-promontory-palace",
+        "bib:hmdb-promontory-palace-marker",
+        "osm:way/96066573",
         "bib:cornell-caesarea-maritima",
+        "bib:gleason-burrell-netzer-promontory-palace",
         "scripture:Acts 23:35"
       ]
     }
@@ -38,20 +39,21 @@
   "summary": {
     "text": "Herod's palace at Caesarea was a seaside palace that Herod the Great built on a rocky promontory jutting into the Mediterranean, later excavated and identified as the \"Promontory Palace.\" According to Acts, after Paul was brought to Caesarea under guard, the governor Felix ordered him kept in custody in Herod's palace to await his accusers.",
     "sources": [
-      "wikidata:Q2527367",
+      "bib:hmdb-promontory-palace-marker",
       "bib:cornell-caesarea-maritima",
+      "scripture:Acts 23:33",
       "scripture:Acts 23:35"
     ]
   },
   "history": [
     {
-      "text": "The Cornell University archaeology program, which excavated the site, describes the Promontory Palace in two parts: a Lower Palace near sea level, with a colonnade framing a great rock-cut pool, and an Upper Palace on higher ground centered on a large paved courtyard. The program dates the Lower Palace to Herod the Great's reign and records that the palace and the nearby stadium described by the first-century Jewish historian Josephus had both been lost to memory until their rediscovery in the last quarter of the twentieth century.",
+      "text": "Cornell University's archaeology program describes the Promontory Palace in two parts: a Lower Palace near sea level, with a colonnade framing a great rock-cut pool, and an Upper Palace on higher ground centered on a large paved courtyard, citing the first-century Jewish historian Josephus's account that Herod the Great built a splendid palace as a showpiece of his new city.",
       "sources": [
         "bib:cornell-caesarea-maritima"
       ]
     },
     {
-      "text": "Acts records that when the Roman governor Felix learned Paul was from Cilicia, he said, \"I will hear you fully when your accusers also arrive,\" and ordered him kept under guard in Herod's palace; Paul remained in custody there for two years, until Felix was succeeded by Porcius Festus.",
+      "text": "Acts records that when the Roman governor Felix learned Paul was from Cilicia, he said, \"I will hear you fully when your accusers also arrive,\" and ordered him kept under guard in Herod's palace; Paul remained in custody for two years, until Felix was succeeded by Porcius Festus.",
       "sources": [
         "scripture:Acts 23:34",
         "scripture:Acts 23:35",
