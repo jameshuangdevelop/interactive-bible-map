@@ -1,0 +1,31 @@
+{
+  "locationId": "valley-of-hinnom",
+  "images": [
+    {
+      "id": "valley-of-hinnom-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Hinnom_valley_panorama_a_%286403859823%29.jpg",
+      "width": 4000,
+      "height": 3000,
+      "author": "Ian Scott",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Hinnom_valley_panorama_a_(6403859823).jpg",
+      "caption": "Panorama of the Hinnom Valley, running along the west and south sides of Jerusalem's Old City.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "valley-of-hinnom-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Hinnom_Valley_%26_the_western_city_wall%2C_Jerusalem%2C_1970s_-_panoramio.jpg",
+      "width": 1554,
+      "height": 1020,
+      "author": "ekstijn",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Hinnom_Valley_&_the_western_city_wall,_Jerusalem,_1970s_-_panoramio.jpg",
+      "caption": "The Hinnom Valley and Jerusalem's western city wall, photographed in the 1970s.",
+      "kind": "historical",
+      "aiGenerated": false
+    }
+  ]
+}

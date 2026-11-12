@@ -1,0 +1,31 @@
+{
+  "locationId": "jacobs-well",
+  "images": [
+    {
+      "id": "jacobs-well-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Jacob%27s_Well_in_2013.jpg",
+      "width": 3000,
+      "height": 4000,
+      "author": "Jeremiah K Garrett",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jacob's_Well_in_2013.jpg",
+      "caption": "Jacob's Well, the traditional site near Sychar where John's Gospel sets Jesus' conversation with a Samaritan woman.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "jacobs-well-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/32/Northern_views._Jacob%27s_Well_and_Plain_of_Makhna_LOC_matpc.01054.jpg",
+      "width": 6013,
+      "height": 4398,
+      "author": "Matson Collection",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Northern_views._Jacob's_Well_and_Plain_of_Makhna_LOC_matpc.01054.jpg",
+      "caption": "An early twentieth-century photograph of Jacob's Well and the surrounding plain, near Mount Gerizim.",
+      "kind": "historical",
+      "aiGenerated": false
+    }
+  ]
+}

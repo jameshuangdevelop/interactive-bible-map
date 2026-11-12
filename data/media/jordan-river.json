@@ -1,0 +1,31 @@
+{
+  "locationId": "jordan-river",
+  "images": [
+    {
+      "id": "jordan-river-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Bethabara%2C_Jordan%2C_in_2009.JPG",
+      "width": 2800,
+      "height": 1550,
+      "author": "High Contrast",
+      "license": "CC BY 3.0 de",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/de/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Bethabara,_Jordan,_in_2009.JPG",
+      "caption": "The Jordan River near Bethabara (Bethany beyond the Jordan), a traditional site associated with Jesus' baptism.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "jordan-river-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/F%C3%A9lix_Bonfils_%28French_-_Le_Jourdain_%28The_Jordan%29_-_Google_Art_Project.jpg",
+      "width": 4251,
+      "height": 3294,
+      "author": "Félix Bonfils",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Félix_Bonfils_(French_-_Le_Jourdain_(The_Jordan)_-_Google_Art_Project.jpg",
+      "caption": "An 1870s photograph of the Jordan River by Félix Bonfils.",
+      "kind": "historical",
+      "aiGenerated": false
+    }
+  ]
+}

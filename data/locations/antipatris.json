@@ -1,0 +1,127 @@
+{
+  "id": "antipatris",
+  "names": {
+    "ancient": [
+      "Antipatris"
+    ],
+    "modern": "Tel Afek / Ras el-Ain",
+    "modernCountries": [
+      "Israel"
+    ],
+    "alternate": []
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "judea-province",
+  "candidates": [
+    {
+      "label": "Tel Ras el-'Ain (Tel Afek)",
+      "coordinates": [
+        34.93078,
+        32.10478
+      ],
+      "coordinateSource": "dare:21684",
+      "confidence": "high",
+      "support": "The Digital Atlas of the Roman Empire's point for Antipatris, at the source of the Yarkon river, is corroborated by Pleiades' independently recorded point for the same site, about 54 meters away; the International Standard Bible Encyclopedia likewise identifies the site with this mound.",
+      "sources": [
+        "dare:21684",
+        "pleiades:687996",
+        "bib:isbe-antipatris"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Antipatris was a town Herod the Great built on the road between Jerusalem and Caesarea, and named after his father, Antipater. Acts records that a Roman detachment, moving the apostle Paul from Jerusalem to Caesarea under guard at night to protect him from an assassination plot against his life, brought him as far as Antipatris before the foot soldiers turned back and the horsemen carried on with him alone to Caesarea.",
+    "sources": [
+      "bib:isbe-antipatris",
+      "scripture:Acts 23:12",
+      "scripture:Acts 23:31",
+      "scripture:Acts 23:32"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia notes that the site preserves the remains of a Crusader-period castle, possibly the \"Mirabel\" of that era.",
+      "sources": [
+        "bib:isbe-antipatris"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 23:31",
+      "book": "Acts",
+      "textWEB": "So the soldiers, carrying out their orders, took Paul and brought him by night to Antipatris."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "judea-samaria-idumea"
+}

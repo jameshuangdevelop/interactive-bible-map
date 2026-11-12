@@ -1,0 +1,31 @@
+{
+  "locationId": "akeldama",
+  "images": [
+    {
+      "id": "akeldama-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/17/Jerusalem-Hinnom-Kidron-Old-City-397.jpg",
+      "width": 5472,
+      "height": 3648,
+      "author": "Bukvoed",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem-Hinnom-Kidron-Old-City-397.jpg",
+      "caption": "The Hinnom Valley near the traditional site of Akeldama (Field of Blood).",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "akeldama-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Jerusalem-Hinnom-Kidron-Old-City-405.jpg",
+      "width": 5364,
+      "height": 3352,
+      "author": "Bukvoed",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem-Hinnom-Kidron-Old-City-405.jpg",
+      "caption": "Another view of the Hinnom Valley near the traditional site of Akeldama.",
+      "kind": "site",
+      "aiGenerated": false
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "id": "akeldama",
+  "names": {
+    "ancient": [
+      "Akeldama",
+      "Field of Blood"
+    ],
+    "modern": "Akeldama",
+    "alternate": [
+      "Aceldama",
+      "Hakeldama"
+    ],
+    "otherLanguages": [
+      "Haqq ed-Dumm"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Akeldama, Hinnom Valley",
+      "coordinates": [
+        35.23288,
+        31.76841
+      ],
+      "coordinateSource": "wikidata:Q886458",
+      "confidence": "medium",
+      "support": "A tradition the International Standard Bible Encyclopedia says \"appears to go back to the 4th century\" locates the field on a platform partway up the southern slope of the Valley of Hinnom, just before it joins the Kidron Valley; a remarkable ruin there, long used as a charnel house, gave the site its reputation. Wikidata's coordinate is corroborated by a separate Wikidata item for St. Onuphrius Monastery, built near the traditional site, about 49 meters away.",
+      "sources": [
+        "wikidata:Q886458",
+        "wikidata:Q3320224",
+        "bib:isbe-akeldama"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Akeldama, meaning \"field of blood,\" is the traditional site of a field near Jerusalem associated with the death of Judas Iscariot. Matthew's Gospel says the chief priests used the thirty pieces of silver Judas returned to buy \"the potter's field with them to bury strangers in,\" which was therefore called the field of blood; Acts says Judas himself obtained a field with the reward of his wrongdoing, and separately describes his death. A tradition that, per the International Standard Bible Encyclopedia, \"appears to go back to the 4th century\" places the field on the slope where the Valley of Hinnom meets the Kidron Valley.",
+    "sources": [
+      "scripture:Matthew 27:7",
+      "scripture:Matthew 27:8",
+      "scripture:Acts 1:18",
+      "scripture:Acts 1:19",
+      "bib:isbe-akeldama"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia suggests that a supposed link between the \"potter's field\" of Matthew's account and the \"potter's house\" and the Valley of Hinnom named in the prophet Jeremiah may have influenced the choice of this particular site for the tradition.",
+      "sources": [
+        "bib:isbe-akeldama",
+        "scripture:Matthew 27:7",
+        "scripture:Jeremiah 19:2"
+      ]
+    },
+    {
+      "text": "A large ruined structure on the traditional site (about 24 by 17 meters) was used for many centuries as a charnel house, its earth reputed to decompose bodies quickly; the International Standard Bible Encyclopedia (1915) records a Greek Orthodox monastery, built in more recent times, standing nearby, over numerous cave tombs.",
+      "sources": [
+        "bib:isbe-akeldama"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 27:7",
+      "book": "Matthew",
+      "textWEB": "They took counsel, and bought the potter’s field with them to bury strangers in."
+    },
+    {
+      "ref": "Matthew 27:8",
+      "book": "Matthew",
+      "textWEB": "Therefore that field has been called “The Field of Blood” to this day."
+    },
+    {
+      "ref": "Matthew 27:9",
+      "book": "Matthew",
+      "textWEB": "Then that which was spoken through Jeremiah the prophet was fulfilled, saying, “They took the thirty pieces of silver, the price of him upon whom a price had been set, whom some of the children of Israel priced,"
+    },
+    {
+      "ref": "Matthew 27:10",
+      "book": "Matthew",
+      "textWEB": "and they gave them for the potter’s field, as the Lord commanded me.”"
+    },
+    {
+      "ref": "Acts 1:19",
+      "book": "Acts",
+      "textWEB": "It became known to everyone who lived in Jerusalem that in their language that field was called ‘Akeldama,’ that is, ‘The field of blood.’"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "judea-samaria-idumea"
+}

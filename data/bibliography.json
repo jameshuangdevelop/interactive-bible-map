@@ -1,128 +1,263 @@
 {
   "entries": [
     {
-      "id": "bas-mount-sinai-candidates",
-      "type": "web",
-      "title": "Searching for Biblical Mt. Sinai",
-      "authors": [
-        "Robin Ngo"
-      ],
-      "year": 2025,
-      "publisher": "Biblical Archaeology Society",
-      "url": "https://www.biblicalarchaeology.org/daily/biblical-topics/exodus/searching-for-biblical-mt-sinai/",
-      "accessed": "2026-11-06"
-    },
-    {
-      "id": "biblearchaeology-sinai-in-arabia",
-      "type": "web",
-      "title": "Where Is Mount Sinai In Arabia (Galatians 4:25)?",
-      "authors": [
-        "Gordon Franz"
-      ],
-      "year": 2013,
-      "publisher": "Associates for Biblical Research",
-      "url": "https://biblearchaeology.org/research-articles/where-is-mount-sinai-in-arabia-galatians-425/",
-      "accessed": "2026-11-06"
-    },
-    {
-      "id": "cornell-caesarea-maritima",
-      "type": "web",
-      "title": "Caesarea Maritima",
-      "authors": [
-        "Cornell University Archaeology Program"
-      ],
-      "year": 2026,
-      "publisher": "Cornell University",
-      "url": "https://archaeology.cornell.edu/caesarea-maritima",
-      "accessed": "2026-11-06"
-    },
-    {
-      "id": "gleason-burrell-netzer-promontory-palace",
-      "type": "article",
-      "title": "The promontory palace at Caesarea Maritima: preliminary evidence for Herod's Praetorium",
-      "authors": [
-        "Kathryn L. Gleason",
-        "Barbara Burrell",
-        "Ehud Netzer",
-        "Laurel Taylor",
-        "J. Howard Williams"
-      ],
-      "year": 1998,
-      "journal": "Journal of Roman Archaeology",
-      "url": "https://www.cambridge.org/core/journals/journal-of-roman-archaeology/article/abs/promontory-palace-at-caesarea-maritima-preliminary-evidence-for-herods-praetorium/9C523B410171B3C2EE6F93B798AD835A"
-    },
-    {
-      "id": "hmdb-promontory-palace-marker",
-      "type": "web",
-      "title": "The Promontory Palace Historical Marker",
-      "authors": [
-        "Dale K. Benington"
-      ],
-      "year": 2013,
-      "publisher": "The Historical Marker Database (HMdb.org)",
-      "url": "https://www.hmdb.org/m.asp?m=64517",
-      "accessed": "2026-11-06"
-    },
-    {
-      "id": "isbe-babylon-new-testament",
+      "id": "isbe-aenon",
       "type": "chapter",
-      "title": "Babylon in the New Testament",
-      "authors": [
-        "A. W. Fortune"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/B/babylon-in-the-new-testament.html",
-      "accessed": "2026-11-06"
-    },
-    {
-      "id": "isbe-har-magedon",
-      "type": "chapter",
-      "title": "Har-magedon",
+      "title": "Aenon",
       "authors": [
         "W. Ewing"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/H/har-magedon.html",
+      "url": "https://www.internationalstandardbible.com/A/aenon.html",
       "accessed": "2026-11-06"
     },
     {
-      "id": "isbe-sinai",
+      "id": "isbe-akeldama",
       "type": "chapter",
-      "title": "Sinai",
+      "title": "Akeldama",
       "authors": [
-        "C. R. Conder"
+        "E. W. G. Masterman"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/S/sinai.html",
+      "url": "https://www.internationalstandardbible.com/A/akeldama.html",
       "accessed": "2026-11-06"
     },
     {
-      "id": "jauhiainen-ot-background-armageddon",
-      "type": "article",
-      "title": "The OT Background To Armageddon (Rev. 16:16 Revisited)",
+      "id": "isbe-antipatris",
+      "type": "chapter",
+      "title": "Antipatris",
       "authors": [
-        "Marko Jauhiainen"
+        "W. Ewing"
       ],
-      "year": 2005,
-      "journal": "Novum Testamentum",
-      "url": "https://brill.com/abstract/journals/nt/47/4/article-p381_5.xml"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/antipatris.html",
+      "accessed": "2026-11-06"
     },
     {
-      "id": "odysseus-corinth-bema",
-      "type": "web",
-      "title": "Bema of Saint Paul (Roman Forum)",
+      "id": "isbe-ashdod",
+      "type": "chapter",
+      "title": "Ashdod",
       "authors": [
-        "Hellenic Ministry of Culture and Sports"
+        "H. Porter"
       ],
-      "year": 2026,
-      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
-      "url": "http://odysseus.culture.gr/h/2/eh2530.jsp?obj_id=20964",
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/ashdod.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-gabbatha",
+      "type": "chapter",
+      "title": "Gabbatha",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gabbatha.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-gaza",
+      "type": "chapter",
+      "title": "Gaza",
+      "authors": [
+        "H. Porter"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gaza.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-gehenna",
+      "type": "chapter",
+      "title": "Gehenna",
+      "authors": [
+        "Geerhardus Vos"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gehenna.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-gennesaret-land-of",
+      "type": "chapter",
+      "title": "Gennesaret, Land of",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gennesaret-land-of.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-gerizim-mount",
+      "type": "chapter",
+      "title": "Gerizim, Mount",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gerizim-mount.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-hinnom-valley-of",
+      "type": "chapter",
+      "title": "Hinnom, Valley of",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/H/hinnom-valley-of.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-jacobs-well",
+      "type": "chapter",
+      "title": "Jacob's Well",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/J/jacobs-well.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-judah-territory-of",
+      "type": "chapter",
+      "title": "Judah, Territory of",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/J/judah-territory-of.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-kidron-the-brook",
+      "type": "chapter",
+      "title": "Kidron, the Brook",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/K/kidron-the-brook.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-lod-lydda",
+      "type": "chapter",
+      "title": "Lod; Lydda",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/L/lod-lydda.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-praetorium",
+      "type": "chapter",
+      "title": "Praetorium",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/praetorium.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-salim",
+      "type": "chapter",
+      "title": "Salim",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/salim.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-samaria-city-of",
+      "type": "chapter",
+      "title": "Samaria, City of",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/samaria-city-of.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-sharon",
+      "type": "chapter",
+      "title": "Sharon",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/sharon.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-tiberias",
+      "type": "chapter",
+      "title": "Tiberias",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/tiberias.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-zarephath",
+      "type": "chapter",
+      "title": "Zarephath",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/Z/zarephath.html",
       "accessed": "2026-11-06"
     },
     {
@@ -211,53 +346,6 @@
       "publisher": "Israel Antiquities Authority, Hadashot Arkheologiyot",
       "url": "https://hadashot.iaa.org.il/report_detail_eng.aspx?id=2304",
       "accessed": "2026-09-23"
-    },
-    {
-      "id": "powell-introducing-nt-armageddon",
-      "type": "book",
-      "title": "Revelation 16:16: Where Is Armageddon? A Biblical Detective Story (supplement to Introducing the New Testament, 2nd ed.)",
-      "authors": [
-        "Mark Allan Powell"
-      ],
-      "year": 2018,
-      "publisher": "Baker Academic",
-      "url": "https://cdn.bakerpublishinggroup.com/processed/esource-assets/files/2545/original/30.17.Revelation_16.16__Where_Is_Armageddon_A_Biblical_Detective_Story.pdf"
-    },
-    {
-      "id": "religiousgreece-lydia-baptistery",
-      "type": "web",
-      "title": "Pilgrimage of Agia Lydia of Philippians (Baptistery of Lydia)",
-      "authors": [
-        "Archdiocese of Athens"
-      ],
-      "year": 2026,
-      "publisher": "Religious Greece (Archdiocese of Athens)",
-      "url": "https://www.religiousgreece.gr/en/attractions/pilgrimage-agia-lydia-phlippians-baptistery-lydia",
-      "accessed": "2026-11-06"
-    },
-    {
-      "id": "topostext-corinth-bema",
-      "type": "web",
-      "title": "Bema (Corinth)",
-      "authors": [
-        "Brady Kiesling"
-      ],
-      "year": 2026,
-      "publisher": "ToposText",
-      "url": "https://topostext.org/place/379229ABem",
-      "accessed": "2026-11-06"
-    },
-    {
-      "id": "unesco-babylon",
-      "type": "web",
-      "title": "Babylon",
-      "authors": [
-        "UNESCO World Heritage Centre"
-      ],
-      "year": 2019,
-      "publisher": "UNESCO World Heritage Centre",
-      "url": "https://whc.unesco.org/en/list/278",
-      "accessed": "2026-11-06"
     },
     {
       "id": "unesco-church-of-nativity",
@@ -3128,6 +3216,178 @@
       "publisher": "Charles Scribner's Sons",
       "url": "https://archive.org/details/aga1254.0001.001.umich.edu",
       "accessed": "2026-10-23"
+    },
+    {
+      "id": "bas-mount-sinai-candidates",
+      "type": "web",
+      "title": "Searching for Biblical Mt. Sinai",
+      "authors": [
+        "Robin Ngo"
+      ],
+      "year": 2025,
+      "publisher": "Biblical Archaeology Society",
+      "url": "https://www.biblicalarchaeology.org/daily/biblical-topics/exodus/searching-for-biblical-mt-sinai/",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "biblearchaeology-sinai-in-arabia",
+      "type": "web",
+      "title": "Where Is Mount Sinai In Arabia (Galatians 4:25)?",
+      "authors": [
+        "Gordon Franz"
+      ],
+      "year": 2013,
+      "publisher": "Associates for Biblical Research",
+      "url": "https://biblearchaeology.org/research-articles/where-is-mount-sinai-in-arabia-galatians-425/",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "cornell-caesarea-maritima",
+      "type": "web",
+      "title": "Caesarea Maritima",
+      "authors": [
+        "Cornell University Archaeology Program"
+      ],
+      "year": 2026,
+      "publisher": "Cornell University",
+      "url": "https://archaeology.cornell.edu/caesarea-maritima",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "gleason-burrell-netzer-promontory-palace",
+      "type": "article",
+      "title": "The promontory palace at Caesarea Maritima: preliminary evidence for Herod's Praetorium",
+      "authors": [
+        "Kathryn L. Gleason",
+        "Barbara Burrell",
+        "Ehud Netzer",
+        "Laurel Taylor",
+        "J. Howard Williams"
+      ],
+      "year": 1998,
+      "journal": "Journal of Roman Archaeology",
+      "url": "https://www.cambridge.org/core/journals/journal-of-roman-archaeology/article/abs/promontory-palace-at-caesarea-maritima-preliminary-evidence-for-herods-praetorium/9C523B410171B3C2EE6F93B798AD835A"
+    },
+    {
+      "id": "hmdb-promontory-palace-marker",
+      "type": "web",
+      "title": "The Promontory Palace Historical Marker",
+      "authors": [
+        "Dale K. Benington"
+      ],
+      "year": 2013,
+      "publisher": "The Historical Marker Database (HMdb.org)",
+      "url": "https://www.hmdb.org/m.asp?m=64517",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-babylon-new-testament",
+      "type": "chapter",
+      "title": "Babylon in the New Testament",
+      "authors": [
+        "A. W. Fortune"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/B/babylon-in-the-new-testament.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-har-magedon",
+      "type": "chapter",
+      "title": "Har-magedon",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/H/har-magedon.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "isbe-sinai",
+      "type": "chapter",
+      "title": "Sinai",
+      "authors": [
+        "C. R. Conder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/sinai.html",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "jauhiainen-ot-background-armageddon",
+      "type": "article",
+      "title": "The OT Background To Armageddon (Rev. 16:16 Revisited)",
+      "authors": [
+        "Marko Jauhiainen"
+      ],
+      "year": 2005,
+      "journal": "Novum Testamentum",
+      "url": "https://brill.com/abstract/journals/nt/47/4/article-p381_5.xml"
+    },
+    {
+      "id": "odysseus-corinth-bema",
+      "type": "web",
+      "title": "Bema of Saint Paul (Roman Forum)",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/2/eh2530.jsp?obj_id=20964",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "powell-introducing-nt-armageddon",
+      "type": "book",
+      "title": "Revelation 16:16: Where Is Armageddon? A Biblical Detective Story (supplement to Introducing the New Testament, 2nd ed.)",
+      "authors": [
+        "Mark Allan Powell"
+      ],
+      "year": 2018,
+      "publisher": "Baker Academic",
+      "url": "https://cdn.bakerpublishinggroup.com/processed/esource-assets/files/2545/original/30.17.Revelation_16.16__Where_Is_Armageddon_A_Biblical_Detective_Story.pdf"
+    },
+    {
+      "id": "religiousgreece-lydia-baptistery",
+      "type": "web",
+      "title": "Pilgrimage of Agia Lydia of Philippians (Baptistery of Lydia)",
+      "authors": [
+        "Archdiocese of Athens"
+      ],
+      "year": 2026,
+      "publisher": "Religious Greece (Archdiocese of Athens)",
+      "url": "https://www.religiousgreece.gr/en/attractions/pilgrimage-agia-lydia-phlippians-baptistery-lydia",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "topostext-corinth-bema",
+      "type": "web",
+      "title": "Bema (Corinth)",
+      "authors": [
+        "Brady Kiesling"
+      ],
+      "year": 2026,
+      "publisher": "ToposText",
+      "url": "https://topostext.org/place/379229ABem",
+      "accessed": "2026-11-06"
+    },
+    {
+      "id": "unesco-babylon",
+      "type": "web",
+      "title": "Babylon",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2019,
+      "publisher": "UNESCO World Heritage Centre",
+      "url": "https://whc.unesco.org/en/list/278",
+      "accessed": "2026-11-06"
     }
   ]
 }

@@ -1,0 +1,31 @@
+{
+  "locationId": "tiberias",
+  "images": [
+    {
+      "id": "tiberias-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/TIBERIAS_-_GALILEE_%287723477802%29.jpg",
+      "width": 3508,
+      "height": 2339,
+      "author": "israeltourism",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:TIBERIAS_-_GALILEE_(7723477802).jpg",
+      "caption": "The city of Tiberias on the western shore of the Sea of Galilee.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "tiberias-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/112400_south_tiberia_in_an_aerial_photograph_PikiWiki_Israel.jpg",
+      "width": 2000,
+      "height": 1333,
+      "author": "משה מילנר",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:112400_south_tiberia_in_an_aerial_photograph_PikiWiki_Israel.jpg",
+      "caption": "Aerial photograph of southern Tiberias, beside the Sea of Galilee.",
+      "kind": "modern",
+      "aiGenerated": false
+    }
+  ]
+}

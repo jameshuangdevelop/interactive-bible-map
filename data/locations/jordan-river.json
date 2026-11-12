@@ -1,0 +1,229 @@
+{
+  "id": "jordan-river",
+  "names": {
+    "ancient": [
+      "Jordan River"
+    ],
+    "modern": "Jordan River",
+    "modernCountries": [
+      "Israel",
+      "Jordan",
+      "West Bank"
+    ],
+    "alternate": [
+      "Jordan"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "region",
+  "prominence": "standard",
+  "naturalFeatureKind": "water",
+  "parentId": "judea-province",
+  "candidates": [
+    {
+      "label": "Mouth of the Jordan River (Dead Sea)",
+      "coordinates": [
+        35.558333,
+        31.761389
+      ],
+      "coordinateSource": "wikidata:Q40059",
+      "confidence": "high",
+      "support": "Wikidata records two coordinate statements for the Jordan River: one near its source north of the Sea of Galilee, and one at its mouth on the Dead Sea, used here as a single representative point for this long natural feature. OpenBible.info's own recorded point for the river matches this mouth coordinate exactly.",
+      "sources": [
+        "wikidata:Q40059",
+        "openbible:jordan"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The first-century Jewish historian Josephus records that \"Jordan's visible stream arises from this cavern\" at Panium and, after further distance, \"passes through the middle of the lake Gennesareth\"; its source lies near the Golan Heights and Sde Nehemia, it flows through the Sea of Galilee, and it empties into the Dead Sea. In the New Testament it is above all the river where John the Baptist preached and baptized, including Jesus himself; Matthew describes crowds from Jerusalem, Judea and \"all the region around the Jordan\" going out to John to be baptized \"in the Jordan.\"",
+    "sources": [
+      "wikidata:Q40059",
+      "bib:josephus-jewish-war",
+      "scripture:Luke 3:3",
+      "scripture:Matthew 3:5",
+      "scripture:Matthew 3:6",
+      "scripture:Matthew 3:13"
+    ]
+  },
+  "history": [
+    {
+      "text": "John's Gospel locates John the Baptist's ministry in relation to the Jordan three times: once at \"Bethany beyond the Jordan,\" once describing him as \"beyond the Jordan,\" and later simply \"beyond the Jordan into the place where John was baptizing at first.\" Other Gospel passages describe the river as a boundary of travel and territory: Matthew records Jesus coming \"into the borders of Judea beyond the Jordan,\" Mark's parallel reads \"the borders of Judea and beyond the Jordan,\" and Mark separately lists \"beyond the Jordan\" among the regions crowds came from to follow Jesus.",
+      "sources": [
+        "scripture:John 1:28",
+        "scripture:John 3:26",
+        "scripture:John 10:40",
+        "scripture:Matthew 19:1",
+        "scripture:Mark 10:1",
+        "scripture:Mark 3:8"
+      ]
+    },
+    {
+      "text": "The first-century Jewish historian Josephus records that the Jordan passes through the middle of the Lake of Gennesareth (the Sea of Galilee).",
+      "sources": [
+        "bib:josephus-jewish-war"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 3:5",
+      "book": "Matthew",
+      "textWEB": "Then people from Jerusalem, all of Judea, and all the region around the Jordan went out to him."
+    },
+    {
+      "ref": "Matthew 3:6",
+      "book": "Matthew",
+      "textWEB": "They were baptized by him in the Jordan, confessing their sins."
+    },
+    {
+      "ref": "Matthew 3:13",
+      "book": "Matthew",
+      "textWEB": "Then Jesus came from Galilee to the Jordan to John, to be baptized by him."
+    },
+    {
+      "ref": "Matthew 4:15",
+      "book": "Matthew",
+      "textWEB": "“The land of Zebulun and the land of Naphtali, toward the sea, beyond the Jordan, Galilee of the Gentiles,"
+    },
+    {
+      "ref": "Matthew 4:25",
+      "book": "Matthew",
+      "textWEB": "Great multitudes from Galilee, Decapolis, Jerusalem, Judea, and from beyond the Jordan followed him."
+    },
+    {
+      "ref": "Matthew 19:1",
+      "book": "Matthew",
+      "textWEB": "When Jesus had finished these words, he departed from Galilee and came into the borders of Judea beyond the Jordan."
+    },
+    {
+      "ref": "Mark 1:5",
+      "book": "Mark",
+      "textWEB": "All the country of Judea and all those of Jerusalem went out to him. They were baptized by him in the Jordan river, confessing their sins."
+    },
+    {
+      "ref": "Mark 1:9",
+      "book": "Mark",
+      "textWEB": "In those days, Jesus came from Nazareth of Galilee, and was baptized by John in the Jordan."
+    },
+    {
+      "ref": "Mark 3:8",
+      "book": "Mark",
+      "textWEB": "from Jerusalem, from Idumaea, beyond the Jordan, and those from around Tyre and Sidon. A great multitude, hearing what great things he did, came to him."
+    },
+    {
+      "ref": "Mark 10:1",
+      "book": "Mark",
+      "textWEB": "He arose from there and came into the borders of Judea and beyond the Jordan. Multitudes came together to him again. As he usually did, he was again teaching them."
+    },
+    {
+      "ref": "Luke 3:3",
+      "book": "Luke",
+      "textWEB": "He came into all the region around the Jordan, preaching the baptism of repentance for remission of sins."
+    },
+    {
+      "ref": "Luke 4:1",
+      "book": "Luke",
+      "textWEB": "Jesus, full of the Holy Spirit, returned from the Jordan and was led by the Spirit into the wilderness"
+    },
+    {
+      "ref": "John 1:28",
+      "book": "John",
+      "textWEB": "These things were done in Bethany beyond the Jordan, where John was baptizing."
+    },
+    {
+      "ref": "John 3:26",
+      "book": "John",
+      "textWEB": "They came to John and said to him, “Rabbi, he who was with you beyond the Jordan, to whom you have testified, behold, he baptizes, and everyone is coming to him.”"
+    },
+    {
+      "ref": "John 10:40",
+      "book": "John",
+      "textWEB": "He went away again beyond the Jordan into the place where John was baptizing at first, and he stayed there."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Joshua 3:17",
+      "note": "Israel crosses the Jordan on dry ground into the Promised Land, one of the river's best-known Old Testament episodes.",
+      "sources": [
+        "scripture:Joshua 3:17"
+      ]
+    },
+    {
+      "ref": "2 Kings 2:8",
+      "note": "The prophet Elijah strikes the Jordan with his rolled-up cloak, parting its waters so that he and Elisha cross on dry ground.",
+      "sources": [
+        "scripture:2 Kings 2:8"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "judea-samaria-idumea"
+}

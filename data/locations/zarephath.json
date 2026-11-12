@@ -1,0 +1,116 @@
+{
+  "id": "zarephath",
+  "names": {
+    "ancient": [
+      "Zarephath",
+      "Sarepta"
+    ],
+    "modern": "Sarafand",
+    "modernCountries": [
+      "Lebanon"
+    ],
+    "alternate": []
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "syria",
+  "candidates": [
+    {
+      "label": "Sarafand",
+      "coordinates": [
+        35.295048,
+        33.46431
+      ],
+      "coordinateSource": "dare:21572",
+      "confidence": "high",
+      "support": "The Digital Atlas of the Roman Empire's point for Sarepta, on the coast between Tyre and Sidon, matches Pleiades' recorded point for the same city closely, though Pleiades' point partly averages in the atlas's own location. The International Standard Bible Encyclopedia likewise identifies the ancient town with the modern village of Sarafend and nearby shoreline ruins.",
+      "sources": [
+        "dare:21572",
+        "pleiades:678374",
+        "bib:isbe-zarephath"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Zarephath, called Sarepta in its Greek form, was a Phoenician town on the coast between Tyre and Sidon. Luke's Gospel records Jesus, in his hometown synagogue at Nazareth, telling his hearers that in the days of the prophet Elijah, when the sky was shut up for three and a half years and a great famine came over the land, Elijah was sent to none of the widows of Israel, but only to a widow at Zarephath, in the land of Sidon.",
+    "sources": [
+      "bib:isbe-zarephath",
+      "scripture:Luke 4:16",
+      "scripture:Luke 4:25",
+      "scripture:Luke 4:26"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia locates the ancient site's ruins on the shore south of the modern village, in two groups, one near a harbor-side spring and the other, farther south, containing columns, sarcophagi and marble slabs that point to a city of some importance.",
+      "sources": [
+        "bib:isbe-zarephath"
+      ]
+    },
+    {
+      "text": "The same encyclopedia records that Zarephath passed from Sidonian to Tyrian control after an Assyrian king's invasion in 722 BC, and fell to the Assyrian ruler Sennacherib in 701 BC.",
+      "sources": [
+        "bib:isbe-zarephath"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Luke 4:26",
+      "book": "Luke",
+      "textWEB": "Elijah was sent to none of them, except to Zarephath, in the land of Sidon, to a woman who was a widow."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "1 Kings 17:9",
+      "note": "God directs the prophet Elijah to go to Zarephath, where a widow will provide for him.",
+      "sources": [
+        "scripture:1 Kings 17:9"
+      ]
+    },
+    {
+      "ref": "1 Kings 17:10",
+      "note": "Elijah arrives at Zarephath and meets the widow gathering sticks at the town gate.",
+      "sources": [
+        "scripture:1 Kings 17:10"
+      ]
+    },
+    {
+      "ref": "Obadiah 1:20",
+      "note": "The prophet Obadiah refers to exiled Israelites possessing the land \"even to Zarephath,\" among the Canaanites, a people the International Standard Bible Encyclopedia says probably means Phoenicia here.",
+      "sources": [
+        "scripture:Obadiah 1:20",
+        "bib:isbe-zarephath"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -64,
+      "toYear": -27,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria",
+      "sources": [
+        "bib:livius-damascus"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": 101,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria (ruler: Imperial legates, governed from Antioch)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:livius-cilicia",
+        "bib:josephus-antiquities"
+      ],
+      "note": "Administers the Cilician plain throughout, and administered Philip's former tetrarchy directly for a few years after his death (34-37; Antiquities 18.4.6)."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "syria"
+}

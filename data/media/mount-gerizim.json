@@ -1,0 +1,31 @@
+{
+  "locationId": "mount-gerizim",
+  "images": [
+    {
+      "id": "mount-gerizim-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/%D7%A8%D7%9B%D7%A1_%D7%94%D7%A8_%D7%92%D7%A8%D7%99%D7%96%D7%99%D7%9D.jpg",
+      "width": 5472,
+      "height": 3648,
+      "author": "יאיר דב",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:רכס_הר_גריזים.jpg",
+      "caption": "Mount Gerizim overlooking Nablus (ancient Shechem), seen from Mount Ebal across the valley.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "mount-gerizim-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/32/Flickr_-_Government_Press_Office_%28GPO%29_-_Remnants_of_the_Roman_Jupiter_Temple.jpg",
+      "width": 3072,
+      "height": 2048,
+      "author": "David Eldan",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Flickr_-_Government_Press_Office_(GPO)_-_Remnants_of_the_Roman_Jupiter_Temple.jpg",
+      "caption": "Ruins on the summit of Mount Gerizim, built over the site of the Samaritan temple.",
+      "kind": "site",
+      "aiGenerated": false
+    }
+  ]
+}

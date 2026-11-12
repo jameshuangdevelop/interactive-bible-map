@@ -1,0 +1,31 @@
+{
+  "locationId": "gaza",
+  "images": [
+    {
+      "id": "gaza-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Gaza_City.JPG",
+      "width": 2304,
+      "height": 1728,
+      "author": "OneArmedMan",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Gaza_City.JPG",
+      "caption": "Panorama of Gaza City, on the coastal route between Syria and Egypt, photographed in 2007.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "gaza-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Gaza_in_William_Tipping_1840s_sketches_of_Palestine_and_the_surrounding_region%2C_from_Traill%E2%80%99s_Josephus_12.jpg",
+      "width": 2451,
+      "height": 2064,
+      "author": "William Tipping",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Gaza_in_William_Tipping_1840s_sketches_of_Palestine_and_the_surrounding_region,_from_Traill’s_Josephus_12.jpg",
+      "caption": "An 1840s sketch of Gaza by William Tipping, published in a nineteenth-century edition of Josephus's works.",
+      "kind": "historical",
+      "aiGenerated": false
+    }
+  ]
+}

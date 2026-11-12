@@ -1,0 +1,164 @@
+{
+  "id": "lydda",
+  "names": {
+    "ancient": [
+      "Lydda",
+      "Lod"
+    ],
+    "modern": "Lod",
+    "modernCountries": [
+      "Israel"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Diospolis"
+    ]
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "judea-province",
+  "candidates": [
+    {
+      "label": "Lod",
+      "coordinates": [
+        34.893068,
+        31.950908
+      ],
+      "coordinateSource": "dare:21685",
+      "confidence": "high",
+      "support": "The Digital Atlas of the Roman Empire's point for Lydda, at the modern Israeli city of Lod, is corroborated by Pleiades' recorded point for the same city, about 900 meters away, though Pleiades' point partly averages in the atlas's own location.",
+      "sources": [
+        "dare:21685",
+        "pleiades:687953",
+        "openbible:lod"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Lydda was a town in the plain of Sharon, administered as one of the toparchies, or local districts, under Jerusalem in the first century. Acts describes the apostle Peter visiting \"the saints who lived at Lydda\" and healing a paralyzed man named Aeneas, leading many in the town and the nearby plain to turn to the Lord.",
+    "sources": [
+      "bib:isbe-lod-lydda",
+      "scripture:Acts 9:32",
+      "scripture:Acts 9:35"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that after the death of Julius Caesar, the Roman official Cassius sold the inhabitants of Lydda and some neighboring towns into slavery for failing to pay a levy he demanded, and that Mark Antony later freed them.",
+      "sources": [
+        "bib:isbe-lod-lydda"
+      ]
+    },
+    {
+      "text": "Josephus records that the Roman commander Cestius found Lydda \"empty of its men,\" who had gone up to Jerusalem for the feast of tabernacles, destroyed fifty who remained, and burned the city; the International Standard Bible Encyclopedia reports that Lydda, along with Jamnia, later surrendered to the future emperor Vespasian.",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:isbe-lod-lydda"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 9:32",
+      "book": "Acts",
+      "textWEB": "As Peter went throughout all those parts, he came down also to the saints who lived at Lydda."
+    },
+    {
+      "ref": "Acts 9:35",
+      "book": "Acts",
+      "textWEB": "All who lived at Lydda and in Sharon saw him, and they turned to the Lord."
+    },
+    {
+      "ref": "Acts 9:38",
+      "book": "Acts",
+      "textWEB": "As Lydda was near Joppa, the disciples, hearing that Peter was there, sent two men to him, imploring him not to delay in coming to them."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "1 Chronicles 8:12",
+      "note": "Lod is listed among the towns built by Shemed, a descendant of the tribe of Benjamin.",
+      "sources": [
+        "bib:isbe-lod-lydda",
+        "scripture:1 Chronicles 8:12"
+      ]
+    },
+    {
+      "ref": "Ezra 2:33",
+      "note": "People of Lod are listed among those who returned from the Babylonian exile with Zerubbabel.",
+      "sources": [
+        "bib:isbe-lod-lydda",
+        "scripture:Ezra 2:33"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "judea-samaria-idumea"
+}
