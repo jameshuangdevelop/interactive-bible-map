@@ -1,0 +1,31 @@
+{
+  "locationId": "athens-agora",
+  "images": [
+    {
+      "id": "athens-agora-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/The_Ancient_Agora_of_Athens_on_March_27%2C_2022.jpg",
+      "width": 6000,
+      "height": 4000,
+      "author": "George E. Koronaios",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_Ancient_Agora_of_Athens_on_March_27,_2022.jpg",
+      "caption": "The reconstructed Stoa of Attalos in the Ancient Agora of Athens, the marketplace of Acts 17:17.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "athens-agora-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Ancient_Agora_Panorama_%28208938095%29.jpeg",
+      "width": 2048,
+      "height": 646,
+      "author": "Georgios Liakopoulos",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_Agora_Panorama_(208938095).jpeg",
+      "caption": "A panoramic view of the Ancient Agora of Athens, the city's civic and commercial square.",
+      "kind": "site",
+      "aiGenerated": false
+    }
+  ]
+}

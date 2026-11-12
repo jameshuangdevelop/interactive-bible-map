@@ -1,0 +1,213 @@
+{
+  "id": "mount-sinai",
+  "names": {
+    "ancient": [
+      "Mount Sinai"
+    ],
+    "modernCountries": [
+      "Egypt",
+      "Saudi Arabia",
+      "Israel"
+    ],
+    "alternate": [
+      "Mount Horeb"
+    ],
+    "otherLanguages": [
+      "Har Sinai"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "naturalFeatureKind": "land",
+  "parentId": "arabia",
+  "candidates": [
+    {
+      "label": "Jebel Musa",
+      "coordinates": [
+        33.9752,
+        28.5384
+      ],
+      "coordinateSource": "wikidata:Q377485",
+      "confidence": "disputed",
+      "support": "The traditional site, in the granite mountains of the southern Sinai Peninsula below the sixth-century Monastery of St. Catherine, has been accepted since at least the early Byzantine period; the International Standard Bible Encyclopedia (1915) calls it \"generally accepted by all those explorers who have carefully considered the subject\" and notes its strong water supply, a point earlier doubted by a rival theory. OpenBible.info's aggregated scholarly identifications for Mount Sinai also favor Jebel Musa by a wide margin over every other candidate. No archaeological remains from the time of the Exodus have been recovered at or near the site.",
+      "sources": [
+        "wikidata:Q377485",
+        "openbible:mount-sinai",
+        "bib:isbe-sinai",
+        "bib:bas-mount-sinai-candidates"
+      ]
+    },
+    {
+      "label": "Har Karkom",
+      "coordinates": [
+        34.75,
+        30.283333
+      ],
+      "coordinateSource": "wikidata:Q2569739",
+      "confidence": "disputed",
+      "support": "A ridge in Israel's southern Negev desert where the archaeologist Emmanuel Anati, after more than thirty years of fieldwork, documented some 1,300 archaeological sites and tens of thousands of rock engravings, and proposed the ridge as Mount Sinai; the proposal was debated at a 2013 scholarly colloquium in Israel. The Biblical Archaeology Society calls chronology one major obstacle: the religious center at Har Karkom flourished at least 800 years earlier than the traditional date of the Exodus.",
+      "sources": [
+        "wikidata:Q2569739",
+        "openbible:mount-sinai",
+        "bib:bas-mount-sinai-candidates"
+      ]
+    },
+    {
+      "label": "Jabal al-Lawz",
+      "coordinates": [
+        35.305833,
+        28.654167
+      ],
+      "coordinateSource": "wikidata:Q4115817",
+      "confidence": "low",
+      "support": "A mountain in northwestern Saudi Arabia that writers, among them Robert Cornuke (president of the BASE Institute), Larry Williams (1990), and Ron Wyatt (1994), have identified with Mount Sinai, partly on the argument that Galatians 4:25 places Mount Sinai \"in Arabia.\" Gordon Franz, writing for the Associates for Biblical Research, responds that in the days of the apostle Paul the term \"Arabia\" already included the Sinai Peninsula, citing ancient sources including Herodotus, the Septuagint, Josephus, and Strabo, so the verse does not by itself rule out the traditional site. The Biblical Archaeology Society describes a broader \"Midianite Hypothesis\" that places Mount Sinai in Midian, in northwestern Saudi Arabia, rather than in the Sinai Peninsula, without naming a specific peak; OpenBible.info's aggregated scholarly identifications give Jabal al-Lawz specifically only a small fraction of the support Jebel Musa receives.",
+      "sources": [
+        "wikidata:Q4115817",
+        "openbible:mount-sinai",
+        "bib:biblearchaeology-sinai-in-arabia",
+        "bib:bas-mount-sinai-candidates",
+        "scripture:Galatians 4:25"
+      ]
+    },
+    {
+      "label": "Jebel Serbal",
+      "coordinates": [
+        33.651667,
+        28.646389
+      ],
+      "coordinateSource": "wikidata:Q722426",
+      "confidence": "low",
+      "support": "A ridge about 20 miles west of Jebel Musa, proposed as Mount Sinai in the nineteenth century by the Egyptologist Karl Richard Lepsius, who argued the Jebel Musa area lacked enough water for the Israelites; the International Standard Bible Encyclopedia reports this water objection was answered by a later explorer's account of several perennial streams near Jebel Musa, and states the patristic tradition for Horeb is traceable to the fourth century AD.",
+      "sources": [
+        "wikidata:Q722426",
+        "openbible:mount-sinai",
+        "bib:isbe-sinai"
+      ]
+    },
+    {
+      "label": "Jebel Sin Bishar",
+      "coordinates": [
+        32.961,
+        29.671
+      ],
+      "coordinateSource": "wikidata:Q6923657",
+      "confidence": "low",
+      "support": "A mountain in the northwest of the Sinai Peninsula, within Egypt, well north of Jebel Musa. Gordon Franz, writing for the Associates for Biblical Research, states his own view that Sinai is better located at Jebel Sin Bishar, citing the earlier proposals of Faiman, Har-el, and Rasmussen alongside his own 2000 article. OpenBible.info's aggregated scholarly identifications record it as a secondary candidate, well behind Jebel Musa.",
+      "sources": [
+        "wikidata:Q6923657",
+        "openbible:mount-sinai",
+        "bib:biblearchaeology-sinai-in-arabia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Mount Sinai is the mountain where, according to Exodus, God gave Moses the Law, and which Acts and Galatians both recall by name. Its location is debated: the traditional site is Jebel Musa in Egypt's southern Sinai Peninsula, long venerated by Christian tradition and marked by a sixth-century monastery; other proposals include Har Karkom in Israel's Negev desert, Jabal al-Lawz in northwestern Saudi Arabia, and, within the Sinai Peninsula itself, Jebel Serbal and Jebel Sin Bishar. Scholars have reached no consensus, and this project takes no position among them.",
+    "sources": [
+      "bib:isbe-sinai",
+      "bib:bas-mount-sinai-candidates",
+      "bib:biblearchaeology-sinai-in-arabia",
+      "scripture:Acts 7:30",
+      "scripture:Galatians 4:24",
+      "scripture:Exodus 31:18"
+    ]
+  },
+  "history": [
+    {
+      "text": "Acts records Stephen's speech recalling that \"an angel of the Lord appeared\" to Moses \"in the wilderness of Mount Sinai,\" and that Moses later received \"living revelations\" there to pass on to Israel. In Galatians, Paul builds an allegory in which Hagar represents \"Mount Sinai in Arabia,\" paired with the Jerusalem of his own day, contrasted with the heavenly Jerusalem.",
+      "sources": [
+        "scripture:Acts 7:30",
+        "scripture:Acts 7:38",
+        "scripture:Galatians 4:24",
+        "scripture:Galatians 4:25"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia traces Christian tradition fixing the traditional site to at least the fourth century AD, when the church historians Eusebius and Jerome placed the nearby wilderness of Horeb near Paran, which in their own time was located in Wady Feiran, and records that the Byzantine emperor Justinian built the monastery below Jebel Musa, now known as St. Catherine's Monastery, in AD 527; the same article cites the first-century Jewish historian Josephus describing Sinai as the highest and most forbidding mountain in the region.",
+      "sources": [
+        "bib:isbe-sinai",
+        "bib:bas-mount-sinai-candidates"
+      ]
+    },
+    {
+      "text": "The Biblical Archaeology Society reports that none of the scholars at a 2013 colloquium on the question discussed the traditional Jebel Musa site, and that no archaeological remains dating to the traditional period of the Exodus have been recovered anywhere in the Sinai Peninsula.",
+      "sources": [
+        "bib:bas-mount-sinai-candidates"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 7:30",
+      "book": "Acts",
+      "textWEB": "“When forty years were fulfilled, an angel of the Lord appeared to him in the wilderness of Mount Sinai, in a flame of fire in a bush."
+    },
+    {
+      "ref": "Acts 7:38",
+      "book": "Acts",
+      "textWEB": "This is he who was in the assembly in the wilderness with the angel that spoke to him on Mount Sinai, and with our fathers, who received living revelations to give to us,"
+    },
+    {
+      "ref": "Galatians 4:24",
+      "book": "Galatians",
+      "textWEB": "These things contain an allegory, for these are two covenants. One is from Mount Sinai, bearing children to bondage, which is Hagar."
+    },
+    {
+      "ref": "Galatians 4:25",
+      "book": "Galatians",
+      "textWEB": "For this Hagar is Mount Sinai in Arabia, and answers to the Jerusalem that exists now, for she is in bondage with her children."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Exodus 19:20",
+      "note": "Exodus describes the Lord coming down on Mount Sinai and calling Moses up to its top, the start of the central event Acts and Galatians both recall.",
+      "sources": [
+        "scripture:Exodus 19:20",
+        "scripture:Acts 7:38"
+      ]
+    },
+    {
+      "ref": "Exodus 31:18",
+      "note": "Exodus records that when God finished speaking with Moses on Mount Sinai, he gave him the two stone tablets of the covenant, written with God's finger.",
+      "sources": [
+        "scripture:Exodus 31:18"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -9,
+      "toYear": 40,
+      "holderId": "nabataean-kingdom",
+      "entity": "Nabataean kingdom (\"Arabia\") (ruler: Aretas IV)",
+      "sources": [
+        "bib:livius-nabataeans",
+        "bib:isbe-arabia"
+      ],
+      "note": "The International Standard Bible Encyclopedia (1915) classes the Sinai peninsula with \"Arabia Petrea,\" the region named for Petra, this kingdom's own capital. This area's drawn extent includes Sinai on that geographic basis; no ancient source describes exactly where the line between Arabia and Egypt ran, so a conventional modern approximation is used instead."
+    },
+    {
+      "fromYear": 40,
+      "toYear": 71,
+      "holderId": "nabataean-kingdom",
+      "entity": "Nabataean kingdom (\"Arabia\") (ruler: Malichus II)",
+      "sources": [
+        "bib:livius-nabataeans"
+      ]
+    },
+    {
+      "fromYear": 71,
+      "toYear": 106,
+      "holderId": "nabataean-kingdom",
+      "entity": "Nabataean kingdom (\"Arabia\") (ruler: Rabbel II)",
+      "sources": [
+        "bib:livius-nabataeans"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "arabia"
+}

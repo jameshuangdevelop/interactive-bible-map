@@ -1,0 +1,121 @@
+{
+  "id": "philippi-place-of-prayer",
+  "names": {
+    "ancient": [
+      "The place of prayer by the river"
+    ],
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [
+      "Lydia's river"
+    ],
+    "otherLanguages": [
+      "Proseuche"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "philippi",
+  "candidates": [
+    {
+      "label": "Stream at Lydia village (traditional site)",
+      "coordinates": [
+        24.276917,
+        41.020889
+      ],
+      "coordinateSource": "wikidata:Q91742263",
+      "confidence": "medium",
+      "support": "The Greek Orthodox Church marks a traditional site of Paul's encounter with Lydia at a stream near the modern village of Lydia, west of Philippi, which Religious Greece calls the Zigaktis, with a 1974 open-air baptistery and chapel dedicated to her. The International Standard Bible Encyclopedia separately records that the plain around Philippi was watered by a river the Greek historian Herodotus calls the Angites, and the Roman-era historian Appian also calls the Gangas or Gangites (today's Anghista), and that Paul went to its bank; Pleiades gives a representative point for an \"Angites (river)\" about 30 km west, near the Strymon, and separately catalogs a \"Gangites/Gangas\" river as formally unlocated. The sources disagree on which ancient river this stream was: Religious Greece calls it the Zigaktis, while Pleiades places the ancient \"Zygaktes?\" river, with a query, at the modern Xiropotamos. Acts does not itself name the river.",
+      "sources": [
+        "wikidata:Q91742263",
+        "bib:isbe-philippi",
+        "bib:religiousgreece-lydia-baptistery",
+        "pleiades:501350",
+        "pleiades:507402",
+        "pleiades:501669",
+        "scripture:Acts 16:13"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The place of prayer by the river is where, according to Acts, Paul and his companions met a group of women outside the gate of Philippi on the Sabbath, and where Lydia, a dealer in purple cloth, believed and was baptized. The International Standard Bible Encyclopedia states that Philippi had no synagogue; its resident Jewish population was small, and their meetings for prayer took place on a river's bank instead. A stream at the modern village of Lydia, west of the city, is marked today by a Greek Orthodox shrine as the traditional site, though Acts itself does not name the river, and the sources disagree on which ancient river it was: Religious Greece calls it the Zigaktis, while the ancient name Zygaktes is otherwise placed, with a query, at the modern Xiropotamos.",
+    "sources": [
+      "scripture:Acts 16:13",
+      "scripture:Acts 16:14",
+      "scripture:Acts 16:15",
+      "bib:isbe-philippi",
+      "bib:religiousgreece-lydia-baptistery",
+      "pleiades:501669"
+    ]
+  },
+  "history": [
+    {
+      "text": "Acts records that on the Sabbath, Paul and his companions went outside the city gate to a riverside where they supposed there was a place of prayer, and sat down to speak with the women who had gathered there; Lydia, a dealer in purple cloth from Thyatira who already worshiped God, listened, and she and her household were baptized.",
+      "sources": [
+        "scripture:Acts 16:13",
+        "scripture:Acts 16:14",
+        "scripture:Acts 16:15"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia records that there was no synagogue at Philippi; the number of resident Jews was small, and their meetings for prayer took place on the river's bank.",
+      "sources": [
+        "bib:isbe-philippi"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 16:13",
+      "book": "Acts",
+      "textWEB": "On the Sabbath day we went outside of the city by a riverside, where we supposed there was a place of prayer, and we sat down and spoke to the women who had come together."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -148,
+      "toYear": -27,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Governed with Achaia)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Imperial legate of Moesia (governed with Achaia))",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 101,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul (restored by the emperor Claudius))",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06",
+  "politicalAreaId": "macedonia"
+}

@@ -1,0 +1,31 @@
+{
+  "locationId": "cyrene",
+  "images": [
+    {
+      "id": "cyrene-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/55/Cyrene_%2821%29_%288289518406%29.jpg",
+      "width": 5184,
+      "height": 3456,
+      "author": "joepyrek",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Cyrene_(21)_(8289518406).jpg",
+      "caption": "The archaeological site of ancient Cyrene, near modern Shahhat, Libya.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "cyrene-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/18/CireneTermeTraiano.jpg",
+      "width": 2424,
+      "height": 1638,
+      "author": "MM",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:CireneTermeTraiano.jpg",
+      "caption": "The Baths of Trajan at Cyrene, overlooking the surrounding plain.",
+      "kind": "site",
+      "aiGenerated": false
+    }
+  ]
+}

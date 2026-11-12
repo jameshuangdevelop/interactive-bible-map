@@ -1,0 +1,207 @@
+{
+  "id": "babylon",
+  "names": {
+    "ancient": [
+      "Babylon"
+    ],
+    "modernCountries": [
+      "Iraq",
+      "Egypt"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Babel"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "mesopotamia",
+  "candidates": [
+    {
+      "label": "Babylon (Mesopotamia, near Hillah)",
+      "coordinates": [
+        44.421111,
+        32.5425
+      ],
+      "coordinateSource": "wikidata:Q5684",
+      "confidence": "high",
+      "support": "The ruins of the Mesopotamian capital are the undisputed site of ancient Babylon, the city Matthew and Acts recall as the place of Judah's exile; Wikidata and Pleiades's coordinates for the site agree closely. Many good scholars have also read this as the literal place meant by \"Babylon\" in 1 Peter 5:13, though the International Standard Bible Encyclopedia notes there is no evidence that Peter was ever in Babylon, and that Josephus records most of its Jewish population had already been driven out to neighboring towns by this period.",
+      "sources": [
+        "wikidata:Q5684",
+        "pleiades:893951",
+        "bib:isbe-babylon-new-testament",
+        "bib:josephus-antiquities",
+        "scripture:Matthew 1:11-17",
+        "scripture:Acts 7:43"
+      ]
+    },
+    {
+      "label": "Babylon Fortress, Old Cairo, Egypt",
+      "coordinates": [
+        31.2297,
+        30.0061
+      ],
+      "coordinateSource": "wikidata:Q2421968",
+      "confidence": "low",
+      "politicalAreaId": "egypt",
+      "support": "A Roman fortress at what is now Old Cairo, Egypt, which the International Standard Bible Encyclopedia equates with the \"Egyptian Babylon\"; its surviving walls date to the late third or early fourth century AD, well after the New Testament period, though tradition holds the Roman emperor Diocletian built it to defend a canal linking the Nile to the Red Sea, and the first-century geographer Strabo says the Egyptian Babylon was founded by refugees from the Mesopotamian Babylon. The encyclopedia records this site as one of three historic proposals for the \"Babylon\" of 1 Peter 5:13, but judges it improbable, since in the first century the site was little more than a military post, and no tradition connects the apostle Peter with Egypt.",
+      "sources": [
+        "wikidata:Q2421968",
+        "pleiades:758514868",
+        "bib:isbe-babylon-new-testament",
+        "scripture:1 Peter 5:13"
+      ]
+    }
+  ],
+  "unmappedCandidates": [
+    {
+      "label": "Rome (figurative name, in 1 Peter and Revelation)",
+      "confidence": "high",
+      "support": "The International Standard Bible Encyclopedia reports that most scholars, from at least the time of the early Christian writer Tertullian onward, have read \"Babylon\" in Revelation as a figurative name for Rome, citing features of the \"Babylon\" Revelation describes, such as ruling over \"the kings of the earth\" and sitting on \"seven mountains,\" that fit Rome rather than any other city of that age; the same encyclopedia reports that most interpreters before the Reformation likewise read 1 Peter 5:13's \"Babylon\" as Rome, and cites as supporting internal evidence that Peter's letter also sends greetings from Mark, whom, the encyclopedia notes, Paul had summoned to Rome (2 Timothy 4:11).",
+      "reason": "A figurative reading of Rome, a place that has its own record in this project; no separate coordinate is needed here.",
+      "sources": [
+        "bib:isbe-babylon-new-testament",
+        "scripture:Revelation 17:5",
+        "scripture:1 Peter 5:13",
+        "scripture:2 Timothy 4:11"
+      ]
+    },
+    {
+      "label": "Jerusalem (minor figurative reading)",
+      "confidence": "low",
+      "support": "The International Standard Bible Encyclopedia notes that a few interpreters have read Revelation's \"Babylon\" as a figurative name for Jerusalem rather than Rome, though it records that most scholars reject this reading.",
+      "reason": "A minor figurative reading of Jerusalem, a place that has its own record in this project; no separate coordinate is needed here.",
+      "sources": [
+        "bib:isbe-babylon-new-testament",
+        "scripture:Revelation 17:5"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Babylon was the capital of ancient Babylonia, the seat of the Neo-Babylonian Empire from the late seventh century BC until 539 BC and, per UNESCO, located 85 km south of Baghdad; it was the city to which the kingdom of Judah was exiled, and Matthew's genealogy and Stephen's speech in Acts both recall this exile by name. Revelation names \"Babylon\" repeatedly as a doomed city, in terms most scholars read as a figurative name for Rome rather than a reference to the Mesopotamian city itself. Where Peter wrote that \"she who is in Babylon\" sends greetings, in 1 Peter 5:13, is disputed: proposals include Rome (read figuratively, the traditional view), the Mesopotamian city itself, and a Roman fortress in Egypt called Babylon, near modern Cairo.",
+    "sources": [
+      "wikidata:Q5684",
+      "pleiades:893951",
+      "bib:unesco-babylon",
+      "bib:isbe-babylon-new-testament",
+      "scripture:Matthew 1:17",
+      "scripture:Acts 7:43",
+      "scripture:1 Peter 5:13",
+      "scripture:Revelation 17:5"
+    ]
+  },
+  "history": [
+    {
+      "text": "Matthew's genealogy of Jesus marks \"the exile to Babylon\" as a hinge point, counting fourteen generations from Abraham to the exile and fourteen more from the exile to Jesus; in Stephen's speech in Acts, he tells the Jewish council that because Israel worshiped false gods, God said he would \"carry you away beyond Babylon.\"",
+      "sources": [
+        "scripture:Matthew 1:11",
+        "scripture:Matthew 1:12",
+        "scripture:Matthew 1:17",
+        "scripture:Acts 7:43"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia sets out three historic proposals for the \"Babylon\" from which 1 Peter was written: the Mesopotamian city, the Egyptian fortress near Old Cairo, and Rome read figuratively. It judges the Egyptian option improbable, since Babylon in Egypt was by then little more than a military station with no tradition of a visit by Peter; it notes that many good scholars have held the Mesopotamian reading, but that Josephus records most of that city's Jewish community had already been driven out to neighboring towns by this period, with no evidence of a church there or of any visit by Peter. The encyclopedia concludes that internal evidence, including the letter's greeting from Mark, favors Rome, and that this figurative reading was the common view of the church before the Reformation.",
+      "sources": [
+        "bib:isbe-babylon-new-testament",
+        "bib:josephus-antiquities",
+        "scripture:1 Peter 5:13"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia describes every reference to \"Babylon\" in Revelation as figurative, noting that the name is explicitly called a \"mystery\" at Revelation 17:5; it reports that this figurative Babylon has, since at least the time of the early Christian writer Tertullian, most often been read as Rome, an identification adopted by the early Christian writers Jerome and Augustine and commonly accepted by the church since.",
+      "sources": [
+        "bib:isbe-babylon-new-testament",
+        "scripture:Revelation 17:5"
+      ]
+    },
+    {
+      "text": "By the first century AD, the Mesopotamian city lay within the Parthian Empire, Rome's rival power to the east; this project's timeline, which tracks Roman-administered areas, does not assign Parthian lands a dated political-history entry of their own.",
+      "sources": [
+        "bib:isbe-parthians"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 1:11-17",
+      "book": "Matthew",
+      "textWEB": "Josiah became the father of Jechoniah and his brothers at the time of the exile to Babylon. After the exile to Babylon, Jechoniah became the father of Shealtiel. Shealtiel became the father of Zerubbabel. Zerubbabel became the father of Abiud. Abiud became the father of Eliakim. Eliakim became the father of Azor. Azor became the father of Zadok. Zadok became the father of Achim. Achim became the father of Eliud. Eliud became the father of Eleazar. Eleazar became the father of Matthan. Matthan became the father of Jacob. Jacob became the father of Joseph, the husband of Mary, from whom was born Jesus, who is called Christ. So all the generations from Abraham to David are fourteen generations; from David to the exile to Babylon fourteen generations; and from the carrying away to Babylon to the Christ, fourteen generations."
+    },
+    {
+      "ref": "Acts 7:43",
+      "book": "Acts",
+      "textWEB": "You took up the tabernacle of Moloch, the star of your god Rephan, the figures which you made to worship, so I will carry you away beyond Babylon.’"
+    },
+    {
+      "ref": "1 Peter 5:13",
+      "book": "1 Peter",
+      "textWEB": "She who is in Babylon, chosen together with you, greets you. So does Mark, my son."
+    },
+    {
+      "ref": "Revelation 14:8",
+      "book": "Revelation",
+      "textWEB": "Another, a second angel, followed, saying, “Babylon the great has fallen, which has made all the nations to drink of the wine of the wrath of her sexual immorality.”"
+    },
+    {
+      "ref": "Revelation 16:19",
+      "book": "Revelation",
+      "textWEB": "The great city was divided into three parts, and the cities of the nations fell. Babylon the great was remembered in the sight of God, to give to her the cup of the wine of the fierceness of his wrath."
+    },
+    {
+      "ref": "Revelation 17:5",
+      "book": "Revelation",
+      "textWEB": "And on her forehead a name was written, “MYSTERY, BABYLON THE GREAT, THE MOTHER OF THE PROSTITUTES AND OF THE ABOMINATIONS OF THE EARTH.”"
+    },
+    {
+      "ref": "Revelation 18:2",
+      "book": "Revelation",
+      "textWEB": "He cried with a mighty voice, saying, “Fallen, fallen is Babylon the great, and she has become a habitation of demons, a prison of every unclean spirit, and a prison of every unclean and hated bird!"
+    },
+    {
+      "ref": "Revelation 18:10",
+      "book": "Revelation",
+      "textWEB": "standing far away for the fear of her torment, saying, ‘Woe, woe, the great city, Babylon, the strong city! For your judgment has come in one hour.’"
+    },
+    {
+      "ref": "Revelation 18:21",
+      "book": "Revelation",
+      "textWEB": "A mighty angel took up a stone like a great millstone and cast it into the sea, saying, “Thus with violence will Babylon, the great city, be thrown down, and will be found no more at all."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "2 Kings 25:1-11",
+      "note": "2 Kings records King Nebuchadnezzar of Babylon's siege of Jerusalem, its fall, and the city's destruction and exile, the events Matthew's genealogy and Stephen's speech both recall.",
+      "sources": [
+        "scripture:2 Kings 25:1-11",
+        "scripture:Matthew 1:17"
+      ]
+    },
+    {
+      "ref": "Daniel 4:30",
+      "note": "Daniel records King Nebuchadnezzar surveying his capital and asking, \"Is not this great Babylon, which I have built?\"",
+      "sources": [
+        "scripture:Daniel 4:30"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -30,
+      "toYear": 101,
+      "holderId": "egypt-prefecture",
+      "entity": "Roman Egypt (special imperial prefecture) (ruler: Equestrian prefect; senators barred without the emperor's leave)",
+      "sources": [
+        "bib:suetonius-twelve-caesars",
+        "bib:tacitus-annals"
+      ],
+      "note": "The Roman biographer Suetonius: after Cleopatra's death, the emperor Augustus \"reduced Egypt to the form of a province.\"",
+      "candidate": 1
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06"
+}

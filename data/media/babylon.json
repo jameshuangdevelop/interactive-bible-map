@@ -1,0 +1,31 @@
+{
+  "locationId": "babylon",
+  "images": [
+    {
+      "id": "babylon-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/DSC_0658-Recovered.jpg",
+      "width": 5334,
+      "height": 4000,
+      "author": "Mohamm3dfadil",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:DSC_0658-Recovered.jpg",
+      "caption": "Reconstructed brick walls at the ancient Mesopotamian city of Babylon, near Hillah, Iraq, one proposed site of 1 Peter 5:13's \"Babylon.\"",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "babylon-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Cairo_-_Coptic_area_-_Roman_Tower.JPG",
+      "width": 2328,
+      "height": 2246,
+      "author": "Daniel Mayer",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Cairo_-_Coptic_area_-_Roman_Tower.JPG",
+      "caption": "The Roman fortress known as Babylon, in Old Cairo, Egypt, another proposed site of 1 Peter 5:13's \"Babylon.\"",
+      "kind": "site",
+      "aiGenerated": false
+    }
+  ]
+}

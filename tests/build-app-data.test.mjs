@@ -33,6 +33,11 @@ const ancientCoastlinePath = path.join(
   "geo",
   "ancient-coastline.geojson"
 );
+const ancientRegionOutlinesPath = path.join(
+  ancientFixtureDirectory,
+  "geo",
+  "region-outlines.geojson"
+);
 const ancientEmpireEdgePath = path.join(
   ancientFixtureDirectory,
   "geo",
@@ -60,6 +65,10 @@ async function withTempDirectory(run) {
   } finally {
     await fs.rm(tempDirectory, { recursive: true, force: true });
   }
+}
+
+async function readJson(filePath) {
+  return JSON.parse(await fs.readFile(filePath, "utf8"));
 }
 
 function toDraftRecord(record) {
@@ -583,8 +592,12 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     assert.equal(timelinePayload.bibliography[0].id, "pleiades-place-resource");
     assert.equal(Array.isArray(timelinePayload.regionOutlineIds), true);
 
-    const stopPayload = JSON.parse(
-      await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")
+    const stopCatalogue = await readJson(
+      path.join(outputDirectory, "ancient.stop-catalogue.json")
+    );
+    const stopPayload = ancientBuilderTestOnly.expandStopPayloadFromCatalogue(
+      await readJson(path.join(outputDirectory, "ancient.stop.4bc.json")),
+      stopCatalogue
     );
     const galileeAt4bc = stopPayload.areas.find((area) => area.areaId === "galilee");
     assert.equal(galileeAt4bc?.heldFromYear, -4);
@@ -614,8 +627,9 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     assert.equal(stopPayload.romanEmpireEdge.type, "MultiLineString");
     assert.equal(typeof stopPayload.holderUnions, "object");
     assert.equal(typeof stopPayload.romanSideUnion, "string");
-    const ad44Payload = JSON.parse(
-      await fs.readFile(path.join(outputDirectory, "ancient.stop.ad44.json"), "utf8")
+    const ad44Payload = ancientBuilderTestOnly.expandStopPayloadFromCatalogue(
+      await readJson(path.join(outputDirectory, "ancient.stop.ad44.json")),
+      stopCatalogue
     );
     const pereaAtAd44 = ad44Payload.areas.find((area) => area.areaId === "perea");
     assert.equal(
@@ -651,6 +665,7 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     const outputFiles = await fs.readdir(outputDirectory);
     assert.ok(outputFiles.includes("ancient.roads.geojson"));
     assert.ok(outputFiles.includes("ancient.holder-unions.json"));
+    assert.ok(outputFiles.includes("ancient.stop-catalogue.json"));
     assert.ok(outputFiles.includes("ancient.region-outlines.json"));
     // The app's roads keep the drawing flags but, like the shapes, leave the provenance in data/geo/.
     const roadsPayload = JSON.parse(
@@ -691,6 +706,53 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     assert.ok(outputFiles.includes("ancient.coastline.geojson"));
     // No empire-edge source sits next to the valid case's data, so none is written.
     assert.equal(outputFiles.includes("ancient.empire-edge.geojson"), false);
+  });
+});
+
+test("ancient stop catalogue keeps each stop's areas, holder borders, and holder labels lossless", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    const [
+      timelineData,
+      ancientAreasData,
+      ancientRoadsData,
+      ancientCoastlineData,
+      regionOutlinesData
+    ] = await Promise.all([
+      readJson(ancientTimelinePath),
+      readJson(ancientAreasPath),
+      readJson(ancientRoadsPath),
+      readJson(ancientCoastlinePath),
+      readJson(ancientRegionOutlinesPath)
+    ]);
+
+    const buildResult = await buildAncientAppData({
+      timelineData,
+      ancientAreasData,
+      ancientRoadsData,
+      ancientCoastlineData,
+      regionOutlinesData,
+      outputDirectory,
+      includeLegacyStopPayloadsInResult: true
+    });
+    assert.ok(buildResult.legacyStopPayloadsById instanceof Map);
+    const stopCatalogue = await readJson(
+      path.join(outputDirectory, "ancient.stop-catalogue.json")
+    );
+
+    for (const stop of timelineData.stops) {
+      const compactStopPayload = await readJson(
+        path.join(outputDirectory, `ancient.stop.${stop.id}.json`)
+      );
+      const reconstructedStopPayload = ancientBuilderTestOnly.expandStopPayloadFromCatalogue(
+        compactStopPayload,
+        stopCatalogue
+      );
+      const legacyStopPayload = buildResult.legacyStopPayloadsById.get(stop.id);
+      assert.ok(legacyStopPayload, `expected legacy stop payload for '${stop.id}'`);
+      assert.deepEqual(reconstructedStopPayload.areas, legacyStopPayload.areas);
+      assert.deepEqual(reconstructedStopPayload.holderBorders, legacyStopPayload.holderBorders);
+      assert.deepEqual(reconstructedStopPayload.holderLabels, legacyStopPayload.holderLabels);
+    }
   });
 });
 
@@ -810,10 +872,14 @@ test("buildAppData supports ancient-source fixture directory", async () => {
 
     assert.equal(result.ancientBuild.generated, true);
 
-    const stopPayload = JSON.parse(
-      await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")
-    );
+    const stopPayload = await readJson(path.join(outputDirectory, "ancient.stop.4bc.json"));
     assert.ok(Array.isArray(stopPayload.holderLabels));
+    assert.ok(stopPayload.holderLabels.length > 0);
+    assert.equal(typeof stopPayload.holderLabels[0], "number");
+    const stopCatalogue = await readJson(
+      path.join(outputDirectory, "ancient.stop-catalogue.json")
+    );
+    assert.ok(Array.isArray(stopCatalogue.holderLabels));
 
     const outputFiles = await fs.readdir(outputDirectory);
     assert.ok(outputFiles.includes("ancient.empire-edge.geojson"));
@@ -945,6 +1011,26 @@ test("buildAppData fails when routes generated files exceed the gzip budget", as
   });
 });
 
+test("buildAppData fails when places.index.json exceeds the gzip budget", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await assert.rejects(
+      () =>
+        buildAppData({
+          locationsDirectory: path.join(validCaseDirectory, "locations"),
+          mediaDirectory: path.join(validCaseDirectory, "media"),
+          bibliographyPath: bibliographyFixturePath,
+          webVplPath: webFixturePath,
+          skipSnapshotChecksumCheck: true,
+          requireEmpireRoot: false,
+          requireModernCountries: false,
+          outputDirectory,
+          maxPlacesIndexGzipBytes: 1
+        }),
+      /places\.index\.json exceeds/u
+    );
+  });
+});
+
 test("buildRoutesAppData embeds cited bibliography entries sorted by id", async () => {
   await withTempDirectory(async (outputDirectory) => {
     await buildRoutesAppData({
@@ -1068,6 +1154,40 @@ test("buildAppData fails when ancient generated files exceed the gzip budget", a
   });
 });
 
+test("buildAppData includes ancient.stop-catalogue.json in the ancient startup gzip cap", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const baseOptions = {
+      locationsDirectory: path.join(validCaseDirectory, "locations"),
+      mediaDirectory: path.join(validCaseDirectory, "media"),
+      bibliographyPath: bibliographyFixturePath,
+      ancientSourceDirectory: ancientFixtureDirectory,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      requireModernCountries: false
+    };
+    const baselineResult = await buildAppData({
+      ...baseOptions,
+      outputDirectory: path.join(temporaryDirectory, "baseline")
+    });
+    const stopCatalogueFile = baselineResult.outputFiles.find(
+      (file) => file.file === "ancient.stop-catalogue.json"
+    );
+    assert.ok(stopCatalogueFile, "expected ancient.stop-catalogue.json output");
+    assert.ok(stopCatalogueFile.gzipBytes > 0);
+    const capWithoutCatalogue = baselineResult.ancientBuild.gzipBytes - stopCatalogueFile.gzipBytes;
+    await assert.rejects(
+      () =>
+        buildAppData({
+          ...baseOptions,
+          outputDirectory: path.join(temporaryDirectory, "capped-without-catalogue"),
+          maxAncientLayerGzipBytes: capWithoutCatalogue
+        }),
+      /Ancient startup layer generated files exceed/u
+    );
+  });
+});
+
 test("buildAppData fails when ancient region outlines exceed the separate gzip cap", async () => {
   await withTempDirectory(async (outputDirectory) => {
     await assert.rejects(
@@ -1176,8 +1296,12 @@ test("buildAncientAppData keeps label points inside concave polygons", async () 
       outputDirectory
     });
 
-    const stopPayload = JSON.parse(
-      await fs.readFile(path.join(outputDirectory, "ancient.stop.ad44.json"), "utf8")
+    const stopCatalogue = await readJson(
+      path.join(outputDirectory, "ancient.stop-catalogue.json")
+    );
+    const stopPayload = ancientBuilderTestOnly.expandStopPayloadFromCatalogue(
+      await readJson(path.join(outputDirectory, "ancient.stop.ad44.json")),
+      stopCatalogue
     );
     const label = stopPayload.holderLabels.find((entry) => entry.holderId === "holder-concave");
     assert.ok(label, "expected concave holder label");
@@ -1212,9 +1336,14 @@ test("buildAppData keeps every holder label point inside at least one held area"
       await fs.readFile(path.join(outputDirectory, "ancient.timeline.json"), "utf8")
     );
 
+    const stopCatalogue = await readJson(
+      path.join(outputDirectory, "ancient.stop-catalogue.json")
+    );
+
     for (const stop of timelinePayload.stops) {
-      const stopPayload = JSON.parse(
-        await fs.readFile(path.join(outputDirectory, `ancient.stop.${stop.id}.json`), "utf8")
+      const stopPayload = ancientBuilderTestOnly.expandStopPayloadFromCatalogue(
+        await readJson(path.join(outputDirectory, `ancient.stop.${stop.id}.json`)),
+        stopCatalogue
       );
       const holderPolygonsById = new Map();
       for (const assignment of stopPayload.areas) {

@@ -1,0 +1,83 @@
+{
+  "id": "sea-of-adria",
+  "names": {
+    "ancient": [
+      "Sea of Adria"
+    ],
+    "modern": "Ionian Sea / Adriatic Sea",
+    "modernCountries": [
+      "Greece",
+      "Italy",
+      "Albania"
+    ],
+    "alternate": [
+      "Adriatic Sea"
+    ],
+    "otherLanguages": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "region",
+  "prominence": "standard",
+  "naturalFeatureKind": "water",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Sea of Adria (label point, between Italy and Greece)",
+      "coordinates": [
+        19,
+        38
+      ],
+      "coordinateSource": "openbible:adriatic-sea",
+      "confidence": "high",
+      "support": "The International Standard Bible Encyclopedia traces how the name \"Adria,\" first applied only to the sea's northern end near the Italian town of Atria, was extended by various ancient writers to cover an area reaching \"even the waters between Crete and Malta\"; the first-century Jewish historian Josephus, in his autobiography, recounts being shipwrecked \"in the middle of the Adria\" and rescued by a ship sailing from Cyrene to Puteoli, a central Mediterranean crossing consistent with this wider area. OpenBible.info's point for this broader sense, covering both today's Adriatic and Ionian Seas, matches Wikidata's point for the Ionian Sea exactly.",
+      "sources": [
+        "openbible:adriatic-sea",
+        "wikidata:Q37495",
+        "bib:isbe-adria"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Sea of Adria is the body of water where Acts places Paul's ship as it was \"driven back and forth\" for fourteen days after a storm, before it neared the shore of Malta. The name, drawn from the Italian town of Atria near the mouth of the Po, first named only the sea's northern reach, but various ancient writers extended it to also cover the Ionian Sea and, in some authors, the waters between Crete and Malta, an area consistent with the ship's actual course.",
+    "sources": [
+      "openbible:adriatic-sea",
+      "bib:isbe-adria",
+      "scripture:Acts 27:27"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia documents the name's gradual spread in ancient usage: first confined to the sea near Atria, it grew to reach the Abruzzi and the Strait of Otranto, and in some ancient authors even to the Gulf of Taranto, the sea off Sicily, and the waters between Crete and Malta; the encyclopedia cites the sixth-century Byzantine historian Procopius placing Malta itself at the Adria's western edge.",
+      "sources": [
+        "bib:isbe-adria"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia compares Acts' account to the first-century Jewish historian Josephus's own report, in his autobiography, of being shipwrecked \"in the middle of the Adria\" and picked up by a ship sailing from Cyrene to Puteoli; the encyclopedia treats this as evidence for the same broad sense of \"Adria\" that Acts uses.",
+      "sources": [
+        "bib:isbe-adria"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 27:27",
+      "book": "Acts",
+      "textWEB": "But when the fourteenth night had come, as we were driven back and forth in the Adriatic Sea, about midnight the sailors surmised that they were drawing near to some land."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 101,
+      "entity": "Open sea between Roman Italy, Macedonia/Achaia, and the island of Crete; this feature has no single political area of its own on this map",
+      "sources": [
+        "bib:isbe-adria"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-11-06"
+}
